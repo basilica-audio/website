@@ -196,6 +196,42 @@
         "Delay-compensated signal path — bands time-aligned, oversampling latency reported to the host",
         "Full state save/recall"
       ]
+    },
+    {
+      "slug": "lancet",
+      "name": "Lancet",
+      "repo": "Lancet",
+      "role": "Dynamic EQ",
+      "tagline": "Cut where it counts — a surgical dynamic EQ with an analog soul.",
+      "description": "A six-band dynamic EQ named after the narrowest of Gothic arches: every band combines a static gain with a threshold-driven dynamic gain of up to ±12 dB — downward to tame resonances, harshness and boom only when they flare up, or upward for program-dependent presence. Each band listens to the untouched input through its own selective bandpass detector, so no band's move ever disturbs another's detection.",
+      "features": [
+        "Six bands — RBJ bells, with Low/High Shelf modes on the outer bands",
+        "Static Gain plus dynamic Range (±12 dB) per band — downward or upward",
+        "Per-band Threshold, Attack (0.5–100 ms) and Release (10–1000 ms)",
+        "Pre-chain band-filtered detectors — surgical selectivity, no inter-band interaction",
+        "Listen — solo exactly what a band's detector hears",
+        "Zero latency (minimum-phase biquads, no lookahead) — safe for tracking",
+        "Global Input/Output Trim and parallel Mix",
+        "Full state save/recall; 47-test DSP verification suite"
+      ]
+    },
+    {
+      "slug": "miserere",
+      "name": "Miserere",
+      "repo": "Miserere",
+      "role": "Parallel vocal chain",
+      "tagline": "Four voices, one prayer — the parallel vocal chain in a single unit.",
+      "description": "The classic parallel \"rough vocal template\" workflow as one plugin: a direct chain plus three parallel busses, each on its own fader. Where conventional channel strips run serial, Miserere sums a clean processed vocal with an opto-levelled sandwich, a smashed FET bus and a filtered slap — thick but dynamic, in a single unit.",
+      "features": [
+        "Bus A Direct — HPF, console-style 3-band EQ, FET compressor with GR metering, split-band de-esser, tape saturation",
+        "Bus B Opto — passive-style boost EQ into an opto leveler with true two-stage program-dependent release, plus an air shelf",
+        "Bus C Smash — all-buttons FET limiter character: ~20:1, mid-forward detection, drive",
+        "Bus D Slap — 60–180 ms filtered slap delay with tape-soft feedback and mono switch",
+        "Per-bus fader and mute, exclusive solo",
+        "Busses A–C stay sample-aligned — parallel summing never combs; zero latency",
+        "Works on more than vocals — parallel compression loves drums too",
+        "Full state save/recall; 65-test DSP verification suite"
+      ]
     }
   ]
 }
