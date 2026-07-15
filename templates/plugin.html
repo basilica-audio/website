@@ -1,0 +1,71 @@
+<nav class="breadcrumb" aria-label="Breadcrumb">
+  <a href="../index.html"><span aria-hidden="true">←</span> All plugins</a>
+</nav>
+<section class="product-hero">
+  <img class="product-icon" src="../assets/icons/{{slug}}.png" alt="{{name}} plugin icon" width="176" height="176">
+  <div class="product-intro">
+    <p class="eyebrow">{{role}}</p>
+    <h1>{{name}}</h1>
+    <p class="tagline">{{tagline}}</p>
+    <p class="formats">AU · VST3 · Standalone&ensp;·&ensp;macOS &amp; Windows&ensp;·&ensp;AGPL-3.0</p>
+    {{note}}
+  </div>
+</section>
+<div class="hairline" role="presentation"></div>
+<section class="section" aria-labelledby="about-heading">
+  <h2 id="about-heading">About</h2>
+  <p class="prose">{{description}}</p>
+</section>
+<section class="section" aria-labelledby="features-heading">
+  <h2 id="features-heading">Features</h2>
+  <ul class="features">
+{{features}}
+  </ul>
+</section>
+<section class="section" id="download" aria-labelledby="download-heading" data-repo="{{repo}}">
+  <h2 id="download-heading">Download</h2>
+  <div class="download-area" id="download-area" aria-live="polite">
+    <p class="download-fallback">The latest builds are published on
+      <a href="https://github.com/{{org}}/{{repo}}/releases/latest" rel="noopener">GitHub&nbsp;Releases</a>.
+    </p>
+  </div>
+  <div class="unsigned-note">
+    <p><strong>A note on unsigned binaries.</strong> These builds are not yet code-signed —
+    the signing and notarization pipeline is still in progress. Your operating system will
+    warn you on first launch:</p>
+    <ul>
+      <li><strong>macOS</strong> — Gatekeeper will block the first open. Right-click the plugin or app
+      and choose <em>Open</em>, or remove the quarantine flag in Terminal:
+      <code>xattr&nbsp;-dr&nbsp;com.apple.quarantine&nbsp;&lt;file&gt;</code>.</li>
+      <li><strong>Windows</strong> — SmartScreen may show “Windows protected your PC”.
+      Choose <em>More info</em> → <em>Run anyway</em>.</li>
+    </ul>
+    <p>Only ever do this for builds downloaded directly from this project’s GitHub releases.</p>
+  </div>
+</section>
+{{screenshots_section}}
+{{audio_section}}
+<section class="section" aria-labelledby="support-heading">
+  <h2 id="support-heading">Support development</h2>
+  <p class="prose">Basilica Audio is free software, built at night and tuned by ear.
+  If it earns a place in your session, you can help keep the candles lit.</p>
+  <!-- DONATIONS STUB — placeholder buttons, intentionally disabled.
+       Yves: wire the real GitHub Sponsors / Ko-fi / PayPal links here later,
+       then replace the <button disabled> elements with real <a class="donate-btn"> links. -->
+  <div class="donate-row">
+    <button type="button" class="donate-btn" disabled aria-describedby="donate-note">GitHub Sponsors</button>
+    <button type="button" class="donate-btn" disabled aria-describedby="donate-note">Ko-fi</button>
+    <button type="button" class="donate-btn" disabled aria-describedby="donate-note">PayPal</button>
+  </div>
+  <p class="stub-note" id="donate-note">Donation links are not wired up yet — they will go live soon.</p>
+</section>
+<section class="section" aria-labelledby="links-heading">
+  <h2 id="links-heading">Links</h2>
+  <ul class="link-list">
+    <li><a href="https://github.com/{{org}}/{{repo}}" rel="noopener">Source code on GitHub</a></li>
+    <li><a href="https://github.com/{{org}}/{{repo}}/blob/main/docs/manual.md" rel="noopener">User manual</a></li>
+    <li><a href="https://github.com/{{org}}/{{repo}}/releases" rel="noopener">All releases</a></li>
+    <li><a href="https://www.gnu.org/licenses/agpl-3.0" rel="noopener">License — GNU AGPL-3.0</a></li>
+  </ul>
+</section>
+<script src="../assets/js/releases.js" defer></script>

@@ -1,0 +1,5 @@
+# Build output — generated in CI, never committed
+dist/
+
+# macOS noise
+.DS_Store
