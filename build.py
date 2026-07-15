@@ -31,7 +31,7 @@ DIST = ROOT / "dist"
 ORG = "basilica-audio"
 
 SITE_NAME = "Basilica Audio"
-SITE_TAGLINE = "Eleven sacred-architecture DSP plugins for symphonic metal"
+SITE_TAGLINE = "Eleven sacred-architecture DSP plugins for heavy music"
 
 IMAGE_EXTS = {".png", ".jpg", ".jpeg", ".webp", ".gif"}
 AUDIO_EXTS = {".mp3", ".wav", ".ogg", ".flac", ".m4a"}

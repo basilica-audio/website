@@ -1,7 +1,7 @@
 # Basilica Audio — Product Website
 
 Static product site for the Basilica Audio plugin suite — eleven
-sacred-architecture DSP plugins for symphonic metal. Zero frameworks, zero
+sacred-architecture DSP plugins for heavy music. Zero frameworks, zero
 external dependencies: a small Python (stdlib-only) generator renders an
 overview page plus one product page per plugin.
 

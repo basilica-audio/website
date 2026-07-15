@@ -24,7 +24,7 @@
       "repo": "Tenebrae",
       "role": "High-gain distortion",
       "tagline": "A liturgy of shadows — cascaded high-gain distortion for the heaviest rhythm tone.",
-      "description": "A high-gain rhythm-guitar distortion aimed squarely at the core \"chug\" tone of symphonic metal: a tightening high-pass ahead of three cascaded, oversampled waveshaper stages — each progressively tighter and darker — followed by a passive-style 3-band tone stack. Pair it with a cabinet IR loader (such as Nave) for the final voicing.",
+      "description": "A high-gain rhythm-guitar distortion aimed squarely at the core \"chug\" tone of modern metal: a tightening high-pass ahead of three cascaded, oversampled waveshaper stages — each progressively tighter and darker — followed by a passive-style 3-band tone stack. Pair it with a cabinet IR loader (such as Nave) for the final voicing.",
       "features": [
         "Tight — high-pass pre-emphasis, 20–300 Hz, so palm mutes stay percussive",
         "Gain — 0–40 dB into the 3-stage waveshaper cascade",
@@ -78,7 +78,7 @@
       "repo": "Requiem",
       "role": "Cinematic convolution reverb",
       "tagline": "A cathedral in a box — cinematic convolution reverb for orchestral and choral space.",
-      "description": "A cinematic convolution reverb built for orchestral and choral space in symphonic metal productions — cathedral, hall, and chamber tails for strings, choir, and everything that needs to bloom into a wide, dark stereo image behind the wall of guitars. Its impulse response is generated procedurally, off the audio thread — or load your own WAV/AIFF IR to override it entirely.",
+      "description": "A cinematic convolution reverb built for orchestral and choral space in heavy productions — cathedral, hall, and chamber tails for strings, choir, and everything that needs to bloom into a wide, dark stereo image behind the wall of guitars. Its impulse response is generated procedurally, off the audio thread — or load your own WAV/AIFF IR to override it entirely.",
       "features": [
         "Procedural impulse response — generated from Decay, Damping, Space and Early/Late Balance; no sample library, no licensing",
         "Space — Cathedral / Hall / Chamber early-reflection density and spread",
@@ -95,8 +95,8 @@
       "name": "Seraph",
       "repo": "Seraph",
       "role": "Choir & vocal processor",
-      "tagline": "Voices from above — a choir and vocal processor for operatic symphonic metal.",
-      "description": "A channel-strip-style choir and vocal processor for operatic symphonic-metal vocals: it tames sibilance, adds airy openness above the vocal's natural top end, glues dynamics together with a gentle broadband compressor, and thickens a lead or choir line with a click-free four-voice doubler.",
+      "tagline": "Voices from above — a choir and vocal processor for operatic metal vocals.",
+      "description": "A channel-strip-style choir and vocal processor for operatic metal vocals: it tames sibilance, adds airy openness above the vocal's natural top end, glues dynamics together with a gentle broadband compressor, and thickens a lead or choir line with a click-free four-voice doubler.",
       "features": [
         "De-Ess — zero-latency dynamic EQ with tunable center frequency (3–12 kHz) and a Listen mode for tuning by ear",
         "Air — fixed 12 kHz high-shelf for openness above the presence range",
@@ -130,8 +130,8 @@
       "name": "Firmament",
       "repo": "Firmament",
       "role": "Stereo widener & imager",
-      "tagline": "Open the heavens — a stereo widener and imager for lush symphonic layers.",
-      "description": "A Mid/Side stereo widener and imager that gives lush symphonic-metal layers — strings, choirs, synth pads — a wider, more open stereo image without smearing the low end: an optional multiband crossover keeps sub-bass centered regardless of how wide the rest of the spectrum is pushed.",
+      "tagline": "Open the heavens — a stereo widener and imager for lush orchestral layers.",
+      "description": "A Mid/Side stereo widener and imager that gives lush orchestral layers — strings, choirs, synth pads — a wider, more open stereo image without smearing the low end: an optional multiband crossover keeps sub-bass centered regardless of how wide the rest of the spectrum is pushed.",
       "features": [
         "Width — 0–200% Mid/Side width scaling; 100% is an unmodified pass-through of the input image",
         "Bass Mono Freq / Low Width — optional crossover (0–500 Hz) that keeps sub-bass centered while the highs go wide",
@@ -149,7 +149,7 @@
       "repo": "Triptych",
       "role": "3-band multiband compressor",
       "tagline": "Three panels, one altarpiece — a 3-band multiband compressor for dense mixes.",
-      "description": "A three-band multiband compressor for dense symphonic-metal mixes: two Linkwitz-Riley crossovers split the signal into Low, Mid and High bands, each with its own full-featured compressor, console-style mute/solo, and an optional brickwall limiter on the high band.",
+      "description": "A three-band multiband compressor for dense, heavy mixes: two Linkwitz-Riley crossovers split the signal into Low, Mid and High bands, each with its own full-featured compressor, console-style mute/solo, and an optional brickwall limiter on the high band.",
       "features": [
         "Two crossovers — Low/Mid (40 Hz–1 kHz) and Mid/High (400 Hz–12 kHz) with enforced band-order separation under automation",
         "Per-band compression — Threshold, Ratio (up to 20:1), Attack, Release and Makeup for each of Low / Mid / High",
