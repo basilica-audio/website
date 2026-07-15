@@ -134,7 +134,7 @@ code {
   color: var(--ink);
 }
 .brand:hover { color: var(--gold-bright); text-decoration: none; }
-.brand img { border-radius: 50%; }
+.brand img { /* transparent squircle icon — no circle clip */ }
 
 .site-nav { display: flex; gap: 1.8rem; }
 .site-nav a {
@@ -284,8 +284,8 @@ main {
 
 .product-icon {
   flex: 0 0 auto;
-  border-radius: 50%;
-  box-shadow: 0 0 0 1px rgba(201, 162, 94, 0.35), 0 0 50px rgba(201, 162, 94, 0.1);
+  /* icons are transparent squircle cutouts — no clipping, alpha-following glow */
+  filter: drop-shadow(0 0 26px rgba(201, 162, 94, 0.16));
 }
 
 .eyebrow {
