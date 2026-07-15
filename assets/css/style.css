@@ -171,8 +171,8 @@ main {
 }
 
 .hero-emblem {
-  border-radius: 50%;
-  box-shadow: 0 0 0 1px rgba(201, 162, 94, 0.35), 0 0 60px rgba(201, 162, 94, 0.12);
+  /* icons are cut out (transparent PNG) — glow must follow the alpha shape */
+  filter: drop-shadow(0 0 30px rgba(201, 162, 94, 0.18));
 }
 
 .hero-title {
@@ -229,8 +229,8 @@ main {
 .card-icon {
   width: 92px;
   height: 92px;
-  border-radius: 50%;
-  box-shadow: 0 0 0 1px rgba(201, 162, 94, 0.25);
+  /* icons are cut out (transparent PNG) — no clipping ring */
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.5));
   margin-bottom: 0.9rem;
 }
 
