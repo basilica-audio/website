@@ -28,7 +28,7 @@ DIST = ROOT / "dist"
 # GitHub org login — SINGLE SOURCE OF TRUTH for the whole site (templates and
 # the client-side release fetcher both receive it from here). When the org is
 # renamed from "metal-up-your-ass" to "basilica-audio", change ONLY this line.
-ORG = "metal-up-your-ass"
+ORG = "basilica-audio"
 
 SITE_NAME = "Basilica Audio"
 SITE_TAGLINE = "Eleven sacred-architecture DSP plugins for symphonic metal"
