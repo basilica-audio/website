@@ -1,24 +1,28 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{html_lang}}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{{title}}</title>
+{{extra_head}}<title>{{title}}</title>
 <meta name="description" content="{{description}}">
+{{hreflang_tags}}
 <link rel="stylesheet" href="{{root}}assets/css/style.css">
 <link rel="icon" type="image/png" href="{{root}}assets/org.png">
 </head>
 <body data-org="{{org}}">
-<a class="skip-link" href="#main">Skip to content</a>
+<a class="skip-link" href="#main">{{skip_link}}</a>
 <header class="site-header">
   <a class="brand" href="{{root}}index.html">
     <img src="{{root}}assets/org.png" alt="" width="36" height="36">
-    <span>Basilica&nbsp;Audio</span>
+    <span>{{brand_name}}</span>
   </a>
-  <nav class="site-nav" aria-label="Site">
-    <a href="{{root}}index.html#plugins">Plugins</a>
-    <a href="https://github.com/{{org}}" rel="noopener">GitHub</a>
-  </nav>
+  <div class="header-nav-group">
+    <nav class="site-nav" aria-label="Site">
+      <a href="{{root}}index.html#plugins">{{nav_plugins}}</a>
+      <a href="https://github.com/{{org}}" rel="noopener">{{nav_github}}</a>
+    </nav>
+    {{lang_switch}}
+  </div>
 </header>
 <main id="main">
 {{content}}
@@ -31,8 +35,7 @@
     <span aria-hidden="true">·</span>
     <a href="https://www.gnu.org/licenses/agpl-3.0" rel="noopener">AGPL-3.0</a>
   </p>
-  <p class="footer-note">Free and open-source software under the GNU AGPL-3.0.
-  Binaries are currently unsigned — a code-signing and notarization pipeline is in progress.</p>
+  <p class="footer-note">{{footer_note}}</p>
 </footer>
 </body>
 </html>

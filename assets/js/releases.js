@@ -6,7 +6,11 @@
  * fallback link to the GitHub releases page simply stays in place.
  *
  * The GitHub org login is injected once by build.py into <body data-org="...">
- * — single source of truth, survives the upcoming org rename.
+ * — single source of truth, survives the upcoming org rename. The one piece
+ * of chrome copy this script renders ("Release notes & previous versions")
+ * is likewise injected per-page via data-release-notes-label on the
+ * data-repo section, sourced from build.py's STRINGS dict, so the German
+ * pages get the localized label too.
  */
 (function () {
   "use strict";
@@ -87,7 +91,7 @@
     var moreLink = document.createElement("a");
     moreLink.href = releasesPage;
     moreLink.rel = "noopener";
-    moreLink.textContent = "Release notes & previous versions";
+    moreLink.textContent = section.dataset.releaseNotesLabel || "Release notes & previous versions";
     more.appendChild(moreLink);
 
     area.textContent = "";
