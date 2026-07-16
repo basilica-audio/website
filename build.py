@@ -131,7 +131,7 @@ STRINGS = {
         "nav_plugins": "Plugins",
         "nav_github": "GitHub",
         "lang_switch_label": "Sprache",
-        "site_tagline": "Dreizehn DSP-Plugins in sakraler Architektur für schwere Musik",
+        "site_tagline": "Dreizehn DSP-Plugins in sakraler Architektur für Heavy Music",
         "site_description": ("Dreizehn DSP-Plugins in sakraler Architektur für schwere "
                               "Musik. Kostenlose Open-Source-Plugins (AU/VST3/Standalone) "
                               "für macOS und Windows, lizenziert unter AGPL-3.0."),
