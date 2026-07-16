@@ -79,6 +79,11 @@ STRINGS = {
         "download_label": "Download",
         "formats_line": "AU · VST3 · Standalone&ensp;·&ensp;macOS &amp; Windows&ensp;·&ensp;AGPL-3.0",
         "about_heading": "About",
+        "lore_heading": "Why the name?",
+        "signed_note": ("The macOS binaries are Developer-ID-signed, notarized by Apple "
+                        "and stapled — they install and open without Gatekeeper warnings. "
+                        "Windows builds are not yet Authenticode-signed; SmartScreen may "
+                        "warn about an unknown publisher."),
         "features_heading": "Features",
         "download_heading": "Download",
         "download_fallback": "The latest builds are published on {link}.",
@@ -118,8 +123,7 @@ STRINGS = {
         "link_license": "License — GNU AGPL-3.0",
         "release_notes_label": "Release notes & previous versions",
         "footer_note": ("Free and open-source software under the GNU AGPL-3.0. "
-                         "Binaries are currently unsigned — a code-signing and "
-                         "notarization pipeline is in progress."),
+                         "macOS binaries are Developer-ID-signed and notarized."),
         "manual_back": "Back to {name}",
         "manual_title_suffix": "User manual",
         "manual_description": "User manual for {name} — {site_name}.",
@@ -143,6 +147,12 @@ STRINGS = {
         "download_label": "Download",
         "formats_line": "AU · VST3 · Standalone&ensp;·&ensp;macOS &amp; Windows&ensp;·&ensp;AGPL-3.0",
         "about_heading": "Über dieses Plugin",
+        "lore_heading": "Woher der Name?",
+        "signed_note": ("Die macOS-Binaries sind Developer-ID-signiert, von Apple "
+                        "notarisiert und gestapelt — sie installieren und öffnen ohne "
+                        "Gatekeeper-Warnung. Windows-Builds sind noch nicht "
+                        "Authenticode-signiert; SmartScreen warnt eventuell vor einem "
+                        "unbekannten Herausgeber."),
         "features_heading": "Funktionen",
         "download_heading": "Download",
         "download_fallback": "Die aktuellen Builds werden auf {link} veröffentlicht.",
@@ -185,8 +195,7 @@ STRINGS = {
         "link_license": "Lizenz — GNU AGPL-3.0",
         "release_notes_label": "Release-Notes & frühere Versionen",
         "footer_note": ("Freie und quelloffene Software unter der GNU AGPL-3.0. "
-                         "Die Binaries sind derzeit unsigniert — eine Signierungs- und "
-                         "Notarisierungs-Pipeline ist in Arbeit."),
+                         "macOS-Binaries sind Developer-ID-signiert und notarisiert."),
         "manual_back": "Zurück zu {name}",
         "manual_title_suffix": "Bedienungsanleitung",
         "manual_description": "Bedienungsanleitung für {name} — {site_name}.",
@@ -561,11 +570,8 @@ def build_plugin_page(lang: str, plugin_tpl: str, base_tpl: str, plugin: dict, m
         "features_heading": s["features_heading"],
         "download_heading": s["download_heading"],
         "download_fallback": build_download_fallback(lang, ORG, plugin["repo"]),
-        "unsigned_title": s["unsigned_title"],
-        "unsigned_body": s["unsigned_body"],
-        "unsigned_macos": s["unsigned_macos"],
-        "unsigned_windows": s["unsigned_windows"],
-        "unsigned_footer": s["unsigned_footer"],
+        "signing_note": s["signed_note"],
+        "lore_section": lore_section(plugin, lang, s),
         "screenshots_section": screenshots_section(plugin, lang, root),
         "audio_section": audio_section(plugin, lang, root),
         "support_heading": s["support_heading"],
@@ -580,6 +586,18 @@ def build_plugin_page(lang: str, plugin_tpl: str, base_tpl: str, plugin: dict, m
     })
     ctx = base_context(lang, dir_, alt_dir, f"{name} — {role} | {SITE_NAME}", tagline, content)
     write_page(dir_, base_tpl, ctx)
+
+
+def lore_section(plugin: dict, lang: str, s: dict) -> str:
+    lore = loc(plugin, lang, "lore") if plugin.get("lore") else ""
+    if not lore:
+        return ""
+    return (
+        '<section class="section" aria-labelledby="lore-heading">\n'
+        f'  <h2 id="lore-heading">{s["lore_heading"]}</h2>\n'
+        f'  <p class="prose lore">{html.escape(lore)}</p>\n'
+        '</section>'
+    )
 
 
 def build_manual_page(lang: str, manual_tpl: str, base_tpl: str, plugin: dict, manuals_present: dict) -> None:

@@ -656,3 +656,15 @@ main {
   max-width: 46em;
   margin: 0 auto;
 }
+
+.signing-note {
+  margin-top: 1rem;
+  font-size: 0.88rem;
+  color: var(--ink-muted);
+}
+
+.prose.lore {
+  font-family: var(--serif);
+  font-style: italic;
+  color: var(--gold);
+}

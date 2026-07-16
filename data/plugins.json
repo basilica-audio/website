@@ -30,8 +30,10 @@
           "Bypass — für den Host sichtbarer Soft Bypass, der überblendet statt zu klicken",
           "Oversampling — wählbar 2× / 4× / 8×",
           "Vollständiges Speichern und Abrufen des Plugin-Zustands"
-        ]
-      }
+        ],
+        "lore": "Die Ouvertüre ist das Eröffnungsstück — die ersten Takte, die entscheiden, wie sich alles danach anfühlt. Overture ist buchstäblich das Erste, was dein Gitarrensignal trifft: die Tightening-Stufe vor dem High-Gain-Amp, die das ganze Stück vorbereitet."
+      },
+      "lore": "An overture is the opening movement — the first notes that decide how everything after them will feel. Overture is literally the first thing your guitar signal meets: the tightening stage in front of the high-gain amp that sets up the whole piece."
     },
     {
       "slug": "tenebrae",
@@ -63,8 +65,10 @@
           "Bass / Mid / Treble — passiv-artiger Tonestack, ±15 dB pro Band",
           "Tone Voice — Flat/Scoop/Boost-Kippschalter für sofortige Rhythmus-Sound-Formen",
           "Level & Mix — Output-Trim und delay-kompensiertes Dry/Wet"
-        ]
-      }
+        ],
+        "lore": "Tenebrae — lateinisch für Finsternis — ist die Karwochen-Liturgie, in der die Kerzen eine nach der anderen gelöscht werden, bis eine einzige Flamme bleibt. Ein passender Name für eine High-Gain-Distortion aus kaskadierten Stufen: Jede nimmt etwas mehr Licht weg, und was bleibt, brennt heißer."
+      },
+      "lore": "Tenebrae — Latin for darkness — is the Holy Week service in which the candles are extinguished one by one until a single flame remains. A fitting name for a high-gain distortion built from cascaded stages: each one takes away a little more light, and what remains burns hotter."
     },
     {
       "slug": "nave",
@@ -94,8 +98,10 @@
           "LoCut / HiCut — Filter nach der Convolution (20–800 Hz / 2–20 kHz) mit expliziten Off-Positionen",
           "Mix & Level — Dry/Wet (Standard: voll wet) und ±24 dB Output-Trim",
           "State Recall umfasst beide geladenen IR-Dateipfade"
-        ]
-      }
+        ],
+        "lore": "Das Kirchenschiff (lateinisch navis) ist der große Hauptraum einer Kirche — der Raum, dessen Stein und Luft aus einer Stimme einen Klang machen. Nave tut dasselbe für deine Gitarre: Die Box ist der Körper, durch den dein verstärktes Signal spricht — und dieses Plugin ist dieser Körper."
+      },
+      "lore": "The nave is the vast central body of a church — the space whose stone and air turn a voice into a sound. Nave does the same for your guitar: the cabinet is the body your amplified signal speaks through, and this plugin is that body."
     },
     {
       "slug": "silentium",
@@ -129,8 +135,10 @@
           "Duck — invertiert den Gain Computer zu einem Ducker",
           "Listen — das Sidechain-Detection-Signal abhören",
           "External Sidechain Input — das Gate von einer anderen Spur aus keyen"
-        ]
-      }
+        ],
+        "lore": "Silentium ist die klösterliche Stille: nicht die Abwesenheit von Klang, sondern seine bewusste Disziplin. Genau das erzwingt das Lookahead-Gate — Stille zwischen den Noten, exakt dann, wenn du sie verlangst."
+      },
+      "lore": "Silentium is monastic silence: not the absence of sound, but its deliberate discipline. As a lookahead gate that is exactly what it enforces — silence between the notes, precisely when you demand it."
     },
     {
       "slug": "requiem",
@@ -162,8 +170,10 @@
           "Width — 0–200 % Mid/Side-Skalierung des Wet-Stereobilds",
           "User IR Override — lade deinen eigenen aufgenommenen Raum, gespeichert im Plugin-Zustand",
           "Latenzkompensiertes Mix und Output-Trim nach dem Mix"
-        ]
-      }
+        ],
+        "lore": "Ein Requiem ist die Totenmesse — Musik, geschrieben für riesige, steinüberwölbte Räume. Dieses Requiem erzeugt genau solche Räume: Kathedral- und Hall-Fahnen für Streicher, Chöre und alles, was hinter der Gitarrenwand aufblühen soll."
+      },
+      "lore": "A requiem is the mass for the dead — music written for vast, stone-vaulted spaces. This Requiem generates exactly those spaces: cathedral and hall tails for strings, choirs and everything that should bloom behind the wall of guitars."
     },
     {
       "slug": "seraph",
@@ -193,8 +203,10 @@
           "Double Detune / Width — Cent-Verstimmung und Stereobreite der verdoppelten Stimmen",
           "Mix & Output — gesamte Dry/Wet-Mischung und Output-Trim",
           "Keine gemeldete Latenz — nichts in der Kette benötigt Delay Compensation durch den Host"
-        ]
-      }
+        ],
+        "lore": "Seraphim sind der höchste Engelschor — jene, deren einzige Aufgabe das Singen ist. Seraph ist der Stimm-Spezialist der Suite: Air, De-Essing, Glue und Doubling für Leads und Chöre, die über einer sehr lauten Welt schweben müssen."
+      },
+      "lore": "Seraphim are the highest choir of angels — the ones whose only task is to sing. Seraph is the suite's voice specialist: air, de-essing, glue and doubling for leads and choirs that have to soar above a very loud world."
     },
     {
       "slug": "aureate",
@@ -226,8 +238,10 @@
           "Tone — Console-artiger Tilt EQ, plus unabhängige HF/LF-Trim-Shelfs (±6 dB)",
           "Mix — delay-kompensiertes Dry/Wet; 0 % ist ein sample-genauer Passthrough",
           "Vollständige Latenzmeldung für die Plugin Delay Compensation des Hosts"
-        ]
-      }
+        ],
+        "lore": "Aureate: vergoldet. Blattgold ändert nie, woraus ein Altar gemacht ist — es bringt ihn zum Leuchten. Aureates Tape- und Konsolen-Saturation tut dasselbe mit Streichern, Bläsern und Bussen: Das Material bleibt, die Oberfläche wird warm."
+      },
+      "lore": "Aureate: gilded. Gold leaf never changes what an altar is made of — it makes it glow. Aureate's tape and console saturation does the same to strings, brass and busses: the material stays, the surface warms."
     },
     {
       "slug": "firmament",
@@ -259,8 +273,10 @@
           "Keine Latenz — TPT-Linkwitz-Riley-Crossover, kein Oversampling, kein Lookahead an irgendeiner Stelle",
           "Laufende Korrelationsschätzung für ein zukünftiges GUI-Meter zugänglich gemacht",
           "Output — ±24 dB Trim"
-        ]
-      }
+        ],
+        "lore": "Das Firmament ist das Himmelsgewölbe — das Weiteste, worauf je ein Mensch geblickt hat. Als Mid/Side-Widener öffnet Firmament genau dieses Gewölbe über deinem Mix, während der Bass am Boden verankert bleibt."
+      },
+      "lore": "The firmament is the vault of heaven — the widest thing anyone has ever looked at. As a Mid/Side widener, Firmament opens exactly that dome above your mix while the bass stays anchored to the ground."
     },
     {
       "slug": "triptych",
@@ -290,8 +306,10 @@
           "Keine zusätzliche Latenz — Crossover und Hüllkurven mit Minimalphase, kein Lookahead",
           "Output — Master-Trim, ±24 dB",
           "Vollständiges Speichern und Abrufen des Plugin-Zustands"
-        ]
-      }
+        ],
+        "lore": "Ein Triptychon ist ein dreiflügeliges Altarbild: drei Tafeln, zu einem Werk verbunden. Triptych teilt dein Signal in drei Bänder — Low, Mid, High — komprimiert jedes auf seiner eigenen Tafel und klappt sie wieder zu einem Bild zusammen."
+      },
+      "lore": "A triptych is a three-panel altarpiece: three images, hinged into one work. Triptych splits your signal into three bands — low, mid, high — compresses each on its own panel, and hinges them back into one picture."
     },
     {
       "slug": "apotheosis",
@@ -323,8 +341,10 @@
           "Dither — Off / 16-Bit / 24-Bit TPDF auf der Output-Wortlänge",
           "Metering — Gain Reduction, True Peak des Outputs sowie Momentary/Short-Term/Integrated LUFS (engine-seitig)",
           "Vollständiges Speichern und Abrufen des Plugin-Zustands"
-        ]
-      }
+        ],
+        "lore": "Apotheose: die Erhebung eines Werks über das Menschliche hinaus — der letzte Schritt, nach dem nichts mehr verändert werden darf. Als True-Peak-Limiter ganz am Ende der Kette spricht Apotheosis das letzte Wort, bevor ein Mix in die Ewigkeit entlassen wird."
+      },
+      "lore": "Apotheosis: the elevation of a work beyond the human — the final step, after which nothing more may be changed. As the true-peak limiter at the very end of the chain, it speaks the last word before a mix leaves for eternity."
     },
     {
       "slug": "crypta",
@@ -357,8 +377,10 @@
           "IR Loader — Cabinet-Simulation auf der Output-Stufe",
           "Delay-kompensierter Signalweg — Bänder zeitlich ausgerichtet, Oversampling-Latenz wird an den Host gemeldet",
           "Vollständiges Speichern und Abrufen des Plugin-Zustands"
-        ]
-      }
+        ],
+        "lore": "Die Krypta liegt unter der Basilika: der älteste, tiefste Raum, der das gesamte Gebäude auf den Schultern trägt. Crypta ist das Bass-Fundament der Suite — gesplittet, komprimiert und angezerrt, damit das Low End alles darüber trägt."
+      },
+      "lore": "The crypt lies beneath the basilica: the oldest, deepest room, carrying the entire building on its shoulders. Crypta is the suite's bass foundation — split, compressed and driven so the low end carries everything above it."
     },
     {
       "slug": "lancet",
@@ -390,8 +412,10 @@
           "Keine Latenz (Minimalphasen-Biquads, kein Lookahead) — sicher für Tracking",
           "Globales Input/Output-Trim und paralleles Mix",
           "Vollständiges Speichern und Abrufen des Plugin-Zustands; 47-Test-DSP-Verifikationssuite"
-        ]
-      }
+        ],
+        "lore": "Lanzettfenster sind die schmalsten aller gotischen Bögen — hohe, spitze Lichtschlitze. Und eine Lanzette ist ein Skalpell. Beide Lesarten sind dieses Plugin: bis zu sechs schmale Bänder, die präzise, dynamische Schnitte setzen — genau dort und nur dann, wenn das Material sie braucht."
+      },
+      "lore": "Lancet windows are the narrowest of Gothic arches — tall, pointed slits of light. And a lancet is a surgeon's blade. Both readings are this plugin: up to six narrow bands making precise, dynamic incisions exactly where — and only when — the material needs them."
     },
     {
       "slug": "miserere",
@@ -423,8 +447,10 @@
           "Busse A–C bleiben sample-aligned — paralleles Summing erzeugt nie Kammfiltereffekte; keine Latenz",
           "Funktioniert nicht nur bei Vocals — parallele Kompression liebt auch Drums",
           "Vollständiges Speichern und Abrufen des Plugin-Zustands; 65-Test-DSP-Verifikationssuite"
-        ]
-      }
+        ],
+        "lore": "Miserere mei, Deus — Psalm 51. Gregorio Allegri vertonte ihn um 1638 für die Sixtinische Kapelle, geschrieben für zwei sich abwechselnde Chöre. Der Vatikan hütete die Partitur weit über ein Jahrhundert — bis ein vierzehnjähriger Mozart sie einmal hörte und aus dem Gedächtnis niederschrieb. Ein lang gehütetes Geheimnis, zwei parallel geführte Chöre, eine Stimme über allem: Kein Name passt besser zu diesem Plugin. Miserere verpackt den gehüteten parallelen Vocal-Workflow der großen Mixer — mehrere bearbeitete ‚Chöre' laufen unter deiner unangetasteten Lead-Stimme."
+      },
+      "lore": "Miserere mei, Deus — Psalm 51. Gregorio Allegri set it for the Sistine Chapel around 1638, written for two choirs in alternation. The Vatican guarded the score for well over a century — until a fourteen-year-old Mozart heard it once and wrote it down from memory. A long-guarded secret, two choirs running in parallel, one voice above everything: no name fits this plugin better. Miserere packages the guarded parallel vocal workflow of the great mixers — several processed 'choirs' running underneath your untouched lead voice."
     }
   ]
 }
