@@ -164,8 +164,9 @@ STRINGS = {
                              "GitHub-Releases dieses Projekts stammen."),
         "screenshots_heading": "Screenshots",
         "screenshots_empty": "Kommt mit dem nächsten Release.",
-        "screenshots_empty_sub": ("Die eigene Oberfläche ist derzeit in Arbeit — "
-                                   "Screenshots erscheinen hier, sobald sie fertig ist."),
+        "screenshots_empty_sub": ("Die individuelle Oberfläche befindet sich aktuell in "
+                                   "der Gestaltung — Screenshots erscheinen hier, sobald "
+                                   "sie fertig ist."),
         "audio_heading": "Hörbeispiele",
         "audio_empty": "Kommt mit dem nächsten Release.",
         "audio_empty_sub": ("Vorher/Nachher-Clips werden gerade aufgenommen — "

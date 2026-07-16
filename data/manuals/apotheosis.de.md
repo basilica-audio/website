@@ -1,0 +1,57 @@
+<!-- German translation of apotheosis.en.md — maintained by hand; re-translate after the English source changes (see website/README.md). -->
+
+<p align="center"><img src="assets/icon.png" alt="Apotheosis-Icon" width="120"/></p>
+
+# Apotheosis — Bedienungsanleitung
+
+*Die letzte Erhebung — ein Lookahead-True-Peak-Brickwall-Limiter für den Master.*
+
+## Was es ist
+
+Apotheosis ist ein Lookahead-**True-Peak-Brickwall-Limiter** mit Oversampling für den Master-Bus. Er ist der letzte Prozessor vor Export/Streaming, kein Allzweck-Kompressor: Seine einzige Aufgabe ist es, zu garantieren, dass der True Peak (Inter-Sample, aus dem zeitkontinuierlichen Signal rekonstruiert) des Ausgangs eine von dir gesetzte Ceiling nie überschreitet — bei möglichst geringem sonstigem Einfluss auf den Klang. Stellst du zusätzlich etwas Clip Mix ein, bekommst du obendrauf einen zweiten, aggressiveren „Clipper"-Charakter, ohne dass diese Garantie verloren geht.
+
+## Wo es in einer intensiven Produktionskette sitzt
+
+Apotheosis gehört ganz ans Ende des **Master-Bus**, nachdem jeder andere Prozessor seine Arbeit getan hat:
+
+```
+Mix bus -> EQ / bus compression / saturation -> Apotheosis (true-peak limiter) -> export / streaming platform
+```
+
+Er ist nicht für einzelne Spuren gedacht (Gitarren, Drums, Vocals) — setze ihn einmal, auf dem Master, als finales Sicherheitsnetz und Loudness-Stufe vor dem Bounce ein. Da er im True-Peak-Bereich (mit Oversampling) statt nur im Sample-Bereich arbeitet, schützt er dich außerdem vor Inter-Sample-Overshoot, den ein reiner Sample-Peak-Limiter übersehen würde — der Art von Overshoot, die nach der Transkodierung eines Tracks in ein verlustbehaftetes Format (MP3/AAC) fürs Streaming als Clipping/Verzerrung auftaucht, obwohl die Originaldatei auf einem normalen Peak-Meter „sicher" aussah.
+
+## Signalfluss
+
+```
+Input -> Input Gain -> [4x oversampled] true-peak detect -> lookahead min-gain envelope -> Release (curve-shaped)
+                                                                          |
+                    Output <-- Dither <-- ceiling clamp <-- Clip Mix blend <-- apply gain to lookahead-delayed signal <-+
+```
+
+Input Gain, True-Peak-Erkennung, die Lookahead-Gain-Reduction-Hüllkurve, die Release-Kurve, die Clip-Mix-Blende und die finale Ceiling-Begrenzung passieren allesamt **innerhalb derselben 4x-oversampleten Domäne**, bevor wieder auf die Samplerate deines Projekts heruntergerechnet wird. Genau das sorgt dafür, dass die Nie-über-die-Ceiling-Garantie strukturell gilt statt nur der Ableitung nach: Der Limiter erkennt einen Peak nie in hoher Auflösung, um ihn danach zu korrigieren, nachdem diese Auflösung schon verworfen wurde. Die vollständige technische Aufschlüsselung, einschließlich des Latenzmodells und der Begründung für die interne Headroom-Marge, findest du in [`docs/architecture.md`](architecture.md).
+
+## Parameter-Referenz
+
+| Parameter | Range | Default | Unit | Was es bewirkt |
+|---|---|---|---|---|
+| **Input Gain** | -12 – +24 | 0 | dB | Trim, der vor der True-Peak-Erkennung angewendet wird — „wie hart triffst du die Ceiling". Erhöhe ihn, um den Limiter härter anzutreiben (mehr Gain Reduction, lauteres/stärker komprimiertes Ergebnis); senke ihn, wenn der eingehende Mix schon nah an der Ceiling liegt und du Apotheosis nur als transparentes Sicherheitsnetz willst. |
+| **Ceiling** | -12 – 0 | -1.0 | dBTP | Das Nie-überschreiten-True-Peak-Ziel. Der True Peak (Inter-Sample) des Ausgangs überschreitet diesen Wert nicht, unabhängig von jeder anderen Einstellung. -1.0 dBTP ist eine übliche Mastering-Sicherheitsmarge, die Raum für nachgelagerten Lossy-Encoding-Overshoot lässt; nutze -1.0 bis -2.0 dBTP für die meisten Streaming-Plattform-Ziele, oder gehe nur dann näher an 0 dBTP heran, wenn du das finale Auslieferungsformat selbst kontrollierst und weißt, dass es nicht neu enkodiert wird. |
+| **Release** | 5 – 1000 | 50 | ms | Wie schnell sich die Gain Reduction wieder Richtung Unity entspannt, sobald das Programmmaterial sie nicht mehr braucht. Es gibt keinen separaten Attack-Regler — der Attack ist immer instantan und knackfrei, ermöglicht durch das Lookahead-Delay (siehe unten), nicht durch eine Zeitkonstante. Ein schnellerer Release (kurze Werte) folgt Transienten enger und kann druckvoller, aber riskanter klingen (mehr hörbares Pumpen bei anhaltendem Material); ein langsamerer Release glättet die Gain Reduction, hält sie dafür länger nach einem Peak. |
+| **Lookahead** | 0.1 – 20 | 5 | ms | Wie weit der Limiter in die Zukunft „sehen" kann, um einen kommenden True Peak zu erkennen, bevor er den Ausgang erreicht — das ist der Mechanismus, der den instantanen, clipfreien Attack überhaupt erst ermöglicht. **Das ist ein „Setup"-Parameter, kein live automatisierbarer**: Er dimensioniert direkt Echtzeit-Buffer und ändert die vom Plugin gemeldete Latenz, daher wird eine Änderung erst beim nächsten Re-Initialisieren des Plugins durch deinen Host wirksam (Samplerate-Wechsel, Transport-Stop/Start in den meisten Hosts oder erneutes Öffnen des Projekts) — nicht sofort, während Audio läuft. Größere Werte fangen schnellere/steilere Transienten zuverlässiger ab, auf Kosten höherer gemeldeter Latenz (die deine DAW auf jeder Spur automatisch kompensiert, du musst sie also nicht manuell korrigieren). |
+| **Release Curve** | Exponential / Linear / Smooth | Exponential | – | Formt nur die *Release*-Phase (die Erholung) — der Attack ist unabhängig von dieser Wahl immer instantan. **Exponential** ist die klassische One-Pole-Rampe: schnelle initiale Erholung, die ausläuft — meist die transparenteste und „musikalischste" Standardeinstellung. **Linear** erholt sich stattdessen mit konstanter Rate statt auszulaufen, was mechanischer/offensichtlicher klingen kann, dafür aber sehr vorhersagbar ist. **Smooth** ist eine zweistufige Kaskade, die dem Einsetzen des Release einen weicheren, überschwingfreien Verlauf gibt — nützlich, wenn die anfängliche Erholungsgeschwindigkeit von Exponential hörbares Pumpen bei anhaltendem Material verursacht — auf Kosten eines insgesamt langsamer wahrgenommenen Release bei gleicher Release-Zeit. Der Wechsel der Release Curve ist eine diskrete Änderung (wie ein Stompbox-Schalter), kein sanft automatisierbarer Regler. |
+| **Clip Mix** | 0 – 100 | 0 | % | Blendet den transparenten Gain-Reduction-Limiter-Pfad (0 %, Standard) mit einem alternativen tanh-Soft-Clip-„Clipper"-Charakter (100 %), der direkt auf das Signal angewendet wird statt über Gain Reduction. Bei 0 % verhält sich Apotheosis exakt wie ein reiner Lookahead-Limiter. Ein höherer Clip Mix fügt allem, was die Ceiling erreicht, zunehmend präsentere, aggressivere/gesättigtere Höhen hinzu — eine gängige moderne Loudness-Maximizer-Technik, die etwas Transparenz gegen zusätzliche wahrgenommene Lautheit und einen „verklebteren"/aggressiveren Charakter eintauscht, passend zu den dichten, energiegeladenen Mastern von Heavy Music. Jede Mischung durchläuft weiterhin dieselbe finale harte Ceiling-Begrenzung, sodass die Nie-über-die-Ceiling-Garantie bei jeder Clip-Mix-Einstellung gilt. |
+| **Dither** | Off / 16-bit / 24-bit | Off | – | Fügt ganz am Ende der Kette, bei der Ausgangswortbreite, TPDF-Dither-Rauschen (Triangular Probability Density Function) hinzu — Standardpraxis, wenn dein finales Export-/Bit-Tiefen-Reduktionsziel 16-bit oder 24-bit ist, da es den Quantisierungsfehler in Rauschen statt harmonische Verzerrung dekorreliert. Lass es **Off**, wenn eine nachgelagerte Stufe (z. B. der eigene geditherte Bounce deiner DAW oder eine 32-bit-Float-Auslieferungspipeline) das Dithering bereits übernimmt — gestapeltes Dither hilft nicht und hebt den Rauschteppich unnötig zweimal an. Seine Amplitude ist winzig (höchstens 1 LSB bei der gewählten Bit-Tiefe, etwa -90 dBFS bei 16-bit und -138 dBFS bei 24-bit) und beeinflusst die True-Peak-Ceiling-Garantie nicht nennenswert. |
+
+## Metering (engine-seitig; GUI-Anzeige folgt in einem späteren Milestone)
+
+Die DSP-Engine von Apotheosis berechnet fortlaufend und stellt (über die Accessor-Methoden `getGainReductionDb()`, `getOutputTruePeakDb()`, `getMomentaryLufs()`, `getShortTermLufs()` und `getIntegratedLufs()` des Prozessors) die aktuelle Gain Reduction, den True Peak des Ausgangs sowie die Momentary- (400 ms), Short-Term- (3 s) und Integrated- (sitzungslaufend, absolute-gated) LUFS-Loudness-Werte bereit. Ein visuelles Meter, das diese Werte in der Plugin-UI zeigt, ist für den Custom-GUI-Milestone (M3) geplant; bis dahin stehen diese Daten jedem Host oder Test-Harness zur Verfügung, der den Prozessor direkt abfragt. Die K-Weighting-/Gating-Implementierungsdetails und die dokumentierten Abweichungen vom vollständigen Zwei-Pass-Algorithmus nach ITU-R BS.1770-4 findest du in [`docs/architecture.md`](architecture.md).
+
+## Tipps
+
+- **Nutze Input Gain, um zu bestimmen, wie hart du den Limiter antreibst — nicht den Fader deines Mix-Bus.** Deinen Mix vor dem Limiter auf einem sinnvollen Pegel zu halten und Input Gain für die Menge an Limiting zu nutzen, hält dein Gain-Staging bewusst und über Sessions hinweg reproduzierbar.
+- **-1.0 dBTP ist eine sichere Allzweck-Ceiling** für die meisten Streaming-Ziele. Kennst du deine genaue Auslieferungspipeline (z. B. eine Plattform mit veröffentlichter Loudness-/True-Peak-Spezifikation), passe die Ceiling an diese Spezifikation an, statt zu raten.
+- **Starte mit Release Curve auf Exponential.** Greife nur zu Linear oder Smooth, wenn dir etwas Konkretes auffällt, das du ändern willst (mechanisch klingende Erholung oder hörbares Pumpen) — sie sind Alternativen, keine Upgrades.
+- **Halte Clip Mix bei 0 % für Mastering-taugliche Transparenz**, und erhöhe ihn nur bewusst, wenn du den härteren, stärker gesättigten „modernen Loudness"-Charakter willst — das ist ein bewusster Trade-off, kein kostenloser Loudness-Bonus.
+- **Lass Dither aus, außer Apotheosis ist die allerletzte Stufe vor einem Bounce mit fester Bit-Tiefe.** Dithert der Export-/Bounce-Schritt deiner DAW bereits selbst, fügt das Aktivieren hier nur unnötiges zusätzliches Rauschen hinzu.
+- **Jage nicht 0 dBTP hinterher.** Die Ceiling ganz bis auf 0 dBTP zu schieben, entfernt deine Sicherheitsmarge gegen nachgelagerten Lossy-Encoding-Overshoot; -1.0 bis -2.0 dBTP ist nicht ohne Grund der übliche Bereich.
+- **Behalte dein Lookahead-/Latenz-Budget im Auge, wenn du Takes über mehrere Plugins hinweg vergleichst.** Da Lookahead erst beim nächsten `prepareToPlay()` wirksam wird, ist es irreführend, es mitten in der Session zu ändern und einen sofortigen hörbaren Unterschied zu erwarten — stopp und starte die Wiedergabe neu (oder öffne das Plugin neu), nachdem du es geändert hast.
