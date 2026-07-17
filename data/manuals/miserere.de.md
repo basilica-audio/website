@@ -1,144 +1,81 @@
-<!-- Generated from miserere/docs/manual.md on 2026-07-16 — do not hand-edit; re-run the manual sync described in website/README.md. -->
+<!-- German translation of miserere.en.md — maintained by hand; re-translate after the English source changes (see website/README.md). -->
 
-# Miserere — Benutzerhandbuch
+# Miserere — Bedienungsanleitung (v0.3.0)
 
-*Vier Stimmen, ein Gebet — die parallele Vocal-Chain in einem einzigen Plug-in.*
+*Vier Stimmen, ein Gebet — die parallele Vocal-Vorlage in einem einzigen Plug-in.*
 
 ## Was Miserere ist
 
-Miserere verpackt den klassischen „Rough Vocal Template"-Workflow des Parallel-Mixings in einem Plugin: eine **Direct**-Vocal-Chain plus drei **parallele Busse** — ein Opto-Leveler-Sandwich, ein aggressiver FET-Smash-Bus und ein Slap-Delay — jeweils mit eigenem Fader, Mute und Solo. Du mischst die vier Busse gegeneinander, statt an einer einzigen seriellen Chain zu schrauben.
+Miserere verpackt die dokumentierte **parallele Vocal-Vorlage der Ära 2010–2023** — den „Rough Vocal"-Workflow, der in öffentlichen Interviews von Mixing-Engineers wie Andrew Scheps populär gemacht wurde — in einem einzigen Plugin: einen **Direct**-Pfad plus vier **parallele Return-Busse** (CRUSH, SANDWICH, SPREAD, SLAP), jeder mit eigenem Return-Fader, Mute und Audition. Das ist eine dokumentierte, öffentlich belegte Technik aus dieser Ära (siehe `research-notes.md`), keine Befürwortung durch oder Verbindung zu einer namentlich genannten Person oder Marke.
 
-Klassische Channel Strips arbeiten seriell: Jedes Modul verarbeitet das, was das vorherige übrig gelassen hat, und „mehr Kompression" bedeutet immer „weniger Dynamik". Der Kern von Miserere ist ECHTES paralleles Routing.
-
-## Warum Parallel-Verarbeitung bei dichten, aber dynamischen Vocals gewinnt
-
-Eine Vocal in einem harten Mix hat zwei widersprüchliche Aufgaben: Sie muss **dicht** genug sein, um sich über eine Wand aus Gitarren zu setzen, und **dynamisch** genug, um noch nach einem Menschen zu klingen. Eine serielle Chain zwingt dich zur Entscheidung — hart komprimieren und die Performance verlieren, oder sanft komprimieren und den Kampf gegen die Gitarren verlieren.
-
-Parallel-Verarbeitung umgeht diese Entscheidung. Der Direct-Bus hält Transienten und Phrasierung der Vocal intakt; der Smash-Bus zerstört seine eigene Kopie des Signals (~20:1, schnell, mid-forward) und wird *unter* den direkten Sound gemischt. Je lauter die Sängerin oder der Sänger wird, desto härter limitiert der Smash-Bus — so bleibt die *Mischung* auf jedem Dynamikpegel dicht, während der Direct-Bus obendrüber weiter atmet. Der Opto-Bus ergänzt eine dritte Textur: langsames, musikalisches Leveling mit passiv anmutendem Low/High-Bloom, das den Körper auffüllt, ohne die Transienten anzutasten. Der Slap-Bus fügt das kurze, dunkle Echo hinzu, das eine trockene Vocal in einen produzierten Mix einklebt, ohne sie in Reverb zu ertränken.
-
-Da die Busse A–C ausschließlich aus minimalphasiger Verarbeitung ohne Lookahead aufgebaut sind, bleiben alle drei **sample-aligned** — du kannst jeden Fader beliebig schieben, ohne dass die Summe je kammfiltert oder hohl klingt. (Der Slap-Bus ist absichtlich ein Delay.)
+**Die Kernidee — und v2s Korrektur gegenüber v0.1.0**: Der Direct-Pfad ist ein Draht. Ab Werk ist jede optionale Sektion darauf AUS, sodass die trockene Vocal im Wesentlichen unangetastet durchläuft — ihre natürliche Hüllkurve und Phrasierung bleiben erhalten. Alles andere legt sich *darunter*, über die vier Return-Busse, die Kopien des Direct-Pfad-Outputs bei Unity sind, hart bearbeitet werden und dezent zurückgemischt werden. „Selbst mit all dem Zeug im Mix würdest du wahrscheinlich denken, die Vocal ist bone dry" ist das Kalibrierungsziel.
 
 ## Signalfluss
 
 ```
-                 ┌─ BUS A "Direct":  HPF → Console EQ → FET Comp → De-Esser → Tape Sat ── fader ─┐
-in ─ [In Trim] ─┼─ BUS B "Opto":    Passive EQ in → Opto Leveler → Passive Air out ───── fader ─┼─ Σ ─ [Out Trim] ─ out
-                 ├─ BUS C "Smash":   FET Limiter (all-buttons, mid-forward sidechain) ─── fader ─┤
-                 └─ BUS D "Slap":    Slap Delay (60–180 ms, filtered tape-soft feedback) ─ fader ─┘
+in → [In Trim] → DIRECT PATH (serial; every section optional, ALL OFF by default:
+                   De-Esser (pre) → FET Comp light → Console EQ → Sat → De-Esser (post))
+        │ = "the channel". Output feeds the sum at unity AND all four sends (unity taps):
+        ├─→ ① CRUSH    : FET limiter, all-buttons character        → return fader
+        ├─→ ② SANDWICH : Passive EQ → Opto Leveler → Passive EQ    → return fader
+        ├─→ ③ SPREAD   : dual micro-pitch (≈30/50 ms, ±cents, L/R) → return fader
+        └─→ ④ SLAP     : ≈110 ms dark single-repeat delay          → return fader
+   Σ (direct + returns) → [Parallel macro trim scales returns ①–④] → [Out Trim] → out
 ```
 
-Die technische Aufschlüsselung und die Design-Notizen zur Phasendisziplin findest du in [`architecture.md`](architecture.md).
+Die Busse ①/② sind minimalphasig und fügen keine Latenz hinzu, bleiben also sample-genau zum Direct-Pfad ausgerichtet — paralleles Summieren kammfiltert nie, unabhängig von den Einstellungen. Die Busse ③/④ sind by Design Delays (siehe `architecture.md`). Die belegten Erkenntnisse hinter jedem Default unten findest du in `research-notes.md`.
 
-## Die vier Busse, musikalisch betrachtet
+## Der Direct-Pfad
 
-### Bus A — Direct
+Standardmäßig aus, Sektion für Sektion, in Signalreihenfolge:
 
-Die Vocal, die du printen würdest: ein funktionierender Channel Strip, der brav bleibt.
+- **De-Ess Pre** — Split-Band-De-Esser, 4–9 kHz einstellbar, bis zu 10 dB Reduktion, platziert dort, wo die Dynamik der Vocal am größten ist (die dokumentierte „de-esse ganz am Anfang"-Regel).
+- **FET Comp** — ein leichter, threshold-basierter Kompressor im FET-Stil, fest bei 4:1, ausgelegt auf sanfte 3–4 dB Peak Gain Reduction — „die einzige Stelle, an der serielle Kompression authentisch ist" in dieser Topologie.
+- **Console EQ** — ein Raster im Stil der 1073-Klasse: HPF (18 dB/oct, 50/80/160/300 Hz), Low Shelf (±16 dB, 35/60/110/220 Hz), eine Mid Bell mit fixem Q (±18 dB, sechs gestufte Mittenfrequenzen), ein fixer 12-kHz-High-Shelf (±16 dB) und ein Drive-Regler, der dezente, Richtung 2./3. Ordnung tendierende Transformer-artige Harmonische beimischt.
+- **Sat** — der aus v1 übernommene Sättiger im Tape-Stil, eine optionale „Grit"-Stufe.
+- **De-Ess Post** — eine zweite De-Esser-Instanz am Ende der Kette, für Zischlaute, die Kompression oder EQ hervorgehoben haben.
 
-- **HPF** (20–300 Hz, 12 dB/oct, schaltbar) — entfernt Rumpeln, Plosiv-Peaks und Mud unterhalb der Stimme.
-- **Console EQ** — ein dreibandiger EQ im Stil britischer Konsolen: Low Shelf bei 100 Hz, eine sweepbare Mid Bell (250 Hz–5 kHz, Q 0.7–2), High Shelf bei 8 kHz, alle ±15 dB. Breite Pinselstriche, keine Chirurgie.
-- **FET Comp** — ein schneller Kompressor im FET-Stil mit 4:1 oder 8:1 Ratio und Makeup Gain. Das ist die „Peaks einfangen"-Stufe — 3–6 dB Gain Reduction auf den lautesten Zeilen ist die klassische Einstellung.
-- **De-Esser** — Split-Band, einstellbar 4–9 kHz, bis zu 10 dB Reduktion. Sitzt *nach* dem Kompressor, weil Kompression Zischlaute verstärkt.
-- **Tape Sat** — 0–24 dB Drive in eine Sättigungsstufe im Tape-Stil mit Pre-/De-Emphasis, pegelkompensiert auf einen nominalen Pegel von −18 dBFS: mehr Drive bedeutet mehr Dichte, nicht mehr Lautheit.
+## Die vier Return-Busse
 
-### Bus B — Opto
+### ① CRUSH — FET-Limiter, All-Buttons-Charakter
 
-Das „Sandwich": EQ in Leveler in EQ. Boost Lows und Highs *in* einen langsamen Leveler im optischen Stil hinein und lass ihn den Überschuss einfangen — der Passiv-EQ-plus-Opto-Kniff, der eine Stimme teuer klingen lässt.
+Kein Threshold-Regler: **Input** treibt das Signal in eine fixe, ratio-abhängige Threshold-/Knee-Tabelle. **Ratio** wählt 4:1/8:1/12:1/20:1/ALL (ALL ist eine plateauförmige Kurve mit bewusstem Give-back und einer kurzen Attack-Verzögerung, die Transienten durchschlagen lässt, bevor geklemmt wird — der „Snap"). **Attack**/**Release** sind 1–7-Regler, bei denen eine HÖHERE Zahl SCHNELLER bedeutet, passend zur Hardware-Konvention, an der sich das orientiert; Release ist zweistufig und programmabhängig (schnell nach kurzen Transienten, mehrfach langsamer nach anhaltend starker Kompression). **Style** schaltet zwischen All-Buttons und einer weicheren, fixen 2:1-**Gentle**-Voicing um. Dieser Bus soll solo „furchtbar" klingen (nutze Audition) und im Mix gut.
 
-- **Passive EQ in** — reiner Boost-Low-Shelf (60 oder 100 Hz, 0–10 dB) und High Shelf (8/10/12/16 kHz, 0–10 dB), breit und sanft.
-- **Opto Leveler** — programmabhängiges zweistufiges Release (~60 ms schnelle Stufe in eine ~600 ms langsame Stufe; je länger er schon arbeitet, desto träger löst er — wie eine echte Photozelle, die warmgelaufen ist), sanftes ~3:1-Ratio, fixer ~10 ms Attack. Ein Peak-Reduction-Regler plus Makeup.
-- **Passive Air out** — ein abschließender 12-kHz-Shelf (0–8 dB, nur Boost) *nach* dem Leveler, damit die Air nie pumpt.
+### ② SANDWICH — Passive EQ → Opto Leveler → Passive EQ
 
-### Bus C — Smash
+Zwei unabhängige Passive-EQ-Instanzen klammern einen Leveler im Opto-Stil ein. Jeder Passive EQ bietet einen gemeinsam-frequenten LF-**Boost** und -**Cut** (beide können gleichzeitig laufen — eine bewusst nicht-kompensierende Kurve, keine simple Summe auf Flat), einen HF-**Bell Boost** mit variabler Bandbreite und ein HF-**Shelf Atten**. Der Opto Leveler hat keinen Threshold: **Peak Reduction** treibt in eine fixe statische Kurve (weich ~3:1 unterhalb −20 dB, harte Decke darüber; **Limit** strafft den weichen Bereich Richtung ~10:1), mit einem Rohsignal-Detektor (kein Smoothing vor der Ballistik) und einem zweistufigen Release, dessen Ausklang sich verlängert, je länger er schon arbeitet. **Emphasis** macht den Detektor zunehmend HF-selektiv (bis zu −10 dB geringere LF-Empfindlichkeit), sodass er bei hohen Einstellungen hauptsächlich auf Zischlaute/Presence reagiert, „wie ein Multiband". **Residual** (standardmäßig an) behält den kleinen, nie ganz flachen Vintage-Tilt des Passive EQ; deaktiviere es für einen saubereren EQ.
 
-Ein Modul, null Subtilität: ein FET-Limiter im All-Buttons-in-Charakter. Ratio um 20:1, Attack bis hinunter zu 0,05 ms, programmabhängiges *Verkürzen* des Release (je härter limitiert wird, desto schneller erholt er sich — das „nach vorne pumpende" Gefühl), und ein Sidechain, der um +6 dB bei 2 kHz angehoben ist, sodass die Mitten — wo die Stimme lebt — das Limiting antreiben. **Drive** knallt das Eingangssignal in den fixen Threshold; **Output Trim** sorgt fürs Gain Staging der Trümmer. Misch ihn unter den Direct-Bus, bis die Vocal dicht wirkt, und zieh den Fader dann 2 dB zurück.
+### ③ SPREAD — Dual-Micro-Pitch
 
-### Bus D — Slap
+Zwei kurze Delay-Taps (~30 ms hochgepitcht, ~50 ms runtergepitcht), hart nach L/R gepannt. **Detune** setzt den Pitch-Offset in Cents (Default 6 — bewusst klein, damit das Ohr „nach außen geschoben" liest statt Chorus). **Time** skaliert beide Basis-Delays gemeinsam; **Width** blendet von einer vollständig mittigen Summe (0 %) zum vollen harten Pan (100 %).
 
-Ein Slap-Echo im Tape-Stil, ausschließlich Wet (für die trockene Stimme ist Bus A zuständig): 60–180 ms fraktionales Delay, bis zu 30 % Feedback, mit einem High-Pass-/Low-Pass-Filterpaar *und* sanfter Tape-Sättigung innerhalb der Feedback-Loop, sodass jede Wiederholung dunkler und runder wird. Ein **Mono**-Schalter kollabiert das Echo auf zentriertes Mono — der klassische Mono-Slap hinter einer breiten Vocal.
+### ④ SLAP — Single-Repeat Dark Delay
+
+**Time** (50–160 ms, Default 110 ms, reine Millisekunden — bewusst nicht tempo-synchronisiert). Feedback ist in v2 fest auf 0: Es gibt genau eine Wiederholung, und ihre Dunkelheit kommt aus einer eingebauten Voicing im Bucket-Brigade-Stil (**Tone** fährt einen progressiven HF-Verlust plus sanfte Sättigung, fest in diese eine Wiederholung eingebacken) statt aus einer gefilterten Feedback-Loop. **Stereo** schaltet vom standardmäßigen Mono-Return (der klassische Mono-Slap hinter einer stereoverbreiterten Vocal) auf unabhängige L/R-Delays um.
 
 ## Fader-Logik
 
-- Jeder Bus hat **Level** (−60…+6 dB; der untere Anschlag des Faders ist ein echtes Off), **Mute** und **Solo**.
-- **Solo ist exklusiv**: Wenn du einen Bus soloest, wird jedes andere Solo aufgehoben — du hörst immer genau einen Bus isoliert.
-- **Mute gewinnt gegen Solo** auf demselben Bus, wie an einer Konsole.
-- Ab Werk ist nur der Direct-Bus oben; die drei parallelen Busse starten am unteren Fader-Anschlag. Miserere tut nichts mit deiner Vocal, bis du einen Fader hochziehst.
+- Jeder Return-Bus hat **Level** (−60…+6 dB; der untere Anschlag ist ein echtes Off), **Mute** und **Audition**.
+- **Audition ist exklusiv** (das Aktivieren eines Busses hebt die anderen auf) und isoliert exakt das, was der Name sagt — der Direct-Pfad und die übrigen Busse sind ausgeschlossen, solange ein Bus auditioniert wird. Es heißt bewusst nicht „Solo": Der ganze Sinn der Technik ist, dass diese Busse nie isoliert *beurteilt* werden sollten, sondern nur genutzt werden, um gegenzuprüfen, was sie gerade tun.
+- **Mute gewinnt gegen Audition** auf demselben Bus, wie an einer Konsole.
+- **Link** (standardmäßig aus) lässt die Detektoren von Crush und Sandwich einem kombinierten L/R-Signal folgen statt jedem Kanal unabhängig — „Dual Mono" (ungelinkt) ist das dokumentierte Standardverhalten für diesen Verarbeitungsstil.
+- **Parallel** ist ein Makro-Trim (−24…+6 dB), der alle vier Return-Fader gemeinsam verschiebt — die „VCA-Ride-back"-Geste, um die gesamte Parallel-Ebene schnell zurückzunehmen.
 
-## Parameterübersicht
+## Presets
 
-| Parameter | Bereich | Standard | Einheit | Hinweise |
-|---|---|---|---|---|
-| In Trim / Out Trim | −12…+12 | 0 | dB | Globales Gain Staging rund um die gesamte Parallelstruktur. |
-| Bypass | off/on | off | – | Für den Host sichtbarer Bypass-Parameter. |
-| **Bus A — Direct** | | | | |
-| HPF / HPF Freq | off/on, 20–300 | on, 80 | Hz | 12 dB/oct High-Pass. |
-| EQ Low | −15…+15 | 0 | dB | Low Shelf, 100 Hz. |
-| Mid Freq / Mid Gain / Mid Q | 250–5k / −15…+15 / 0.7–2 | 1k / 0 / 1 | Hz, dB | Sweepbare Bell. |
-| EQ High | −15…+15 | 0 | dB | High Shelf, 8 kHz. |
-| Ratio | 4:1, 8:1 | 4:1 | – | Ratio des FET Comp. |
-| Threshold | −40…0 | −18 | dB | Threshold des FET Comp. |
-| Attack / Release | 0.1–10 / 50–1100 | 3 / 150 | ms | Ballistik des FET Comp. |
-| Makeup | 0…24 | 0 | dB | Makeup Gain des FET Comp. |
-| De-Ess / Freq / Thr | off/on, 4k–9k, −40…0 | on, 6.5k, −24 | Hz, dB | Split-Band, max. 10 dB Reduktion. |
-| Sat Drive | 0…24 | 6 | dB | 0 dB ist ein exakter Bypass. |
-| **Bus B — Opto** | | | | |
-| Low Boost Freq / Gain | 60/100, 0–10 | 100, 0 | Hz, dB | Reiner Boost-Shelf im passiven Stil. |
-| High Boost Freq / Gain | 8k/10k/12k/16k, 0–10 | 12k, 0 | Hz, dB | Reiner Boost-Shelf im passiven Stil. |
-| Peak Reduction | 0–100 | 40 | % | 0 % ist ein exakter Bypass. |
-| Makeup | 0…24 | 0 | dB | Gain nach dem Leveler. |
-| Air | 0…8 | 0 | dB | 12-kHz-Shelf nach dem Leveler. |
-| **Bus C — Smash** | | | | |
-| Attack / Release | 0.05–0.8 / 50–200 | 0.3 / 100 | ms | Release verkürzt sich bei starkem Limiting. |
-| Drive | 0…12 | 0 | dB | Eingangssignal knallt in den fixen Threshold. |
-| Output Trim | −12…+12 | 0 | dB | Gain Staging nach dem Limiter. |
-| **Bus D — Slap** | | | | |
-| Delay | 60–180 | 110 | ms | Fraktionales (sample-genaues) Delay. |
-| Feedback | 0–30 | 15 | % | Bedingungslos stabil. |
-| Loop HP / Loop LP | 50–1k / 2k–10k | 200 / 5k | Hz | Filter innerhalb der Feedback-Loop. |
-| Mono | off/on | off | – | Kollabiert das Echo auf Mono. |
-| **Pro Bus** | | | | |
-| Level | −60…+6 | A: 0, B/C/D: −60 | dB | −60 dB ist ein echtes Off. |
-| Mute / Solo | off/on | off | – | Solo exklusiv; Mute gewinnt. |
+Am oberen Rand des Editors sitzt eine Preset-Leiste: `[<] [Preset-Name*] [>] [Save] [Save As...] [Delete] [Import...] [Export...]`. Ein Klick auf den Preset-Namen öffnet ein Factory/User-Menü; ein angehängtes `*` bedeutet, dass das aktuelle Preset ungespeicherte Änderungen hat. Zehn Werkspresets sind ab Werk dabei (was jedes einzelne bewirkt, steht in `presets.md`); eigene Presets speichert Miserere unter `~/Library/Audio/Presets/Yves Vogl/Miserere/` auf macOS (`%APPDATA%/Yves Vogl/Miserere/Presets/` unter Windows). „Set current as default" im Preset-Menü macht ein beliebiges Preset — Werks- oder eigenes — zu dem, das auf jeder frischen Instanz automatisch geladen wird; „Import..." akzeptiert sowohl einzelne Preset-Dateien als auch Zip-Preset-Bänke.
 
-Alle kontinuierlichen Parameter sind geglättet (kein Zipper-Noise) und automatisierungssicher.
+## Starter-Rezept
 
-## Starter-Rezepte
+1. Lass den Direct-Pfad aus, oder ergänze De-Ess Pre / einen Hauch Console EQ, falls die Quelle es braucht. Lass FET Comp und Sat aus, außer die Vocal braucht ausdrücklich leichte Insert-Kompression.
+2. CRUSH startet standardmäßig bei −9 dB, mit dem ALL-Buttons-Charakter bereits aktiviert — dreh Input auf, bis Audition schwere, „solo eine Katastrophe" klingende Kompression zeigt, vertrau dann dem Default-Fader-Pegel und justiere von dort aus nach Gehör.
+3. SANDWICH startet bei −12 dB; erhöhe Peak Reduction, bis die Vocal dicker wird, ohne im Kontext hörbar zu pumpen.
+4. SPREAD und SLAP (standardmäßig −18 dB / −15 dB) sollten beide den „du merkst erst, dass es weg ist, wenn du es mutest"-Test bestehen — ist eines der beiden als eigenständiger Effekt hörbar, nimm es zurück.
+5. Nutze **Parallel**, um bei leiserem/organischerem Material die gesamte Ebene schnell zurückzunehmen.
 
-### Lead-Vocal (die Rough-Vorlage)
+## Bekannte Einschränkungen (v0.3.0)
 
-1. Bus A: HPF ~80–100 Hz, ein bis zwei dB Air im Bereich 10 kHz über EQ High, FET Comp bei 4:1 mit 3–5 dB Gain Reduction auf den lauten Zeilen, De-Esser an, Sat Drive auf dem Default von 6 dB.
-2. Zieh **Bus B** auf etwa −6 dB unter den Direct-Pegel hoch: Peak Reduction ~40–50 %, 2–3 dB Low Boost bei 100 Hz und High Boost bei 12 kHz. Die Stimme bekommt Körper und Glanz, ohne den Direct-Pfad zu EQen.
-3. Zieh **Bus C** vom Boden hoch, bis du ihn eher *fühlst* als hörst (meist −10 bis −6 dB unter dem Direct-Pegel), Drive nach Geschmack. Die Vocal verschwindet in den Chorus-Passagen nicht mehr.
-4. **Bus D**: 100–120 ms, Feedback ~10–15 %, Mono an, knapp an der Hörbarkeitsgrenze versteckt.
-
-### Aggressive Vocal (Screams, geschriene Leads)
-
-1. Bus A: HPF höher (~120 Hz), 8:1-Ratio, schnellerer Attack (~1 ms), niedrigerer De-Esser-Threshold — harte Quellen treffen härter.
-2. Bus C wird zum Star: Fader nur wenige dB unter dem Direct-Pegel, Drive 6–12 dB. Der mid-forward Sidechain hält das Limiting auf den Kern des Screams fokussiert, nicht auf Cymbal-Übersprechen.
-3. Bus B weglassen oder subtil halten — Opto-Bloom kann eine aggressive Quelle zu stark weichzeichnen.
-4. Bus D mit kürzerem Delay (60–80 ms) und Loop LP heruntergezogen auf ~3 kHz liest sich bei hoher Aggression eher als „Size" denn als „Echo".
-
-### Drum-Bus-Missbrauch
-
-Parallelkompression wurde auf Drums geboren, und Miserere kontrolliert nicht, was du ihm zuführst:
-
-1. Bus A fast neutral: HPF aus oder sehr niedrig, EQ flach, Comp-Threshold hoch (oder bei 0 dB für einen sauberen Durchlauf), De-Esser aus, Drive 0 — ein sauberer Direct-Pfad.
-2. Bus C laut hochziehen: Drive 6+ dB. Das ist der klassische All-Buttons-Parallel-Drum-Crush — explosive Room-Energie unter einem unangetasteten Close-Mic-Bild.
-3. Bus B statt (oder zusammen mit) C für eine rundere, verklebtere Dichte: 60 Hz Low und 10 kHz High in den Leveler hinein boosten.
-4. Bus D bei 60–80 ms mit Mono an fügt einen trashigen, kurzen Fake-Room hinzu. Eigentlich falsch, aber oft genial.
-
-## Tipps
-
-- **Stell zuerst den Direct-Bus alleine ein.** Soloe Bus A, bring ihn auf einen guten, leicht konservativen Vocal-Channel-Sound, dann *Solo aufheben* und die Parallel-Mischung darum herum aufbauen.
-- **Nutze für die Balance die Fader, nicht die Modul-Regler.** Das ist der ganze Sinn der Topologie: Sobald jeder Bus solo richtig klingt, mischst du sie wie Tracks.
-- **Der Smash-Bus soll solo furchtbar klingen.** Klingt er für sich allein gut, ist er vermutlich nicht stark genug komprimiert, um seinen Job in der Mischung zu erledigen.
-- **Behalte die Summe im Blick.** Drei Busse derselben Vocal summieren sich: 6–10 dB Headroom auf Out Trim sind normal, wenn alles hochgezogen ist.
-- **Null Latenz, parallel-sicher.** Miserere meldet 0 Samples Latenz und ist damit an jeder Stelle einer Chain sicher einsetzbar, auch neben anderen Parallel-Bussen in deiner DAW.
-
-## Bekannte Einschränkungen (v0.1.0)
-
-- Das GUI ist ein funktionaler Slider-/Knob-Editor (ein individuelles Vektor-GUI mit Nadelinstrumenten pro Bus ist Milestone M3).
-- Noch keine Werkspresets (M2).
-- Modul-Slots sind fest; austauschbare Alternativen pro Slot (z. B. eine VCA-artige Option in den Kompressor-Slots) sind ein Roadmap-Punkt für M2.
-- Die Tape-Sat-Stufe läuft in M1 ohne Oversampling — bei vocal-typischen Drive-Mengen liegen ihre Aliasing-Produkte weit unter dem Programmmaterial; ein Oversampling-Upgrade ist eine Voicing-Entscheidung für M2+.
-- Die Dynamikerkennung erfolgt auf allen Bussen pro Kanal (nicht stereo-linked); bei einer Stereoquelle mit stark asymmetrischem Bild können die beiden Kanäle leicht unterschiedlich komprimiert werden.
+- Das GUI ist ein funktionaler Slider-/Knob-Editor (ein individuelles Vektor-GUI mit Nadelinstrumenten pro Bus ist Milestone M3); die Preset-Leiste ist ein rein funktionaler Streifen, noch nicht neu gestaltet.
+- Außerhalb des Scopes von v2, als M2+/M3-Issues erfasst: ein kurzes Plate-Reverb-Modul, ein „BV Mode"-Preset, austauschbare Kompressor-Farben über die beiden CRUSH-Styles hinaus, externer Sidechain, ein Output-Limiter.
+- Die Dynamikerkennung ist bei Crush und Sandwich standardmäßig ungelinkt (unabhängiges L/R); Link lässt beide Kanäle einem gemeinsamen Detektor folgen.
+- Das Voicing ist im gesamten Plugin **recherchebasiert, nicht gegen Hardware-Einheiten gemessen** — die belegten Erkenntnisse und ihre Grenzen findest du in `research-notes.md`.

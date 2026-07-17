@@ -1,6 +1,6 @@
-<!-- Generated from nave/docs/manual.md on 2026-07-16 — do not hand-edit; re-run the manual sync described in website/README.md. -->
+<!-- German translation of nave.en.md — maintained by hand; re-translate after the English source changes (see website/README.md). -->
 
-<p align="center"><img src="assets/icon.png" alt="Nave icon" width="120"/></p>
+<p align="center"><img src="assets/icon.png" alt="Nave-Icon" width="120"/></p>
 
 # Nave-Benutzerhandbuch
 
@@ -48,6 +48,8 @@ Die Dateipfade beider Slots werden mit deiner Session/deinem Preset gespeichert,
 
 ### IR Blend
 
+Zwei unterschiedliche geladene IRs können selbst bei identischen Distance-/LoCut-/HiCut-/Mix-Einstellungen spürbar unterschiedlich laut klingen — Nave normalisiert die *Energie* jeder geladenen IR auf eine einheitliche Referenz (nicht ihre wahrgenommene Lautheit), und reale Cab-IRs unterscheiden sich in Länge/Spektralinhalt genug, dass dasselbe Energieziel trotzdem bei unterschiedlicher subjektiver Lautstärke landen kann. Das ist kein Bug, den du mit EQ ausgleichen solltest — greife stattdessen zu **Level**, um das Gain-Staging nach dem Tausch von IRs anzugleichen.
+
 Der Regler **IR Blend** überblendet zwischen IR A (0 %) und IR B (100 %). Typische Anwendungen:
 
 - **Zwei verschiedene Cabs** — ein straffes 4x12 mit einem boomigeren 2x12 nach Geschmack mischen, ohne ein separates Blending-Plugin zu brauchen.
@@ -59,13 +61,13 @@ Blend steht standardmäßig auf 0 % (nur IR A) — eine IR B zu laden und Blend 
 
 ### Distance (simulierter Mikrofonabstand)
 
-Der Regler **Distance** ist eine vereinfachte Emulation davon, das Mikrofon weiter vom Cab wegzurücken: bei höheren Einstellungen reduziert er sanft den Nahbesprechungseffekt im Bass und dämpft die Höhen leicht (simuliert hochfrequente Luftabsorption und Off-Axis-Verdunkelung). Es ist *kein* physikalisch exaktes Distanzmodell — es wird keine Pre-Delay-/Timing-Änderung angewendet — nur eine musikalisch nützliche klangliche Verschiebung, um eine zu nahe/zu helle IR im Mix zurückzuschieben, ohne zu einem separaten EQ greifen zu müssen.
+Der Regler **Distance** ist eine vereinfachte Emulation davon, das Mikrofon weiter vom Cab wegzurücken: Bei höheren Einstellungen reduziert er den Nahbesprechungseffekt im Bass und dämpft die Höhen leicht. Die Höhenverdunklung ist modelliert nach dem Verhalten eines echten Cabinets, dessen Höhen abfallen, wenn ein Mikrofon weiter zurück und aus der Achse bewegt wird — das wird sehr viel stärker von der Richtcharakteristik des Lautsprechers getrieben als von tatsächlicher Luftabsorption bei typischen Reamping-Abständen. Lies es also weniger als „die Luft zwischen Mikro und Cab" und mehr als „wie der Lautsprecher selbst seitlich weniger Höhen abstrahlt". Es ist *kein* physikalisch exaktes Distanzmodell — es wird keine Pre-Delay-/Timing-Änderung angewendet — nur eine musikalisch nützliche klangliche Verschiebung, um eine zu nahe/zu helle IR im Mix zurückzuschieben, ohne zu einem separaten EQ greifen zu müssen. Der Bassbereich reagiert im ersten Teil des Reglerwegs schneller und flacht Richtung 100 % ab, was dem Verhalten des echten Nahbesprechungseffekts entspricht — der Großteil der Änderung passiert früh, nicht gleichmäßig über den gesamten Regelweg verteilt.
 
 Distance steht standardmäßig auf 0 % ("aus" — an dieser Stelle der Chain wird gar keine Färbung angewendet, ein echter Passthrough).
 
 ## Parameterreferenz
 
-| Parameter | Range | Default | Unit | Was es tut |
+| Parameter | Range | Default | Unit | Was es bewirkt |
 |---|---|---|---|---|
 | **LoCut** | 20 – 800 | 20 (off) | Hz | Hochpassfilter nach der Convolution. Bei seinem Minimum (20 Hz, Default) ist es vollständig bypassed — ein echter Passthrough, nicht nur eine unhörbare Grenzfrequenz. Höher drehen, um eine boomige Cab-IR zu straffen oder Low-End-Mud zu zähmen, bevor das Low End auf dein Amp-/Bus-Processing trifft. |
 | **HiCut** | 2000 – 20000 | 20000 (off) | Hz | Tiefpassfilter nach der Convolution. Bei seinem Maximum (20 kHz, Default) ist es vollständig bypassed. Niedriger drehen, um Fizz, Härte oder überschüssige Höhen einer hellen IR zu zähmen — ein klassischer Move bei High-Gain-Metal-Gitarrensounds. |
@@ -73,6 +75,10 @@ Distance steht standardmäßig auf 0 % ("aus" — an dieser Stelle der Chain wir
 | **Distance** | 0 – 100 | 0 (off) | % | Simulierter Mikrofon-zu-Cab-Abstand: reduziert Nahbesprechungs-Bass und fügt mit steigendem Wert hochfrequente Verdunkelung hinzu. Siehe [Distance](#distance-simulierter-mikrofonabstand). |
 | **Mix** | 0 – 100 | 100 (fully wet) | % | Dry/Wet-Blend des vollständig verarbeiteten Signals gegen deinen Original-Input. Niedriger drehen für einen parallelen/gemischten Cab-Sound, oder um probehalber zu hören, wie viel vom Charakter der IR du wirklich willst. |
 | **Level** | -24 – +24 | 0 | dB | Output-Trim, zuletzt angewendet. Nutze es, um das Gain-Staging nach dem Wechseln von IRs oder dem Einstellen von Mix/Blend/Distance anzugleichen — all das kann den Gesamtpegel verschieben. |
+
+## Presets
+
+Am oberen Rand von Naves Editor sitzt eine Preset-Leiste: `[<] [Preset-Name] [>] [Save] [Save As...] [Delete] [Import...] [Export...]`. Klicke auf den Preset-Namen, um die vollständige Liste zu öffnen (zuerst Werkspresets, dann deine eigenen, beide alphabetisch); `<`/`>` blättern durch dieselbe Liste. Nave bringt acht Werkspresets mit — was jedes einzelne bewirkt, steht in [`docs/presets.md`](presets.md). Deine eigenen Presets speichert Nave unter `~/Library/Audio/Presets/Yves Vogl/Nave/` auf macOS (`%APPDATA%\Yves Vogl\Nave\Presets\` unter Windows); „Set current as default" (im Preset-Menü) bestimmt, was eine frisch eingefügte Instanz von Nave lädt. Import/Export akzeptieren beide einzelne Preset-Dateien; Import akzeptiert zusätzlich eine `.zip`-Preset-Bank, exportiert von `PresetManager::exportBank()`.
 
 ## Latenz
 
@@ -82,7 +88,6 @@ Nave nutzt aus gutem Grund JUCEs Zero-Latency-Convolution-Algorithmus — für R
 
 - **Beginne mit LoCut/HiCut auf ihren Defaults (aus)** und bringe sie erst ein, wenn die rohe IR Formung braucht — eine gut aufgenommene Cab-IR braucht oft wenig bis gar keine zusätzliche Filterung, und unnötige Filter kosten nur Headroom und CPU ohne Nutzen.
 - **Für einen druckvolleren Metal-Rhythmus-Sound** versuche, eine straffe, nah abgenommene 4x12-IR (IR A) mit einer kleinen Menge einer etwas dunkleren/räumlicheren IR B zu mischen (10–25 % Blend), statt zu einem zweiten Cab-Sim-Plugin zu greifen.
-- **Distance ist ein Feinschliff, kein Tone-Shaping-Tool** — brauchst du einen bestimmten Frequenzgang, nutze stattdessen LoCut/HiCut (oder deinen EQ danach); Distance ist für eine leichte "im Raum zurückschieben"-Anpassung gedacht.
+- **Distance ist ein Feinschliff, kein Tone-Shaping-Tool** — brauchst du einen bestimmten Frequenzgang, nutze stattdessen LoCut/HiCut (oder deinen EQ danach); Distance ist für eine leichte „im Raum zurückschieben"-Anpassung gedacht.
 - **Klingt eine geladene IR nach Blend-/Distance-Änderungen dünn oder boxig, prüfe Level** — weder Mix, Blend noch Distance sind gegeneinander gain-kompensiert, bewusst so gebaut (damit du immer genau weißt, was du hörst), was bedeutet, dass Level die eine Stelle ist, an der du einen daraus resultierenden Pegel-Mismatch korrigierst, bevor er auf deinen Mixbus trifft.
 - **Führe einen Null-Test mit deinen Default-Einstellungen durch**, falls du dir je unsicher bist, ob Nave dein Signal färbt: ohne geladene IR (oder mit IR A auf ihrem Default) und LoCut/HiCut/Distance allesamt auf ihren Defaults ist Nave ein zertifizierter bit-genauer Passthrough (siehe die projekteigenen Null-Tests in `tests/EngineTests.cpp` und `tests/CoverageTests.cpp`).
-</content>

@@ -10,11 +10,13 @@
       "features": [
         "Tight — high-pass pre-emphasis, 20–400 Hz, removes low end before the clipper",
         "Drive — 0–40 dB of gain into the clipper",
-        "Voicing — Asymmetric (the original \"808 boost\" character), Soft Symmetric, or Hard Clip, run inside oversampling to keep aliasing out",
-        "Tone — post-clip 4th-order low-pass, 1–8 kHz, for fizz control without touching the fundamental",
+        "Bite & Knee Soften — frequency-dependent and drive-dependent shaping inside the clipper stage (v0.2.0)",
+        "Voicing — Asymmetric (the original \"808 boost\" character, adjustable Asymmetry bias), Soft Symmetric, or Hard Clip, run inside oversampling to keep aliasing out",
+        "Bite Tilt — post-clip bidirectional tone tilt around a ~3 kHz corner, replacing v0.1's cut-only Tone",
         "Level & Mix — output trim and delay-compensated dry/wet; Mix at 0% is a sample-accurate passthrough",
         "Bypass — host-visible soft bypass that crossfades instead of clicking",
         "Oversampling — selectable 2× / 4× / 8×",
+        "Factory presets & preset management — browse/save/import/export via the in-plugin preset bar",
         "Full state save/recall"
       ],
       "de": {
@@ -24,11 +26,13 @@
         "features": [
           "Tight — Hochpass-Pre-Emphasis, 20–400 Hz, entfernt Bassanteile vor dem Clipper",
           "Drive — 0–40 dB Gain in den Clipper",
-          "Voicing — Asymmetric (der originale „808 Boost“-Charakter), Soft Symmetric oder Hard Clip, läuft innerhalb des Oversamplings, um Aliasing draußen zu halten",
-          "Tone — Lowpass 4. Ordnung nach dem Clip, 1–8 kHz, zur Fizz-Kontrolle, ohne die Grundfrequenz zu berühren",
+          "Bite & Knee Soften — frequenz- und drive-abhängige Formung innerhalb der Clipper-Stufe (v0.2.0)",
+          "Voicing — Asymmetric (der originale „808 Boost“-Charakter, mit einstellbarem Asymmetry-Bias), Soft Symmetric oder Hard Clip, läuft innerhalb des Oversamplings, um Aliasing draußen zu halten",
+          "Bite Tilt — bidirektionaler Tone-Tilt nach dem Clip um einen ~3-kHz-Eckpunkt, ersetzt das reine Cut-Tone von v0.1",
           "Level & Mix — Output-Trim und delay-kompensiertes Dry/Wet; Mix bei 0 % ist ein sample-genauer Passthrough",
           "Bypass — für den Host sichtbarer Soft Bypass, der überblendet statt zu klicken",
           "Oversampling — wählbar 2× / 4× / 8×",
+          "Werkspresets & Preset-Verwaltung — durchsuchen/speichern/importieren/exportieren über die Preset-Leiste im Plugin",
           "Vollständiges Speichern und Abrufen des Plugin-Zustands"
         ],
         "lore": "Die Ouvertüre ist das Eröffnungsstück — die ersten Takte, die entscheiden, wie sich alles danach anfühlt. Overture ist buchstäblich das Erste, was dein Gitarrensignal trifft: die Tightening-Stufe vor dem High-Gain-Amp, die das ganze Stück vorbereitet."
@@ -50,7 +54,10 @@
         "Bright — fixed pre-cascade high-shelf switch, modelled on an amp channel's bright switch",
         "Bass / Mid / Treble — passive-style tone stack, ±15 dB per band",
         "Tone Voice — Flat / Scoop / Boost one-switch tilt for instant rhythm-tone shapes",
-        "Level & Mix — output trim and delay-compensated dry/wet"
+        "Presence — post-cascade high-shelf at 2.4 kHz, independent of Bright's pre-cascade shelf (v0.2.0)",
+        "Gate — full-band noise gate after the cascade and tone stack, on by default (v0.2.0)",
+        "Level & Mix — output trim and delay-compensated dry/wet",
+        "Factory presets & preset management — browse/save/import/export via the in-plugin preset bar"
       ],
       "de": {
         "role": "High-Gain-Distortion",
@@ -64,7 +71,10 @@
           "Bright — fest eingestellter High-Shelf-Schalter vor der Kaskade, nachempfunden dem Bright-Switch eines Amp-Kanals",
           "Bass / Mid / Treble — passiv-artiger Tonestack, ±15 dB pro Band",
           "Tone Voice — Flat/Scoop/Boost-Kippschalter für sofortige Rhythmus-Sound-Formen",
-          "Level & Mix — Output-Trim und delay-kompensiertes Dry/Wet"
+          "Presence — High-Shelf nach der Kaskade bei 2,4 kHz, unabhängig von Brights Shelf vor der Kaskade (v0.2.0)",
+          "Gate — Full-Band-Noise-Gate nach Kaskade und Tone Stack, standardmäßig an (v0.2.0)",
+          "Level & Mix — Output-Trim und delay-kompensiertes Dry/Wet",
+          "Werkspresets & Preset-Verwaltung — durchsuchen/speichern/importieren/exportieren über die Preset-Leiste im Plugin"
         ],
         "lore": "Tenebrae — lateinisch für Finsternis — ist die Karwochen-Liturgie, in der die Kerzen eine nach der anderen gelöscht werden, bis eine einzige Flamme bleibt. Ein passender Name für eine High-Gain-Distortion aus kaskadierten Stufen: Jede nimmt etwas mehr Licht weg, und was bleibt, brennt heißer."
       },
@@ -84,6 +94,7 @@
         "Distance — simulated mic-to-cab distance (proximity-effect bass and air-absorption darkening)",
         "LoCut / HiCut — post-convolution filters (20–800 Hz / 2–20 kHz) with explicit off positions",
         "Mix & Level — dry/wet (default fully wet) and ±24 dB output trim",
+        "Factory presets & preset management — browse/save/import/export via the in-plugin preset bar",
         "State recall includes both loaded IR file paths"
       ],
       "de": {
@@ -97,6 +108,7 @@
           "Distance — simulierter Mic-to-Cab-Abstand (Proximity-Effekt-Bass und Verdunklung durch Luftabsorption)",
           "LoCut / HiCut — Filter nach der Convolution (20–800 Hz / 2–20 kHz) mit expliziten Off-Positionen",
           "Mix & Level — Dry/Wet (Standard: voll wet) und ±24 dB Output-Trim",
+          "Werkspresets & Preset-Verwaltung — durchsuchen/speichern/importieren/exportieren über die Preset-Leiste im Plugin",
           "State Recall umfasst beide geladenen IR-Dateipfade"
         ],
         "lore": "Das Kirchenschiff (lateinisch navis) ist der große Hauptraum einer Kirche — der Raum, dessen Stein und Luft aus einer Stimme einen Klang machen. Nave tut dasselbe für deine Gitarre: Die Box ist der Körper, durch den dein verstärktes Signal spricht — und dieses Plugin ist dieser Körper."
@@ -115,11 +127,12 @@
         "Lookahead — 0–20 ms head start so the gate never clips a pick attack; reported to the host as latency",
         "Attack / Hold / Release — full envelope control (0.1–50 ms / 0–500 ms / 5–500 ms)",
         "Range — floor attenuation down to −80 dB while closed",
-        "SC HPF — sidechain-only high-pass, 20–500 Hz, keeps hum from falsely holding the gate open",
+        "SC HPF / SC LPF — sidechain-only high-pass and low-pass (v0.2.0), band-limit detection onto the pick-attack transient range and keep hum from falsely holding the gate open",
         "Knee — 0–24 dB soft knee, from classic hard snap to smooth gain blend",
         "Duck — inverts the gain computer into a ducker",
         "Listen — audition the sidechain detection signal",
-        "External sidechain input — key the gate from another track"
+        "External sidechain input — key the gate from another track",
+        "Factory presets & preset management — browse/save/import/export via the in-plugin preset bar"
       ],
       "de": {
         "role": "Lookahead-Noise-Gate",
@@ -130,11 +143,12 @@
           "Lookahead — 0–20 ms Vorsprung, damit das Gate nie einen Pick-Anschlag beschneidet; wird dem Host als Latenz gemeldet",
           "Attack / Hold / Release — volle Hüllkurvenkontrolle (0,1–50 ms / 0–500 ms / 5–500 ms)",
           "Range — Grundabsenkung bis −80 dB im geschlossenen Zustand",
-          "SC HPF — Hochpass nur im Sidechain, 20–500 Hz, verhindert, dass Brummen das Gate fälschlich offen hält",
+          "SC HPF / SC LPF — Hoch- und Tiefpass nur im Sidechain (v0.2.0), begrenzen die Erkennung auf den Pick-Attack-Transientenbereich und verhindern, dass Brummen das Gate fälschlich offen hält",
           "Knee — 0–24 dB Soft Knee, vom klassischen harten Zuschnappen bis zum sanften Gain-Übergang",
           "Duck — invertiert den Gain Computer zu einem Ducker",
           "Listen — das Sidechain-Detection-Signal abhören",
-          "External Sidechain Input — das Gate von einer anderen Spur aus keyen"
+          "External Sidechain Input — das Gate von einer anderen Spur aus keyen",
+          "Werkspresets & Preset-Verwaltung — durchsuchen/speichern/importieren/exportieren über die Preset-Leiste im Plugin"
         ],
         "lore": "Silentium ist die klösterliche Stille: nicht die Abwesenheit von Klang, sondern seine bewusste Disziplin. Genau das erzwingt das Lookahead-Gate — Stille zwischen den Noten, exakt dann, wenn du sie verlangst."
       },
@@ -150,12 +164,15 @@
       "features": [
         "Procedural impulse response — generated from Decay, Damping, Space and Early/Late Balance; no sample library, no licensing",
         "Space — Cathedral / Hall / Chamber early-reflection density and spread",
+        "Size — continuous apparent-size axis within the chosen Space, independent of Decay (v0.2.0)",
+        "Bass Decay — 25–175% control over how much longer the low end rings relative to mid/high (v0.2.0)",
         "Freeze — sustains the tail's spectral content as a bounded, convolution-based pad",
         "Modulation — subtle chorus-style movement on the wet tail only; 0% is bit-identical",
         "Pre-Delay — 0–250 ms to keep rhythm parts tight while strings and choir bloom behind them",
         "Width — 0–200% mid/side scaling of the wet stereo image",
         "User IR override — load your own captured space, persisted in the plugin state",
-        "Latency-compensated Mix and post-mix Output trim"
+        "Latency-compensated Mix and post-mix Output trim",
+        "Factory presets & preset management — browse/save/import/export via the in-plugin preset bar"
       ],
       "de": {
         "role": "Cinematic-Convolution-Reverb",
@@ -164,12 +181,15 @@
         "features": [
           "Procedural Impulse Response — erzeugt aus Decay, Damping, Space und Early/Late Balance; keine Sample-Library, keine Lizenzierung",
           "Space — Cathedral/Hall/Chamber-Dichte und -Spread der frühen Reflexionen",
+          "Size — kontinuierliche Achse für die wahrgenommene Größe innerhalb des gewählten Space, unabhängig von Decay (v0.2.0)",
+          "Bass Decay — 25–175 % Kontrolle darüber, wie viel länger der Bassbereich im Vergleich zu Mid/High nachklingt (v0.2.0)",
           "Freeze — hält den spektralen Inhalt des Tails als begrenztes, convolution-basiertes Pad",
           "Modulation — subtile, Chorus-artige Bewegung nur auf dem Wet-Tail; 0 % ist bit-identisch",
           "Pre-Delay — 0–250 ms, damit Rhythmusparts tight bleiben, während Streicher und Chor dahinter aufblühen",
           "Width — 0–200 % Mid/Side-Skalierung des Wet-Stereobilds",
           "User IR Override — lade deinen eigenen aufgenommenen Raum, gespeichert im Plugin-Zustand",
-          "Latenzkompensiertes Mix und Output-Trim nach dem Mix"
+          "Latenzkompensiertes Mix und Output-Trim nach dem Mix",
+          "Werkspresets & Preset-Verwaltung — durchsuchen/speichern/importieren/exportieren über die Preset-Leiste im Plugin"
         ],
         "lore": "Ein Requiem ist die Totenmesse — Musik, geschrieben für riesige, steinüberwölbte Räume. Dieses Requiem erzeugt genau solche Räume: Kathedral- und Hall-Fahnen für Streicher, Chöre und alles, was hinter der Gitarrenwand aufblühen soll."
       },
@@ -183,26 +203,28 @@
       "tagline": "Voices from above — a choir and vocal processor for operatic metal vocals.",
       "description": "A channel-strip-style choir and vocal processor for operatic metal vocals: it tames sibilance, adds airy openness above the vocal's natural top end, glues dynamics together with a gentle broadband compressor, and thickens a lead or choir line with a click-free four-voice doubler.",
       "features": [
-        "De-Ess — zero-latency dynamic EQ with tunable center frequency (3–12 kHz) and a Listen mode for tuning by ear",
+        "De-Ess — zero-latency dynamic EQ with tunable center frequency (3–12 kHz), a Width control for the detection band (v0.2.0), and a Listen mode for tuning by ear",
         "Air — fixed 12 kHz high-shelf for openness above the presence range",
         "Gentle Compressor — single-knob broadband glue, scaling up to a deliberately gentle 3:1",
         "Doubler — four independently modulated, detuned voices at per-voice pan positions; click-free by design",
         "Double Detune / Width — cents detune and stereo spread of the doubled voices",
         "Mix & Output — overall dry/wet blend and output trim",
-        "Zero reported latency — nothing in the chain needs host delay compensation"
+        "Zero reported latency — nothing in the chain needs host delay compensation",
+        "Factory presets & preset management — browse/save/import/export via the in-plugin preset bar"
       ],
       "de": {
         "role": "Chor- & Vocal-Prozessor",
         "tagline": "Stimmen von oben — ein Chor- und Vocal-Prozessor für opernhafte Metal-Vocals.",
         "description": "Ein Chor- und Vocal-Prozessor im Channel-Strip-Stil für opernhafte Metal-Vocals: Er zähmt Sibilanzen, fügt luftige Offenheit oberhalb des natürlichen Vocal-Top-Ends hinzu, verklebt die Dynamik mit einem sanften Breitband-Kompressor und verdickt eine Lead- oder Chorstimme mit einem klickfreien Four-Voice-Doubler.",
         "features": [
-          "De-Ess — latenzfreier Dynamic EQ mit einstellbarer Mittenfrequenz (3–12 kHz) und einem Listen-Modus zum Abstimmen nach Gehör",
+          "De-Ess — latenzfreier Dynamic EQ mit einstellbarer Mittenfrequenz (3–12 kHz), einem Width-Regler für das Erkennungsband (v0.2.0) und einem Listen-Modus zum Abstimmen nach Gehör",
           "Air — fest eingestellter High-Shelf bei 12 kHz für Offenheit oberhalb des Präsenzbereichs",
           "Gentle Compressor — Breitband-Glue mit einem einzigen Regler, skaliert bis zu einem bewusst sanften 3:1",
           "Doubler — vier unabhängig modulierte, verstimmte Stimmen mit individuellen Pan-Positionen; von Grund auf klickfrei",
           "Double Detune / Width — Cent-Verstimmung und Stereobreite der verdoppelten Stimmen",
           "Mix & Output — gesamte Dry/Wet-Mischung und Output-Trim",
-          "Keine gemeldete Latenz — nichts in der Kette benötigt Delay Compensation durch den Host"
+          "Keine gemeldete Latenz — nichts in der Kette benötigt Delay Compensation durch den Host",
+          "Werkspresets & Preset-Verwaltung — durchsuchen/speichern/importieren/exportieren über die Preset-Leiste im Plugin"
         ],
         "lore": "Seraphim sind der höchste Engelschor — jene, deren einzige Aufgabe das Singen ist. Seraph ist der Stimm-Spezialist der Suite: Air, De-Essing, Glue und Doubling für Leads und Chöre, die über einer sehr lauten Welt schweben müssen."
       },
@@ -219,11 +241,12 @@
         "Character — Tape / Console / Valve saturator transfer-function families, 4× oversampled",
         "Warmth — saturator asymmetry plus a gentle tape-style pre-clip HF rolloff in one knob",
         "Bias — independent saturator asymmetry trim on top of Warmth",
-        "Wow/Flutter — tape-transport speed instability, off by default",
+        "Wow & Flutter — independent slow/fast tape-transport speed instability (v0.2.0 splits these into two controls), off by default",
         "Hiss — shaped tape-noise floor mixed into the wet path, off by default",
         "Tone — console-style tilt EQ, plus independent HF/LF trim shelves (±6 dB)",
         "Mix — delay-compensated dry/wet; 0% is a sample-accurate passthrough",
-        "Full latency reporting for host plugin-delay compensation"
+        "Full latency reporting for host plugin-delay compensation",
+        "Factory presets & preset management — browse/save/import/export via the in-plugin preset bar"
       ],
       "de": {
         "role": "Orchester-Saturation-Glue",
@@ -233,11 +256,12 @@
           "Character — Tape/Console/Valve-Übertragungsfunktionsfamilien des Saturators, 4× oversampelt",
           "Warmth — Saturator-Asymmetrie plus ein sanfter, tape-artiger HF-Rolloff vor dem Clip, in einem Regler",
           "Bias — unabhängiger Trim der Saturator-Asymmetrie zusätzlich zu Warmth",
-          "Wow/Flutter — Geschwindigkeitsinstabilität des Tape-Transports, standardmäßig aus",
+          "Wow & Flutter — unabhängige langsame/schnelle Geschwindigkeitsinstabilität des Tape-Transports (v0.2.0 trennt dies in zwei Regler), standardmäßig aus",
           "Hiss — geformtes Tape-Rauschen, in den Wet-Pfad gemischt, standardmäßig aus",
           "Tone — Console-artiger Tilt EQ, plus unabhängige HF/LF-Trim-Shelfs (±6 dB)",
           "Mix — delay-kompensiertes Dry/Wet; 0 % ist ein sample-genauer Passthrough",
-          "Vollständige Latenzmeldung für die Plugin Delay Compensation des Hosts"
+          "Vollständige Latenzmeldung für die Plugin Delay Compensation des Hosts",
+          "Werkspresets & Preset-Verwaltung — durchsuchen/speichern/importieren/exportieren über die Preset-Leiste im Plugin"
         ],
         "lore": "Aureate: vergoldet. Blattgold ändert nie, woraus ein Altar gemacht ist — es bringt ihn zum Leuchten. Aureates Tape- und Konsolen-Saturation tut dasselbe mit Streichern, Bläsern und Bussen: Das Material bleibt, die Oberfläche wird warm."
       },
@@ -252,13 +276,15 @@
       "description": "A Mid/Side stereo widener and imager that gives lush orchestral layers — strings, choirs, synth pads — a wider, more open stereo image without smearing the low end: an optional multiband crossover keeps sub-bass centered regardless of how wide the rest of the spectrum is pushed.",
       "features": [
         "Width — 0–200% Mid/Side width scaling; 100% is an unmodified pass-through of the input image",
-        "Bass Mono Freq / Low Width — optional crossover (0–500 Hz) that keeps sub-bass centered while the highs go wide",
-        "Auto Mono Safety — correlation-driven Side attenuation that reins in heavily out-of-phase sources",
+        "Bass Mono Freq / Low Width — optional crossover (0–600 Hz) that keeps sub-bass centered while the highs go wide",
+        "Auto Mono Safety — correlation-driven Side attenuation with a dead-zone and adjustable floor, plus an optional per-band mode (v0.2.0)",
+        "Decorrelate — gentler mono-compatible widening alternative to Haas Mode, at a smaller mono-fold-down cost (v0.2.0)",
         "Haas Mode — optional 0–40 ms widening for genuinely mono material; a clearly documented trade-off, off by default",
-        "Mono-safe by construction — the mono downmix is provably identical to the input's (Haas Mode aside)",
+        "Mono-safe by construction — the mono downmix is provably identical to the input's (Haas Mode/Decorrelate aside)",
         "Zero latency — TPT Linkwitz-Riley crossover, no oversampling, no lookahead anywhere",
         "Running correlation estimate exposed for a future GUI meter",
-        "Output — ±24 dB trim"
+        "Output — ±24 dB trim",
+        "Factory presets & preset management — browse/save/import/export via the in-plugin preset bar"
       ],
       "de": {
         "role": "Stereo-Widener & -Imager",
@@ -266,13 +292,15 @@
         "description": "Ein Mid/Side-Stereo-Widener und -Imager, der satten orchestralen Layern — Streichern, Chören, Synth-Pads — ein breiteres, offeneres Stereobild verleiht, ohne den Bassbereich zu verschmieren: Ein optionaler Multiband-Crossover hält den Sub-Bass zentriert, egal wie breit der Rest des Spektrums gezogen wird.",
         "features": [
           "Width — 0–200 % Mid/Side-Breitenskalierung; 100 % ist ein unverändertes Pass-Through des Eingangsbilds",
-          "Bass Mono Freq / Low Width — optionaler Crossover (0–500 Hz), der den Sub-Bass zentriert hält, während die Höhen breit werden",
-          "Auto Mono Safety — korrelationsgesteuerte Side-Abschwächung, die stark phasenverschobene Quellen einbremst",
+          "Bass Mono Freq / Low Width — optionaler Crossover (0–600 Hz), der den Sub-Bass zentriert hält, während die Höhen breit werden",
+          "Auto Mono Safety — korrelationsgesteuerte Side-Abschwächung mit Totzone und einstellbarer Untergrenze, plus optionalem Per-Band-Modus (v0.2.0)",
+          "Decorrelate — sanftere, mono-kompatible Alternative zu Haas Mode, mit geringeren Mono-Fold-down-Kosten (v0.2.0)",
           "Haas Mode — optionale Verbreiterung von 0–40 ms für echtes Mono-Material; ein klar dokumentierter Trade-off, standardmäßig aus",
-          "Mono-sicher von Grund auf — der Mono-Downmix ist nachweisbar identisch mit dem des Eingangs (Haas Mode ausgenommen)",
+          "Mono-sicher von Grund auf — der Mono-Downmix ist nachweisbar identisch mit dem des Eingangs (Haas Mode/Decorrelate ausgenommen)",
           "Keine Latenz — TPT-Linkwitz-Riley-Crossover, kein Oversampling, kein Lookahead an irgendeiner Stelle",
           "Laufende Korrelationsschätzung für ein zukünftiges GUI-Meter zugänglich gemacht",
-          "Output — ±24 dB Trim"
+          "Output — ±24 dB Trim",
+          "Werkspresets & Preset-Verwaltung — durchsuchen/speichern/importieren/exportieren über die Preset-Leiste im Plugin"
         ],
         "lore": "Das Firmament ist das Himmelsgewölbe — das Weiteste, worauf je ein Mensch geblickt hat. Als Mid/Side-Widener öffnet Firmament genau dieses Gewölbe über deinem Mix, während der Bass am Boden verankert bleibt."
       },
@@ -287,11 +315,12 @@
       "description": "A three-band multiband compressor for dense, heavy mixes: two Linkwitz-Riley crossovers split the signal into Low, Mid and High bands, each with its own full-featured compressor, console-style mute/solo, and an optional brickwall limiter on the high band.",
       "features": [
         "Two crossovers — Low/Mid (40 Hz–1 kHz) and Mid/High (400 Hz–12 kHz) with enforced band-order separation under automation",
-        "Per-band compression — Threshold, Ratio (up to 20:1), Attack, Release and Makeup for each of Low / Mid / High",
+        "Per-band compression — Threshold, Ratio (up to 20:1), Knee (v0.2.0), Attack, Release and Makeup for each of Low / Mid / High",
         "Per-band Mute/Solo — console semantics; compressors keep running under solo, so no re-attack pop on unmute",
         "High-band limiter — optional brickwall stage after the High band's compressor",
         "Zero added latency — minimum-phase crossovers and envelopes, no lookahead",
         "Output — master trim, ±24 dB",
+        "Factory presets & preset management — browse/save/import/export via the in-plugin preset bar",
         "Full state save/recall"
       ],
       "de": {
@@ -300,11 +329,12 @@
         "description": "Ein 3-Band-Multiband-Kompressor für dichte, schwere Mixe: Zwei Linkwitz-Riley-Crossover teilen das Signal in die Bänder Low, Mid und High auf, jedes mit eigenem vollausgestattetem Kompressor, Console-artigem Mute/Solo und einem optionalen Brickwall-Limiter auf dem High-Band.",
         "features": [
           "Zwei Crossover — Low/Mid (40 Hz–1 kHz) und Mid/High (400 Hz–12 kHz) mit erzwungener Band-Reihenfolge auch unter Automation",
-          "Kompression pro Band — Threshold, Ratio (bis 20:1), Attack, Release und Makeup für jedes der Bänder Low / Mid / High",
+          "Kompression pro Band — Threshold, Ratio (bis 20:1), Knee (v0.2.0), Attack, Release und Makeup für jedes der Bänder Low / Mid / High",
           "Mute/Solo pro Band — Console-Semantik; Kompressoren laufen auch unter Solo weiter, sodass beim Un-Mute kein Re-Attack-Knacken entsteht",
           "High-Band-Limiter — optionale Brickwall-Stufe nach dem Kompressor des High-Bands",
           "Keine zusätzliche Latenz — Crossover und Hüllkurven mit Minimalphase, kein Lookahead",
           "Output — Master-Trim, ±24 dB",
+          "Werkspresets & Preset-Verwaltung — durchsuchen/speichern/importieren/exportieren über die Preset-Leiste im Plugin",
           "Vollständiges Speichern und Abrufen des Plugin-Zustands"
         ],
         "lore": "Ein Triptychon ist ein dreiflügeliges Altarbild: drei Tafeln, zu einem Werk verbunden. Triptych teilt dein Signal in drei Bänder — Low, Mid, High — komprimiert jedes auf seiner eigenen Tafel und klappt sie wieder zu einem Bild zusammen."
@@ -323,9 +353,13 @@
         "Ceiling — −12 to 0 dBTP target, default −1.0 dBTP; the output never exceeds it",
         "Lookahead — 0.1–20 ms; makes gain-reduction attack instantaneous and click-free",
         "Release — 5–1000 ms, log-mapped, with Exponential / Linear / Smooth curve shapes",
+        "Attack — transient/sustain classifier for near-instant recovery on brief peaks (v0.2.0)",
+        "Auto Release — program-dependent release-time modulation, layered on top of Release Curve (v0.2.0)",
+        "Stereo Link — 0–100% true-peak detector linking, for independent per-channel limiting when needed (v0.2.0)",
         "Clip Mix — blends the transparent limiter with a tanh soft-clip character, same ceiling guarantee",
-        "Dither — Off / 16-bit / 24-bit TPDF at the output word length",
+        "Dither — Off / 16-bit / 24-bit TPDF at the output word length, with Flat/Shaped noise-shaping (v0.2.0)",
         "Metering — gain reduction, output true peak, and Momentary/Short-Term/Integrated LUFS (engine-side)",
+        "Factory presets & preset management — browse/save/import/export via the in-plugin preset bar",
         "Full state save/recall"
       ],
       "de": {
@@ -337,9 +371,13 @@
           "Ceiling — Zielwert −12 bis 0 dBTP, Standard −1,0 dBTP; der Output überschreitet ihn nie",
           "Lookahead — 0,1–20 ms; macht den Attack der Gain Reduction instantan und klickfrei",
           "Release — 5–1000 ms, logarithmisch gemappt, mit den Kurvenformen Exponential / Linear / Smooth",
+          "Attack — Transient/Sustain-Klassifikator für nahezu sofortige Erholung bei kurzen Peaks (v0.2.0)",
+          "Auto Release — programmabhängige Release-Zeit-Modulation, zusätzlich zur Release Curve (v0.2.0)",
+          "Stereo Link — 0–100 % Kopplung der True-Peak-Erkennung, für unabhängiges Limiting pro Kanal bei Bedarf (v0.2.0)",
           "Clip Mix — mischt den transparenten Limiter mit einem tanh-Soft-Clip-Charakter, bei gleicher Ceiling-Garantie",
-          "Dither — Off / 16-Bit / 24-Bit TPDF auf der Output-Wortlänge",
+          "Dither — Off / 16-Bit / 24-Bit TPDF auf der Output-Wortlänge, mit Flat/Shaped Noise-Shaping (v0.2.0)",
           "Metering — Gain Reduction, True Peak des Outputs sowie Momentary/Short-Term/Integrated LUFS (engine-seitig)",
+          "Werkspresets & Preset-Verwaltung — durchsuchen/speichern/importieren/exportieren über die Preset-Leiste im Plugin",
           "Vollständiges Speichern und Abrufen des Plugin-Zustands"
         ],
         "lore": "Apotheose: die Erhebung eines Werks über das Menschliche hinaus — der letzte Schritt, nach dem nichts mehr verändert werden darf. Als True-Peak-Limiter ganz am Ende der Kette spricht Apotheosis das letzte Wort, bevor ein Mix in die Ewigkeit entlassen wird."
@@ -352,30 +390,34 @@
       "repo": "Crypta",
       "role": "Bass processor",
       "tagline": "Split your bass. Compress the lows. Twist the guts out of the highs.",
-      "description": "A Parallax-style bass plugin: it splits your bass into low and high bands with a Linkwitz-Riley crossover, compresses the low band in parallel, and runs the high band through a choice of three distortion voicings before summing everything back through a 4-band EQ and an impulse-response (cab sim) loader.",
+      "description": "A Parallax-style bass plugin: as of v0.2.0 it splits your bass into low, mid and high bands with two cascaded Linkwitz-Riley crossovers, compresses the low band in parallel, drives the mid band with staged saturation, and runs the high band through a choice of three distortion voicings before summing everything back through a 4-band EQ and an impulse-response (cab sim) loader.",
       "note": "Formerly Twist Your Guts — renamed as part of the suite's move to Basilica Audio naming. The new plugin identity means DAWs treat it as a new plugin; v0.1.0-era sessions need re-pointing.",
       "features": [
-        "LR4 crossover band-split — 4th-order Linkwitz-Riley, adjustable 60 Hz–1 kHz",
-        "Low band — parallel (\"New York style\") compressor with makeup gain, wet/dry mix and output level",
-        "High band — three distortion voicings, each 4× oversampled: Gnaw (op-amp hard clip), Wool (cascaded soft-clip fuzz), Razor (tight overdrive)",
+        "Split Low / Split High — two cascaded LR4 crossovers carving low/mid/high bands, 60 Hz–2 kHz (v0.2.0, replaces the single v0.1.x crossover)",
+        "Low band — parallel (\"glue\"-style) compressor with makeup gain, wet/dry mix and output level",
+        "Mid band — staged/cascaded saturation drive for a distinct \"throatier\" grind (new in v0.2.0)",
+        "High band — three distortion voicings, each 4× oversampled: Gnaw (op-amp hard clip), Wool (cascaded soft-clip fuzz), Razor (tight overdrive), plus a High Tight pre-drive filter",
         "Noise gate — full-band, ahead of the crossover split",
         "4-band EQ — LowShelf / Peak / Peak / HighShelf after the band sum",
-        "IR loader — cabinet simulation on the output stage",
+        "IR loader — cabinet simulation on the Mid+High path only, never the Low band (relocated in v0.2.0)",
         "Delay-compensated signal path — bands time-aligned, oversampling latency reported to the host",
+        "Factory presets & preset management — browse/save/import/export via the in-plugin preset bar",
         "Full state save/recall"
       ],
       "de": {
         "role": "Bass-Prozessor",
         "tagline": "Splitte deinen Bass. Komprimiere die Lows. Dreh den Highs die Gedärme raus.",
-        "description": "Ein Bass-Plugin im Stil von Parallax: Es splittet deinen Bass mit einem Linkwitz-Riley-Crossover in ein Low- und ein High-Band, komprimiert das Low-Band parallel und schickt das High-Band durch eine von drei wählbaren Distortion-Voicings, bevor alles wieder über einen 4-Band-EQ und einen Impulsantwort-(Cab-Sim-)Loader summiert wird.",
+        "description": "Ein Bass-Plugin im Stil von Parallax: Seit v0.2.0 splittet es deinen Bass mit zwei kaskadierten Linkwitz-Riley-Crossovern in ein Low-, ein Mid- und ein High-Band, komprimiert das Low-Band parallel, treibt das Mid-Band mit gestufter Sättigung an und schickt das High-Band durch eine von drei wählbaren Distortion-Voicings, bevor alles wieder über einen 4-Band-EQ und einen Impulsantwort-(Cab-Sim-)Loader summiert wird.",
         "features": [
-          "LR4-Crossover-Bandsplit — Linkwitz-Riley 4. Ordnung, einstellbar 60 Hz–1 kHz",
-          "Low-Band — paralleler („New York Style“) Kompressor mit Makeup Gain, Wet/Dry-Mix und Output-Level",
-          "High-Band — drei Distortion-Voicings, je 4× oversampelt: Gnaw (Op-Amp Hard Clip), Wool (kaskadierter Soft-Clip-Fuzz), Razor (Tight Overdrive)",
+          "Split Low / Split High — zwei kaskadierte LR4-Crossover für Low-/Mid-/High-Band, 60 Hz–2 kHz (v0.2.0, ersetzt den einzelnen Crossover von v0.1.x)",
+          "Low-Band — paralleler („Glue“-artiger) Kompressor mit Makeup Gain, Wet/Dry-Mix und Output-Level",
+          "Mid-Band — gestufte/kaskadierte Sättigung für einen eigenständigen, „kehligeren“ Grind (neu in v0.2.0)",
+          "High-Band — drei Distortion-Voicings, je 4× oversampelt: Gnaw (Op-Amp Hard Clip), Wool (kaskadierter Soft-Clip-Fuzz), Razor (Tight Overdrive), plus ein High-Tight-Filter vor dem Drive",
           "Noise Gate — Full-Band, vor dem Crossover-Split",
           "4-Band-EQ — LowShelf / Peak / Peak / HighShelf nach der Bandsummierung",
-          "IR Loader — Cabinet-Simulation auf der Output-Stufe",
+          "IR Loader — Cabinet-Simulation nur auf dem Mid+High-Pfad, nie auf dem Low-Band (in v0.2.0 verschoben)",
           "Delay-kompensierter Signalweg — Bänder zeitlich ausgerichtet, Oversampling-Latenz wird an den Host gemeldet",
+          "Werkspresets & Preset-Verwaltung — durchsuchen/speichern/importieren/exportieren über die Preset-Leiste im Plugin",
           "Vollständiges Speichern und Abrufen des Plugin-Zustands"
         ],
         "lore": "Die Krypta liegt unter der Basilika: der älteste, tiefste Raum, der das gesamte Gebäude auf den Schultern trägt. Crypta ist das Bass-Fundament der Suite — gesplittet, komprimiert und angezerrt, damit das Low End alles darüber trägt."
@@ -392,12 +434,14 @@
       "features": [
         "Six bands — RBJ bells, with Low/High Shelf modes on the outer bands",
         "Static Gain plus dynamic Range (±12 dB) per band — downward or upward",
-        "Per-band Threshold, Attack (0.5–100 ms) and Release (10–1000 ms)",
+        "Per-band Threshold, Attack (0.5–100 ms) and Release (10–1000 ms), with a Range-scaled soft knee (v0.2.0)",
+        "Auto Release & Gain/Q — program-dependent release shortening and dynamic-gain-linked Q widening (v0.2.0)",
         "Pre-chain band-filtered detectors — surgical selectivity, no inter-band interaction",
         "Listen — solo exactly what a band's detector hears",
         "Zero latency (minimum-phase biquads, no lookahead) — safe for tracking",
         "Global Input/Output Trim and parallel Mix",
-        "Full state save/recall; 47-test DSP verification suite"
+        "Factory presets & preset management — browse/save/import/export via the in-plugin preset bar",
+        "Full state save/recall; extensive DSP verification suite"
       ],
       "de": {
         "role": "Dynamic EQ",
@@ -406,12 +450,14 @@
         "features": [
           "Sechs Bänder — RBJ-Bells, mit Low/High-Shelf-Modi auf den äußeren Bändern",
           "Static Gain plus dynamische Range (±12 dB) pro Band — abwärts oder aufwärts",
-          "Threshold, Attack (0,5–100 ms) und Release (10–1000 ms) pro Band",
+          "Threshold, Attack (0,5–100 ms) und Release (10–1000 ms) pro Band, mit einem an Range gekoppelten Soft Knee (v0.2.0)",
+          "Auto Release & Gain/Q — programmabhängige Release-Verkürzung und dynamik-gekoppelte Q-Verbreiterung (v0.2.0)",
           "Vorgeschaltete, bandgefilterte Detektoren — chirurgische Selektivität, keine Interaktion zwischen den Bändern",
           "Listen — genau das solieren, was der Detektor eines Bands hört",
           "Keine Latenz (Minimalphasen-Biquads, kein Lookahead) — sicher für Tracking",
           "Globales Input/Output-Trim und paralleles Mix",
-          "Vollständiges Speichern und Abrufen des Plugin-Zustands; 47-Test-DSP-Verifikationssuite"
+          "Werkspresets & Preset-Verwaltung — durchsuchen/speichern/importieren/exportieren über die Preset-Leiste im Plugin",
+          "Vollständiges Speichern und Abrufen des Plugin-Zustands; umfangreiche DSP-Verifikationssuite"
         ],
         "lore": "Lanzettfenster sind die schmalsten aller gotischen Bögen — hohe, spitze Lichtschlitze. Und eine Lanzette ist ein Skalpell. Beide Lesarten sind dieses Plugin: bis zu sechs schmale Bänder, die präzise, dynamische Schnitte setzen — genau dort und nur dann, wenn das Material sie braucht."
       },
@@ -422,31 +468,35 @@
       "name": "Miserere",
       "repo": "Miserere",
       "role": "Parallel vocal chain",
-      "tagline": "Four voices, one prayer — the parallel vocal chain in a single unit.",
-      "description": "The classic parallel \"rough vocal template\" workflow as one plugin: a direct chain plus three parallel busses, each on its own fader. Where conventional channel strips run serial, Miserere sums a clean processed vocal with an opto-levelled sandwich, a smashed FET bus and a filtered slap — thick but dynamic, in a single unit.",
+      "tagline": "Four voices, one prayer — the parallel vocal template in a single unit.",
+      "description": "The documented parallel \"rough vocal\" template workflow as one plugin: a Direct path (off by default, essentially a wire) plus four parallel return busses, each on its own fader. Where conventional channel strips run serial, Miserere layers an all-buttons FET crush, a passive-EQ/opto-leveler sandwich, a dual micro-pitch spread and a dark single-repeat slap underneath the untouched direct vocal — thick but dynamic, in a single unit.",
       "features": [
-        "Bus A Direct — HPF, console-style 3-band EQ, FET compressor with GR metering, split-band de-esser, tape saturation",
-        "Bus B Opto — passive-style boost EQ into an opto leveler with true two-stage program-dependent release, plus an air shelf",
-        "Bus C Smash — all-buttons FET limiter character: ~20:1, mid-forward detection, drive",
-        "Bus D Slap — 60–180 ms filtered slap delay with tape-soft feedback and mono switch",
-        "Per-bus fader and mute, exclusive solo",
-        "Busses A–C stay sample-aligned — parallel summing never combs; zero latency",
-        "Works on more than vocals — parallel compression loves drums too",
-        "Full state save/recall; 65-test DSP verification suite"
+        "Direct path — De-Ess, FET Comp, 1073-style Console EQ, tape Sat, a second De-Ess; every section off by default",
+        "CRUSH — all-buttons FET limiter character: 4:1/8:1/12:1/20:1/ALL ratios, hardware-style Attack/Release",
+        "SANDWICH — Passive EQ into an Opto Leveler into a second Passive EQ, with an HF-selective Emphasis detector",
+        "SPREAD — dual micro-pitch (~30/50 ms taps, cents Detune, hard-panned L/R)",
+        "SLAP — ~110 ms single-repeat dark delay with built-in bucket-brigade-style darkening",
+        "Per-bus Level fader, Mute and exclusive Audition (not Solo — busses are never meant to be judged in isolation)",
+        "Busses ①/② stay sample-aligned — parallel summing never combs; zero latency",
+        "Parallel macro trim backs off all four return busses together",
+        "Factory presets & preset management — browse/save/import/export via the in-plugin preset bar",
+        "Full state save/recall; extensive DSP verification suite"
       ],
       "de": {
         "role": "Parallele Vocal-Chain",
-        "tagline": "Vier Stimmen, ein Gebet — die parallele Vocal-Chain in einem einzigen Plugin.",
-        "description": "Der klassische parallele „Rough Vocal Template“-Workflow als ein Plugin: eine Direct Chain plus drei parallele Busse, jeder auf eigenem Fader. Wo konventionelle Channel-Strips seriell arbeiten, summiert Miserere einen sauber prozessierten Vocal mit einem opto-gelevelten Sandwich, einem smashten FET-Bus und einem gefilterten Slap — dick, aber dynamisch, in einem einzigen Plugin.",
+        "tagline": "Vier Stimmen, ein Gebet — die parallele Vocal-Vorlage in einem einzigen Plugin.",
+        "description": "Der dokumentierte parallele „Rough Vocal“-Vorlagen-Workflow als ein Plugin: ein Direct-Pfad (standardmäßig aus, im Wesentlichen ein Draht) plus vier parallele Return-Busse, jeder auf eigenem Fader. Wo konventionelle Channel-Strips seriell arbeiten, legt Miserere einen All-Buttons-FET-Crush, ein Passive-EQ-/Opto-Leveler-Sandwich, ein Dual-Micro-Pitch-Spread und einen dunklen Single-Repeat-Slap unter die unangetastete Direct-Vocal — dick, aber dynamisch, in einem einzigen Plugin.",
         "features": [
-          "Bus A Direct — HPF, Console-artiger 3-Band-EQ, FET-Kompressor mit GR-Metering, Split-Band-De-Esser, Tape-Saturation",
-          "Bus B Opto — passiv-artiger Boost-EQ in einen Opto-Leveler mit echtem zweistufigem, programmabhängigem Release, plus einem Air-Shelf",
-          "Bus C Smash — „All-Buttons“-FET-Limiter-Charakter: ~20:1, mittenbetonte Detection, Drive",
-          "Bus D Slap — gefiltertes Slap-Delay, 60–180 ms, mit tape-weichem Feedback und Mono-Schalter",
-          "Fader und Mute pro Bus, exklusives Solo",
-          "Busse A–C bleiben sample-aligned — paralleles Summing erzeugt nie Kammfiltereffekte; keine Latenz",
-          "Funktioniert nicht nur bei Vocals — parallele Kompression liebt auch Drums",
-          "Vollständiges Speichern und Abrufen des Plugin-Zustands; 65-Test-DSP-Verifikationssuite"
+          "Direct-Pfad — De-Ess, FET Comp, Console EQ im 1073-Stil, Tape Sat, ein zweiter De-Ess; jede Sektion standardmäßig aus",
+          "CRUSH — All-Buttons-FET-Limiter-Charakter: 4:1/8:1/12:1/20:1/ALL-Ratios, Attack/Release im Hardware-Stil",
+          "SANDWICH — Passive EQ in einen Opto Leveler in einen zweiten Passive EQ, mit HF-selektivem Emphasis-Detektor",
+          "SPREAD — Dual-Micro-Pitch (~30/50 ms Taps, Cent-Detune, hart nach L/R gepannt)",
+          "SLAP — ~110 ms Single-Repeat Dark Delay mit eingebauter Verdunklung im Bucket-Brigade-Stil",
+          "Level-Fader, Mute und exklusives Audition pro Bus (kein Solo — die Busse sollen nie isoliert beurteilt werden)",
+          "Busse ①/② bleiben sample-aligned — paralleles Summing erzeugt nie Kammfiltereffekte; keine Latenz",
+          "Parallel-Makro-Trim nimmt alle vier Return-Busse gemeinsam zurück",
+          "Werkspresets & Preset-Verwaltung — durchsuchen/speichern/importieren/exportieren über die Preset-Leiste im Plugin",
+          "Vollständiges Speichern und Abrufen des Plugin-Zustands; umfangreiche DSP-Verifikationssuite"
         ],
         "lore": "Miserere mei, Deus — Psalm 51. Gregorio Allegri vertonte ihn um 1638 für die Sixtinische Kapelle, geschrieben für zwei sich abwechselnde Chöre. Der Vatikan hütete die Partitur weit über ein Jahrhundert — bis ein vierzehnjähriger Mozart sie einmal hörte und aus dem Gedächtnis niederschrieb. Ein lang gehütetes Geheimnis, zwei parallel geführte Chöre, eine Stimme über allem: Kein Name passt besser zu diesem Plugin. Miserere verpackt den gehüteten parallelen Vocal-Workflow der großen Mixer — mehrere bearbeitete ‚Chöre' laufen unter deiner unangetasteten Lead-Stimme."
       },
