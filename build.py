@@ -48,6 +48,20 @@ AUDIO_MIME = {
 
 PLACEHOLDER_RE = re.compile(r"\{\{[a-z_]+\}\}")
 
+# Compatible-DAW logo strip, rendered on every product page and on the
+# overview page. Keys map to assets/daws/daw-<key>.png. Pro Tools is
+# deliberately absent: it only loads AAX plugins, which the suite does not
+# ship (its logo tile sits unused in assets/daws/ alongside the others).
+DAWS = [
+    ("cubase", "Cubase"),
+    ("reaper", "REAPER"),
+    ("logic-pro", "Logic Pro"),
+    ("ableton-live", "Ableton Live"),
+    ("studio-one", "Studio One"),
+    ("fl-studio", "FL Studio"),
+    ("reason", "Reason"),
+]
+
 MANUALS_DIR = ROOT / "data" / "manuals"
 
 # ---------------------------------------------------------------------------
@@ -110,6 +124,9 @@ STRINGS = {
         "audio_empty_sub": ("Before/after clips are being recorded — audio examples will "
                              "appear here with an upcoming release."),
         "audio_download_prefix": "Download {caption}",
+        "daws_heading": "Compatible DAWs",
+        "daws_note": ("Any modern DAW that supports VST3 or Audio Units. "
+                       "Pro Tools (AAX) is currently not supported."),
         "support_heading": "Support development",
         "support_body": ("Basilica Audio is free software, built at night and tuned by "
                           "ear. If it earns a place in your session, you can help keep "
@@ -182,6 +199,9 @@ STRINGS = {
         "audio_empty_sub": ("Vorher/Nachher-Clips werden gerade aufgenommen — "
                              "Hörbeispiele erscheinen hier mit einem kommenden Release."),
         "audio_download_prefix": "{caption} herunterladen",
+        "daws_heading": "Kompatible DAWs",
+        "daws_note": ("Jede moderne DAW mit VST3- oder Audio-Units-Unterstützung. "
+                       "Pro Tools (AAX) wird derzeit nicht unterstützt."),
         "support_heading": "Entwicklung unterstützen",
         "support_body": ("Basilica Audio ist freie Software, nachts gebaut und nach "
                           "Gehör abgestimmt. Wenn sie sich einen Platz in deiner Session "
@@ -443,6 +463,24 @@ def audio_section(plugin: dict, lang: str, root: str) -> str:
 </section>"""
 
 
+def daws_section(lang: str, root: str, centered: bool = False) -> str:
+    """The compatible-DAWs logo strip (product pages + overview page)."""
+    s = STRINGS[lang]
+    tiles = "\n".join(
+        f'    <li><img src="{root}assets/daws/daw-{key}.png" alt="{name}" '
+        f'title="{name}" width="56" height="56" loading="lazy"></li>'
+        for key, name in DAWS
+    )
+    cls = " daw-section-centered" if centered else ""
+    return f"""<section class="section daw-section{cls}" aria-labelledby="daws-heading">
+  <h2 id="daws-heading">{s['daws_heading']}</h2>
+  <ul class="daw-grid">
+{tiles}
+  </ul>
+  <p class="daw-note">{s['daws_note']}</p>
+</section>"""
+
+
 def build_card(plugin: dict, lang: str, root: str) -> str:
     s = STRINGS[lang]
     slug, name = plugin["slug"], plugin["name"]
@@ -529,6 +567,7 @@ def build_index(lang: str, index_tpl: str, base_tpl: str, plugins: list[dict]) -
         "brand_name": s["brand_name"],
         "cards": cards,
         "root": root,
+        "daws_section": daws_section(lang, root, centered=True),
     })
     ctx = base_context(lang, dir_, alt_dir, f"{SITE_NAME} — {s['site_tagline']}", s["site_description"], index_content)
     if lang == "en":
@@ -571,6 +610,7 @@ def build_plugin_page(lang: str, plugin_tpl: str, base_tpl: str, plugin: dict, m
         "download_heading": s["download_heading"],
         "download_fallback": build_download_fallback(lang, ORG, plugin["repo"]),
         "signing_note": s["signed_note"],
+        "daws_section": daws_section(lang, root),
         "lore_section": lore_section(plugin, lang, s),
         "screenshots_section": screenshots_section(plugin, lang, root),
         "audio_section": audio_section(plugin, lang, root),

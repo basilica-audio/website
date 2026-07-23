@@ -503,6 +503,39 @@ main {
 .audio-list .audio-caption { display: block; font-size: 0.92rem; color: var(--ink-muted); margin-bottom: 0.4rem; }
 .audio-list audio { width: 100%; }
 
+/* ---- compatible DAWs ---- */
+.daw-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  list-style: none;
+  margin: 0 0 1.1rem;
+  padding: 0;
+}
+.daw-grid li {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 5.4rem;
+  height: 5.4rem;
+  background: linear-gradient(180deg, var(--bg-raised), var(--bg-card));
+  border: 1px solid rgba(201, 162, 94, 0.16);
+  border-radius: 6px;
+  transition: border-color 180ms ease, transform 180ms ease;
+}
+.daw-grid li:hover {
+  border-color: rgba(201, 162, 94, 0.45);
+  transform: translateY(-2px);
+}
+.daw-grid img { display: block; }
+.daw-note { font-size: 0.9rem; color: var(--ink-muted); max-width: var(--measure); margin: 0; }
+
+/* centered variant (overview page) */
+.daw-section-centered { text-align: center; padding-bottom: 5rem; }
+.daw-section-centered h2::after { margin-left: auto; margin-right: auto; }
+.daw-section-centered .daw-grid { justify-content: center; }
+.daw-section-centered .daw-note { margin: 0 auto; }
+
 /* ---- donations stub ---- */
 .donate-row { display: flex; flex-wrap: wrap; gap: 1rem; margin: 0.4rem 0 0.9rem; }
 
