@@ -1,4 +1,4 @@
-<!-- Generated from Miserere/docs/manual.md on 2026-07-17 — do not hand-edit; re-run the manual sync described in website/README.md. -->
+<!-- Generated from Miserere/docs/manual.md on 2026-07-23 — do not hand-edit; re-run the manual sync described in website/README.md. -->
 
 # Miserere — user manual (v0.3.0)
 
@@ -67,6 +67,13 @@ hardware convention this is modelled on; release is dual-rate and program-depend
 after brief transients, several times slower after sustained heavy compression). **Style**
 switches between All-Buttons and a softer, fixed 2:1 **Gentle** voicing. This bus is meant to
 sound "terrible" soloed (use Audition) and good blended in.
+
+CRUSH also carries a touch of program-dependent colour: as gain reduction builds, a
+class-A-style asymmetric harmonic and a transformer-style low-frequency saturation blend in on
+top of the limiter's own detector-ripple character — negligible at light settings, staying
+under roughly 0.5% distortion at moderate gain reduction, and growing only as the bus works
+harder. A clean, barely-compressed signal is unaffected; lean on Input and Audition to hear it
+come alive.
 
 ### ② SANDWICH — Passive EQ → Opto Leveler → Passive EQ
 

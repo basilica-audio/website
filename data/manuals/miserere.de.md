@@ -41,6 +41,14 @@ Standardmäßig aus, Sektion für Sektion, in Signalreihenfolge:
 
 Kein Threshold-Regler: **Input** treibt das Signal in eine fixe, ratio-abhängige Threshold-/Knee-Tabelle. **Ratio** wählt 4:1/8:1/12:1/20:1/ALL (ALL ist eine plateauförmige Kurve mit bewusstem Give-back und einer kurzen Attack-Verzögerung, die Transienten durchschlagen lässt, bevor geklemmt wird — der „Snap"). **Attack**/**Release** sind 1–7-Regler, bei denen eine HÖHERE Zahl SCHNELLER bedeutet, passend zur Hardware-Konvention, an der sich das orientiert; Release ist zweistufig und programmabhängig (schnell nach kurzen Transienten, mehrfach langsamer nach anhaltend starker Kompression). **Style** schaltet zwischen All-Buttons und einer weicheren, fixen 2:1-**Gentle**-Voicing um. Dieser Bus soll solo „furchtbar" klingen (nutze Audition) und im Mix gut.
 
+CRUSH bringt außerdem einen Hauch programmabhängiger Färbung mit: Mit wachsender Gain
+Reduction mischen sich eine asymmetrische Harmonische im Class-A-Stil und eine
+Transformer-artige Tiefton-Sättigung unter den ohnehin vorhandenen Detektor-Ripple-Charakter
+des Limiters — bei leichten Einstellungen vernachlässigbar, bei moderater Gain Reduction unter
+rund 0,5 % Verzerrung bleibend, und nur wachsend, je härter der Bus arbeitet. Ein sauberes,
+kaum komprimiertes Signal bleibt unangetastet; nutze Input und Audition, um es zum Leben
+erwecken zu hören.
+
 ### ② SANDWICH — Passive EQ → Opto Leveler → Passive EQ
 
 Zwei unabhängige Passive-EQ-Instanzen klammern einen Leveler im Opto-Stil ein. Jeder Passive EQ bietet einen gemeinsam-frequenten LF-**Boost** und -**Cut** (beide können gleichzeitig laufen — eine bewusst nicht-kompensierende Kurve, keine simple Summe auf Flat), einen HF-**Bell Boost** mit variabler Bandbreite und ein HF-**Shelf Atten**. Der Opto Leveler hat keinen Threshold: **Peak Reduction** treibt in eine fixe statische Kurve (weich ~3:1 unterhalb −20 dB, harte Decke darüber; **Limit** strafft den weichen Bereich Richtung ~10:1), mit einem Rohsignal-Detektor (kein Smoothing vor der Ballistik) und einem zweistufigen Release, dessen Ausklang sich verlängert, je länger er schon arbeitet. **Emphasis** macht den Detektor zunehmend HF-selektiv (bis zu −10 dB geringere LF-Empfindlichkeit), sodass er bei hohen Einstellungen hauptsächlich auf Zischlaute/Presence reagiert, „wie ein Multiband". **Residual** (standardmäßig an) behält den kleinen, nie ganz flachen Vintage-Tilt des Passive EQ; deaktiviere es für einen saubereren EQ.

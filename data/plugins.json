@@ -315,7 +315,10 @@
       "description": "A three-band multiband compressor for dense, heavy mixes: two Linkwitz-Riley crossovers split the signal into Low, Mid and High bands, each with its own full-featured compressor, console-style mute/solo, and an optional brickwall limiter on the high band.",
       "features": [
         "Two crossovers — Low/Mid (40 Hz–1 kHz) and Mid/High (400 Hz–12 kHz) with enforced band-order separation under automation",
-        "Per-band compression — Threshold, Ratio (up to 20:1), Knee (v0.2.0), Attack, Release and Makeup for each of Low / Mid / High",
+        "Per-band compression — Threshold, Ratio (0.2:1–20:1, v0.3.0 widened for upward compression/expansion), Knee (v0.2.0), Attack, Release and Makeup for each of Low / Mid / High",
+        "Per-band Range — clamps maximum gain change up or down, keeping aggressive Ratio settings musically usable (v0.3.0)",
+        "Per-band downward expander/gate — independent Threshold, Ratio, Attack and Release, running in parallel with each band's compressor (v0.4.0)",
+        "Per-band Mid/Side — encode to Mid/Side before gain computation with an independent Side Threshold/Ratio, mono-safe by construction (v0.4.0)",
         "Per-band Mute/Solo — console semantics; compressors keep running under solo, so no re-attack pop on unmute",
         "High-band limiter — optional brickwall stage after the High band's compressor",
         "Zero added latency — minimum-phase crossovers and envelopes, no lookahead",
@@ -329,7 +332,10 @@
         "description": "Ein 3-Band-Multiband-Kompressor für dichte, schwere Mixe: Zwei Linkwitz-Riley-Crossover teilen das Signal in die Bänder Low, Mid und High auf, jedes mit eigenem vollausgestattetem Kompressor, Console-artigem Mute/Solo und einem optionalen Brickwall-Limiter auf dem High-Band.",
         "features": [
           "Zwei Crossover — Low/Mid (40 Hz–1 kHz) und Mid/High (400 Hz–12 kHz) mit erzwungener Band-Reihenfolge auch unter Automation",
-          "Kompression pro Band — Threshold, Ratio (bis 20:1), Knee (v0.2.0), Attack, Release und Makeup für jedes der Bänder Low / Mid / High",
+          "Kompression pro Band — Threshold, Ratio (0.2:1–20:1, in v0.3.0 für aufwärtsgerichtete Kompression/Expansion erweitert), Knee (v0.2.0), Attack, Release und Makeup für jedes der Bänder Low / Mid / High",
+          "Range pro Band — begrenzt die maximale Gain-Änderung nach oben oder unten, damit aggressive Ratio-Einstellungen musikalisch nutzbar bleiben (v0.3.0)",
+          "Downward Expander/Gate pro Band — unabhängiger Threshold, Ratio, Attack und Release, parallel zum Kompressor jedes Bands (v0.4.0)",
+          "Mid/Side pro Band — Kodierung nach Mid/Side vor der Gain-Berechnung mit eigenem Side-Threshold/-Ratio, konstruktionsbedingt mono-sicher (v0.4.0)",
           "Mute/Solo pro Band — Console-Semantik; Kompressoren laufen auch unter Solo weiter, sodass beim Un-Mute kein Re-Attack-Knacken entsteht",
           "High-Band-Limiter — optionale Brickwall-Stufe nach dem Kompressor des High-Bands",
           "Keine zusätzliche Latenz — Crossover und Hüllkurven mit Minimalphase, kein Lookahead",
@@ -434,8 +440,9 @@
       "features": [
         "Six bands — RBJ bells, with Low/High Shelf modes on the outer bands",
         "Static Gain plus dynamic Range (±12 dB) per band — downward or upward",
-        "Per-band Threshold, Attack (0.5–100 ms) and Release (10–1000 ms), with a Range-scaled soft knee (v0.2.0)",
+        "Per-band Threshold, Attack (0.1–500 ms) and Release (5–1500 ms), with a Range-scaled soft knee (v0.2.0) and per-band voicing defaults tuned to each band's role (v0.3.0)",
         "Auto Release & Gain/Q — program-dependent release shortening and dynamic-gain-linked Q widening (v0.2.0)",
+        "Gentle Saturation — soft tanh waveshaping while a band is actively boosting, untouched while cutting or idle (v0.3.0)",
         "Pre-chain band-filtered detectors — surgical selectivity, no inter-band interaction",
         "Listen — solo exactly what a band's detector hears",
         "Zero latency (minimum-phase biquads, no lookahead) — safe for tracking",
@@ -450,8 +457,9 @@
         "features": [
           "Sechs Bänder — RBJ-Bells, mit Low/High-Shelf-Modi auf den äußeren Bändern",
           "Static Gain plus dynamische Range (±12 dB) pro Band — abwärts oder aufwärts",
-          "Threshold, Attack (0,5–100 ms) und Release (10–1000 ms) pro Band, mit einem an Range gekoppelten Soft Knee (v0.2.0)",
+          "Threshold, Attack (0,1–500 ms) und Release (5–1500 ms) pro Band, mit einem an Range gekoppelten Soft Knee (v0.2.0) und auf die Rolle jedes Bands abgestimmten Voicing-Defaults (v0.3.0)",
           "Auto Release & Gain/Q — programmabhängige Release-Verkürzung und dynamik-gekoppelte Q-Verbreiterung (v0.2.0)",
+          "Gentle Saturation — sanftes tanh-Waveshaping, während ein Band aktiv boostet, unangetastet beim Schneiden oder in Ruhe (v0.3.0)",
           "Vorgeschaltete, bandgefilterte Detektoren — chirurgische Selektivität, keine Interaktion zwischen den Bändern",
           "Listen — genau das solieren, was der Detektor eines Bands hört",
           "Keine Latenz (Minimalphasen-Biquads, kein Lookahead) — sicher für Tracking",
@@ -472,7 +480,7 @@
       "description": "The documented parallel \"rough vocal\" template workflow as one plugin: a Direct path (off by default, essentially a wire) plus four parallel return busses, each on its own fader. Where conventional channel strips run serial, Miserere layers an all-buttons FET crush, a passive-EQ/opto-leveler sandwich, a dual micro-pitch spread and a dark single-repeat slap underneath the untouched direct vocal — thick but dynamic, in a single unit.",
       "features": [
         "Direct path — De-Ess, FET Comp, 1073-style Console EQ, tape Sat, a second De-Ess; every section off by default",
-        "CRUSH — all-buttons FET limiter character: 4:1/8:1/12:1/20:1/ALL ratios, hardware-style Attack/Release",
+        "CRUSH — all-buttons FET limiter character: 4:1/8:1/12:1/20:1/ALL ratios, hardware-style Attack/Release, plus gain-reduction-gated program-dependent colour (v0.4.0)",
         "SANDWICH — Passive EQ into an Opto Leveler into a second Passive EQ, with an HF-selective Emphasis detector",
         "SPREAD — dual micro-pitch (~30/50 ms taps, cents Detune, hard-panned L/R)",
         "SLAP — ~110 ms single-repeat dark delay with built-in bucket-brigade-style darkening",
@@ -488,7 +496,7 @@
         "description": "Der dokumentierte parallele „Rough Vocal“-Vorlagen-Workflow als ein Plugin: ein Direct-Pfad (standardmäßig aus, im Wesentlichen ein Draht) plus vier parallele Return-Busse, jeder auf eigenem Fader. Wo konventionelle Channel-Strips seriell arbeiten, legt Miserere einen All-Buttons-FET-Crush, ein Passive-EQ-/Opto-Leveler-Sandwich, ein Dual-Micro-Pitch-Spread und einen dunklen Single-Repeat-Slap unter die unangetastete Direct-Vocal — dick, aber dynamisch, in einem einzigen Plugin.",
         "features": [
           "Direct-Pfad — De-Ess, FET Comp, Console EQ im 1073-Stil, Tape Sat, ein zweiter De-Ess; jede Sektion standardmäßig aus",
-          "CRUSH — All-Buttons-FET-Limiter-Charakter: 4:1/8:1/12:1/20:1/ALL-Ratios, Attack/Release im Hardware-Stil",
+          "CRUSH — All-Buttons-FET-Limiter-Charakter: 4:1/8:1/12:1/20:1/ALL-Ratios, Attack/Release im Hardware-Stil, plus gain-reduction-gatete programmabhängige Färbung (v0.4.0)",
           "SANDWICH — Passive EQ in einen Opto Leveler in einen zweiten Passive EQ, mit HF-selektivem Emphasis-Detektor",
           "SPREAD — Dual-Micro-Pitch (~30/50 ms Taps, Cent-Detune, hart nach L/R gepannt)",
           "SLAP — ~110 ms Single-Repeat Dark Delay mit eingebauter Verdunklung im Bucket-Brigade-Stil",
