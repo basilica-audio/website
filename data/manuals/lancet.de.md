@@ -4,6 +4,54 @@
 
 *Schneide, wo es zählt — ein chirurgischer Dynamic EQ mit analoger Seele.*
 
+## Was ist neu in v0.4.0
+
+**Der Attack-Regler ist jetzt bis hinunter zu 0,1 ms echt.** Bis v0.3.0 saß hinter
+dem Gain-Computer ein fester 50-ms-Glätter, sodass keine Attack-Einstellung
+schneller als etwa 50 ms tatsächlich hörbar war — 0,1 ms, 1 ms und 20 ms taten
+allesamt dasselbe. Dieser Glätter ist weg; die Ballistik des Detektors selbst ist
+jetzt das Einzige, was formt, wie schnell sich ein Band bewegt, und sie wird
+einmal pro Sample ausgewertet.
+
+**Bitte lies das, wenn du bestehende Sessions hast.** Eine Session, die eine von
+null verschiedene Range mit schnellem Attack nutzt, *wird* schneller reagieren als
+zuvor. Das ist ein Bugfix, keine Neuabstimmung — das Plugin tut jetzt, was sein
+eigener Regler immer schon behauptet hat —, aber es ist eine reale, hörbare
+Änderung, und du solltest damit rechnen, sie zu hören. Fühlt sich ein Band jetzt
+zu zupackend an, dreh seinen Attack hoch: Zum ersten Mal hat dieser Regler die
+Wirkung, die sein Label beschreibt. Sessions mit `Range = 0` auf jedem Band
+(reiner statischer EQ, keine Dynamik) sind unverändert, und die statischen
+EQ-Kurven selbst sind bei jedem Bandtyp, jedem Gain und jedem Q identisch mit
+denen aus v0.3.0.
+
+Ebenfalls neu:
+
+- **Sidechain (SC Source: Internal / External).** Jedes Band kann seinen
+  Detektor-Input jetzt aus einem externen Sidechain beziehen statt aus dem Audio,
+  das durch das Band läuft — ein Band kann damit gegen eine Kick, einen
+  Lead-Gesang oder alles andere ducken, was dein Host routen kann. Aktiviere
+  zuerst den Sidechain-Input des Plugins in deinem Host; ist kein Sidechain
+  verfügbar, nutzt ein auf External gestelltes Band schlicht weiter das interne
+  Signal, statt zu verstummen.
+- **SC Mode: Split / Wide.** Split (Default und das einzige Verhalten früherer
+  Versionen) bedeutet, dass das Band nur auf seinen eigenen Frequenzbereich hört.
+  Wide bedeutet, dass es auf das *gesamte* Signal hört und dabei weiterhin nur sein
+  eigenes Band bewegt — der übliche Weg, ein Band mit dem Mix pumpen zu lassen.
+  Listen folgt der jeweiligen Wahl, sodass du immer hörst, was das Band wirklich
+  triggert.
+- **Sauberere Saturation.** Die Saturation-Stufe pro Band nutzt jetzt einen
+  antialiasten Waveshaper. Gleicher Charakter, spürbar weniger von den kratzigen
+  Fold-back-Harmonischen, die ein einfacher Waveshaper bei hochfrequentem Material
+  erzeugt — und weiterhin ohne zusätzliche Latenz.
+- **Sanfteres Gain/Q.** Mit aktivierter Gain/Q-Kopplung gleitet das Q des Bands
+  jetzt mit dem dynamischen Gain, statt zu springen.
+- **Ein elftes Werkspreset, Sidechain Carve**, das das neue Routing demonstriert.
+
+Beide neuen Regler pro Band sitzen im Editor als Comboboxen unter dem Type-Slot
+des jeweiligen Bands. Von älteren Versionen gespeicherte Sessions laden exakt wie
+zuvor, mit beiden neuen Reglern auf den Einstellungen, die das alte Verhalten
+reproduzieren.
+
 ## Was ist neu in v0.3.0
 
 Ein musikalischer Voicing-Pass (siehe `docs/voicing-notes.md`) — gemessen, wo die eigene DSP des Plugins eine Messung erlaubte, ehrlich als „nach Gehör, noch nicht gegen echtes Material abgestimmt" gekennzeichnet, wo nicht:
@@ -63,12 +111,14 @@ Der Detector jedes Bands zapft das Signal direkt nach Input Trim an, *vor* Band 
 | **Gain** | -12 - +12 | 0 | dB | Das *statische* Gain des Bands — immer angewendet, dynamisch oder nicht. Setze das auf deine „Ruhe"-EQ-Bewegung; Range addiert oder subtrahiert dann obendrauf, wenn der Detector auslöst. |
 | **Range** | -12 - +12 | 0 | dB | Wie weit sich das Gain des Bands dynamisch bewegen kann, zusätzlich zu Gain. **0 = ein rein statisches EQ-Band** (kein Detector-Einfluss). Negatives Range schneidet, wenn das Signal lauter als Threshold wird (die klassische Resonanz-Zähmung/De-Essing-Bewegung); positives Range boostet, wenn es lauter wird (eine aufwärtsgerichtete „Duck-in"-Expansions-Bewegung, nützlich z. B. um Anschlag nur bei hart gespielten Noten hervorzuheben). |
 | **Thresh** | -60 - 0 | -26 / -28 / -26 / -24 / -22 / -20 (v0.3.0, pro Band — siehe Tabelle unten) | dB | Der Detector-Pegel, ab dem die dynamische Bewegung einsetzt. Ein Soft-Knee, zentriert auf diesen Wert, macht den Übergang graduell statt zu einem harten Schalter — die Breite des Knees selbst skaliert mit Range (v0.2.0): `clamp(\|Range\| * 0.5, 2, 10)` dB, sodass flachere Range-Einstellungen sanfter wirken und Range-Einstellungen mit voller Tiefe (±12 dB) identisch zum festen 6-dB-Knee von v0.1.0 klingen. |
-| **Attack** | 0.1 - 500 | 25 / 15 / 8 / 4 / 2 / 3 (v0.3.0, pro Band — siehe Tabelle unten) | ms | Wie schnell sich das dynamische Gain bewegt, sobald der Detector den Threshold überschreitet. Schneller Attack erwischt Transienten hart; langsamerer Attack lässt einen kurzen Peak durch, bevor reagiert wird, was bei perkussivem Material natürlicher klingen kann. Die 500-ms-Obergrenze ist für langsame, musikalische Tonalausgleichs-Bewegungen gedacht, nicht für das Einfangen von Transienten. |
+| **Attack** | 0.1 - 500 | 25 / 15 / 8 / 4 / 2 / 3 (v0.3.0, pro Band — siehe Tabelle unten) | ms | Wie schnell sich das dynamische Gain bewegt, sobald der Detector den Threshold überschreitet. Schneller Attack erwischt Transienten hart; langsamerer Attack lässt einen kurzen Peak durch, bevor reagiert wird, was bei perkussivem Material natürlicher klingen kann. Die 500-ms-Obergrenze ist für langsame, musikalische Tonalausgleichs-Bewegungen gedacht, nicht für das Einfangen von Transienten. **Seit v0.4.0 ist dieser Regler über seinen gesamten Bereich echt** — siehe „Was ist neu in v0.4.0" oben; davor verhielt sich alles unterhalb von ~50 ms identisch. |
 | **Release** | 5 - 1500 | 280 / 180 / 130 / 100 / 70 / 90 (v0.3.0, pro Band — siehe Tabelle unten) | ms | Wie schnell das dynamische Gain zurück Richtung Gain kehrt, sobald der Detector wieder unter den Threshold fällt. Schneller Release kann bei anhaltendem Material hörbar pumpen; langsamer Release glättet die Rückkehr, kann aber einen Cut/Boost in Inhalt hineinhalten, der ihn nicht mehr braucht. |
 | **Listen** | Off / On | Off | | Solot das eigene Detector-Signal dieses Bands — das bandpassgefilterte Audio vor dem EQ, das tatsächlich seine dynamische Bewegung antreibt — anstelle des normalen Programm-Outputs, um genau zu hören, was es auslöst. Exklusiv: Aktivierst du Listen bei einem Band, deaktiviert das automatisch Listen bei jedem anderen Band. Die vollständige Signalkette (inklusive der Verarbeitung jedes einzelnen Bands) läuft darunter weiter, sodass das Deaktivieren von Listen nie knackt. |
 | **Auto Release** (v0.2.0) | Off / On | Off | | Programmabhängiges Auto-Release: Ist es aktiviert, verkürzt sich die *effektive* Release-Zeit für einen gegebenen Übergang automatisch (nie unter die eigene 5-ms-Release-Untergrenze des Plugins, nie über die manuelle Release-Einstellung selbst hinaus), sobald die eigene Hüllkurve des Signals bereits von selbst abfällt — nützlich, um ein Band bei natürlich abklingendem Material schneller entspannen zu lassen, ohne für anhaltendes Material auf einen langsameren, musikalischen manuellen Release zu verzichten. In v0.2.0 nur per Automation/Preset — noch kein dedizierter Editor-Regler (Roadmap M3). |
 | **Gain/Q** (v0.2.0) | Off / On | Off | | Gain/Q-Kopplung: Ist sie aktiviert, verbreitert (weicht) sich das eigene Filter-Q des Bands proportional dazu, wie weit sein *dynamisches* Gain gerade in Richtung Range steht — ein sanfterer, analogerer Charakter bei tieferen dynamischen Bewegungen. Das statische Gain beeinflusst Q nie, nur die dynamische Komponente tut das. In v0.2.0 nur per Automation/Preset — noch kein dedizierter Editor-Regler (Roadmap M3). |
-| **Saturation** (v0.3.0) | Off / On | Off | | Sanftes Waveshaping: Ist es aktiviert, wird ein sanfter, `tanh`-basierter Drive auf den eigenen Output des Bands angewendet, aber nur, während es aktiv boostet (Gain + der dynamische Beitrag netto positiv) — ein schneidendes oder ruhendes Band bleibt unberührt, auch damit aktiviert. Der Drive skaliert damit, wie stark das Band gerade boostet (kaum wahrnehmbar nahe 0 dB, deutlich hörbar, aber weiterhin soft-knee-geformt nahe +12 dB). In v0.3.0 nur per Automation/Preset — noch kein dedizierter Editor-Regler (Roadmap M3). |
+| **SC Source** (v0.4.0) | Internal / External | Internal | | Wo der Detektor dieses Bands hört. **Internal** (Default und das einzige Verhalten jeder früheren Version) ist das durch das Plugin laufende Signal, abgegriffen vor Band 1. **External** ist der Sidechain-Input des Plugins — route in deinem Host etwas anderes dorthin, und dieses Band bewegt sich als Reaktion auf *das*, während es weiterhin das Hauptsignal filtert. Stellt dein Host keinen Sidechain bereit oder bleibt der Sidechain-Input deaktiviert, fällt ein auf External gestelltes Band auf Internal zurück, statt zu verstummen. Auf den Sidechain wird keine Delay-Kompensation angewendet, er muss also bereits vom Host zeitlich ausgerichtet sein. |
+| **SC Mode** (v0.4.0) | Split / Wide | Split | | Wie viel von der Quelle des Detektors dieses Band hört. **Split** (Default) filtert den Detektor-Input auf den eigenen Frequenzbereich dieses Bands herunter, sodass nur Inhalt nahe Freq es triggern kann — das chirurgische Verhalten. **Wide** überspringt diesen Filter, sodass das Band auf den Gesamtpegel über das ganze Spektrum reagiert und dabei weiterhin nur sein eigenes Band bewegt. Wide willst du, wenn ein Band mit dem Mix atmen soll, statt eine Resonanz zu überwachen. Listen folgt dieser Einstellung, sodass du immer das echte Trigger-Signal abhörst. |
+| **Saturation** (v0.3.0) | Off / On | Off | | Sanftes Waveshaping: Ist es aktiviert, wird ein sanfter Drive auf den eigenen Output des Bands angewendet, aber nur, während es aktiv boostet (Gain + der dynamische Beitrag netto positiv) — ein schneidendes oder ruhendes Band bleibt unberührt, auch damit aktiviert. Der Drive skaliert damit, wie stark das Band gerade boostet (kaum wahrnehmbar nahe 0 dB, deutlich hörbar, aber weiterhin soft-knee-geformt nahe +12 dB). Seit v0.4.0 ist der Waveshaper antialiast und fügt damit weit weniger vom harschen Fold-back-Grit hinzu, den ein einfacher Waveshaper bei hochfrequentem Material erzeugt, ohne Latenzkosten. Nur per Automation/Preset — noch kein dedizierter Editor-Regler (Roadmap M3). |
 
 Per-Band-Voicing-Defaults (v0.3.0, `docs/voicing-notes.md`) — abgestimmt auf die
 typische Rolle jedes Bands entlang der bestehenden Frequenzleiter, kein flacher
@@ -91,9 +141,9 @@ Wert, der über jedes Band hinweg wiederholt wird:
 | **Output Trim** | -12 - +12 | 0 | dB | Gain, das nach Band 6 und nach der Mix-Blende angewendet wird — die finale Gain-Stufe, um den Ausgangspegel von Lancet an das anzupassen, was als Nächstes in der Kette folgt. |
 | **Mix** | 0 - 100 | 100 | % | Paralleler Dry/Wet-Blend der gesamten Six-Band-Kette. 100 % ist vollständig prozessiert; niedrigere Werte mischen zunehmend mehr vom unbearbeiteten (aber weiterhin Input-getrimmten) Signal bei — nützlich für „New-York"-artiges paralleles Dynamic EQing, bei dem die Korrektur hinzufügen statt vollständig ersetzen soll. |
 
-## Presets (v0.2.0)
+## Presets
 
-Am oberen Rand des Editors sitzt eine Preset-Leiste: `[<] [Preset Name] [>]`, um alphabetisch durch die Werks- und Nutzer-Bibliothek zu blättern, `Save`/`Save As...`, um eigene Presets zu schreiben, `Delete` für Nutzer-Presets, `Import.../Export...` für einzelne `.basilicapreset`-Dateien oder `.zip`-Bänke, sowie ein Menü (Klick auf den Preset-Namen) mit einem Eintrag „Set current as default" für deinen eigenen Out-of-the-Box-Startpunkt. Neun Werkspresets werden mit v0.2.0 ausgeliefert — was jedes davon bewirkt und warum, steht in `docs/presets.md`. Nutzer-Presets werden pro Nutzer unter `~/Library/Audio/Presets/Yves Vogl/Lancet/` auf macOS gespeichert (`%APPDATA%/Yves Vogl/Lancet/Presets/` unter Windows).
+Am oberen Rand des Editors sitzt eine Preset-Leiste: `[<] [Preset Name] [>]`, um alphabetisch durch die Werks- und Nutzer-Bibliothek zu blättern, `Save`/`Save As...`, um eigene Presets zu schreiben, `Delete` für Nutzer-Presets, `Import.../Export...` für einzelne `.basilicapreset`-Dateien oder `.zip`-Bänke, sowie ein Menü (Klick auf den Preset-Namen) mit einem Eintrag „Set current as default" für deinen eigenen Out-of-the-Box-Startpunkt. Elf Werkspresets werden mit v0.4.0 ausgeliefert — was jedes davon bewirkt und warum, steht in `docs/presets.md`. Nutzer-Presets werden pro Nutzer unter `~/Library/Audio/Presets/Yves Vogl/Lancet/` auf macOS gespeichert (`%APPDATA%/Yves Vogl/Lancet/Presets/` unter Windows).
 
 Die Interface-Texte des Editors (Preset-Leisten-Beschriftungen, Menüs, Dialoge) werden automatisch auf Deutsch lokalisiert, wenn die Systemsprache Deutsch ist; Parameternamen, Einheiten und Fachbegriffe (Attack, Release, Hz, dB, ms, …) bleiben immer auf Englisch — genau wie bei jedem anderen Basilica-Audio-Plugin.
 

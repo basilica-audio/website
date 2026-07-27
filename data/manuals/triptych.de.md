@@ -36,6 +36,8 @@ Der eigene Kompressor jedes Bands (Knee → Threshold/Ratio → Range → Attack
 
 **Ein Hinweis zum Voicing.** Die unten stehenden Per-Band-Defaults (und die Werkspresets in [`docs/presets.md`](presets.md)) sind **recherchebasiert** — sie stützen sich auf veröffentlichte Hersteller-Handbücher und Fachartikel von Mastering-Engineers zur Referenzklasse der Multiband-Kompression, nicht auf Messungen gegen Referenz-Hardware. Die zitierten Quellen/URLs findest du in [`docs/research-notes.md`](research-notes.md), die Begründung für den Soft-Knee aus v0.2.0 in [`docs/design-brief.md`](design-brief.md), und die Ratio/Range-Dynamik-Erweiterung aus v0.3.0 in [`docs/design-brief-v3-dynamics.md`](design-brief-v3-dynamics.md).
 
+**v0.5.0: der Flaggschiff-Dynamikkern.** Der Detektor jedes Bands bekommt eine wählbare **Peak-/RMS**-Kennlinie, ein programmabhängiges **Auto Release**, einen **VCA**-Charakter und einen **Stereo-Link**-Regler. Dazu ein globales **Lookahead** und **Mix**, wählbare **Crossover-Flanken** (12/24/48 dB/Okt.), ein **externer Sidechain** mit Keying pro Band und Detektor-Key-Monitoring sowie **Hold + Hysterese** an jedem Gate. Alle dreiundzwanzig neuen Regler stehen per Default auf einem vollständig neutralen Zustand, sodass eine in v0.4.0 gespeicherte Session in v0.5.0 exakt wie zuvor klingt — und dieselbe Null-Latenz meldet.
+
 **v0.3.0: echtes dynamisches Multiband.** Die Ratio jedes Bands reicht jetzt von **0.2:1 bis 20:1** (vorher 1:1–20:1) — Werte unter 1:1 sind *aufwärtsgerichtete* Kompression/Expansion: Signal oberhalb des Thresholds wird angehoben statt geschnitten, mit sanftem Übergang durch einen exakten Nullpunkt bei 1:1. Ein neuer Per-Band-Regler **Range** begrenzt die maximale Gain-Änderung (nach oben oder unten), damit eine aggressive Ratio-Einstellung musikalisch nutzbar bleibt, statt durchzugehen. Beide werden in den Tabellen unten beschrieben.
 
 ## Parameter-Referenz
@@ -87,6 +89,42 @@ Das Gate läuft unabhängig von, und parallel zu, dem eigenen Kompressor dieses 
 
 Da L + R nach dem Dekodieren nur von Mid abhängt (algebraisch unabhängig davon, was mit Side geschieht), kann das Bearbeiten der Side-Komponente — wie aggressiv auch immer — niemals ein Phasenauslöschungs-Artefakt in eine Mono-Abmischung einbringen; nur eine Änderung an der Verarbeitung der Mid-Komponente selbst verändert die Mono-Summe, was der beabsichtigte, hörbare Effekt des Komprimierens/Expandierens des Zentrums ist.
 
+### Globale Regler *(neu in v0.5.0)*
+
+| Parameter | Range | Default | Unit | Was es bewirkt |
+|---|---|---|---|---|
+| **SC Source** (Sidechain Source) | Internal / External | Internal | | Legt fest, worauf der Kompressor-Detektor jedes Bands hört. *Internal* ist das bandeigene Signal, exakt wie zuvor. *External* keyt die Detektoren stattdessen vom Sidechain-Bus — aufgeteilt durch ein eigenes Weichenpaar bei denselben Frequenzen und derselben Flanke, sodass jedes Band einem bandpassenden Key folgt statt dem vollbandigen Sidechain. Wählst du External, ohne dass der Host einen Sidechain verbunden hat, fällt Triptych stillschweigend auf Internal zurück, statt zu verstummen. |
+| **SC Listen** (Sidechain Listen) | Off / Low / Mid / High | Off | | Ersetzt den Output durch den **Detektor-Key** des gewählten Bands, damit du beim Einstellen der Thresholds genau hörst, worauf die Detektoren reagieren. Das ist *kein* Band-Solo — es ist das Key-Signal, nicht das bearbeitete Audio. Eine Abhörhilfe, nicht für Automation gedacht. |
+| **Slope** (Crossover Slope) | 12 / 24 / 48 dB/Okt. | 24 dB/Okt. | | Die Flankensteilheit beider Weichen-Aufteilungen. 24 dB/Okt. ist die klassische Einstellung und das, was jede frühere Version genutzt hat. 12 dB/Okt. lässt die Bänder stärker überlappen (sanftere, „analogere" Band-Interaktion); 48 dB/Okt. trennt sie hart, was du willst, wenn die Bearbeitung eines Bands nicht in seine Nachbarn bluten darf. Ein Flankenwechsel setzt die Weichenfilter zurück und kann klicken — ändere ihn bei gestopptem Transport. |
+| **Lookahead** | Off / 1.5 / 3 / 5 ms | Off | | Lässt die Detektoren das Signal sehen, bevor es eintrifft, sodass die Gain-Reduktion bereits steht, wenn ein Transient kommt. Kostet genau so viel Latenz, die zur Delay-Kompensation an den Host gemeldet wird (siehe die Latenztabelle unten). Off ist der Default und hält Triptych bei null Latenz. |
+| **Mix** | 0 – 100 | 100 | % | Dry/Wet-Blend um die gesamte Multiband-Kette — Parallelkompression ohne separaten Bus. Der Dry-Pfad wird passend zur Lookahead-Einstellung verzögert, sodass die beiden ausgerichtet bleiben. Beachte, dass das Mischen eines *minimalphasigen* Multiband-Baums gegen ein Dry-Signal das Ergebnis selbst bei sanften Einstellungen färbt: Triptychs Bandsumme ist magnitudenflach, aber nicht phasenflach, die beiden Pfade interagieren also. Das liegt am Parallelmischen jedes minimalphasigen Multiband-Prozessors und ist kein Defekt — nutze deine Ohren, statt anzunehmen, 50 % sei „der halbe Effekt". |
+
+### Detektor je Band *(neu in v0.5.0)*
+
+Identische Bereiche in jedem Band.
+
+| Parameter | Range | Default | Unit | Was es bewirkt |
+|---|---|---|---|---|
+| **Detector** | Peak / RMS | Peak | | Die Detektionskennlinie. *Peak* folgt den momentanen Spitzen der Wellenform — das strammere, transientenbewusstere Verhalten, das jede frühere Version genutzt hat. *RMS* folgt stattdessen der mittleren Leistung des Signals, was bei einem Sinus 3 dB unter der Peak-Kennlinie liegt und generell glatter und eher „pegelbezogen" als „transientenbezogen" klingt. RMS nutzt eine Mean-Square-Zeitkonstante von `max(Attack, 5 ms)` vor der bandeigenen Attack-/Release-Ballistik. |
+| **Auto Rel** (Auto Release) | Off / On | Off | | Programmabhängiges Release. Zwei Release-Konstanten laufen parallel — eine schnelle (0,15 s) und ein langsames Reservoir (Aufladung 0,6 s, Release 4 s) — und die Hüllkurve nimmt die jeweils höhere. Eine kurze Spitze erholt sich schnell; anhaltende Gain-Reduktion baut einen mehrsekündigen Ausklang auf, der das Band vom Pumpen abhält. Der Release-Regler skaliert beide Konstanten, tut also weiterhin, was du erwartest; bei etwa 300 ms reproduziert er die Referenzwerte exakt. |
+| **Character** | Clean / VCA | Clean | | *Clean* ist das Feed-Forward-Verhalten jeder früheren Version. *VCA* approximiert statisch die Schleife eines Feedback-Kompressors: Der Knee rundet sich um einen ratio-abhängigen Betrag (etwa 6 dB bei 2:1, 4 dB bei 4:1, 3 dB bei 10:1), und der effektive Attack wird mit steigender Ratio schneller. Es gibt bewusst **keine** hinzugefügte Verzerrung und keine Harmonischen-Stufe — der Unterschied zwischen beiden liegt im Hüllkurvenverhalten, und dort sitzt der Charakter dieser Kompressorklasse tatsächlich. |
+| **Link** (Stereo Link) | 0 – 100 | 0 | % | Wie stark sich die Detektoren beider Kanäle eine Hüllkurve teilen. Bei 0 % sind sie vollständig unabhängig, was jede frühere Version getan hat — und was einen hart gepannten Transienten eine Seite für sich herunterziehen und das Stereobild verschieben lässt. Bei 100 % wenden beide Kanäle exakt denselben Gain an, das Bild kann sich also überhaupt nicht bewegen. Alles dazwischen mischt die beiden. In einem Band, das Mid/Side fährt, verkoppelt das stattdessen das Mid-/Side-Paar. |
+
+**Ein Hinweis zum VCA-Knee nahe einem 0-dB-Threshold.** Triptychs Knee ist konstruktionsbedingt *threshold-relativ* (seine Breite skaliert damit, wie weit der Threshold unter 0 dBFS liegt — siehe [`docs/architecture.md`](architecture.md)). Das bedeutet, dass die Ziel-Knee-Breite des VCA-Charakters unerreichbar wird, sobald der Threshold innerhalb einer halben Knee-Breite von 0 dB liegt: Ab etwa -3 dB aufwärts verengt sich die erreichte Breite gleichmäßig Richtung Hard Knee und erreicht bei einem 0-dB-Threshold exakt Hard Knee. Das ist eine Eigenschaft des Knee-Modells und kein Bug, und numerisch verhält sich dort nichts daneben. Willst du die volle VCA-Rundung, halte den Threshold des Bands bei -3 dB oder darunter — dort sitzt der Threshold eines Multiband-Kompressors ohnehin normalerweise.
+
+### Gate-Formung je Band *(neu in v0.5.0)*
+
+| Parameter | Range | Default | Unit | Was es bewirkt |
+|---|---|---|---|---|
+| **Gate Hold** | 0 – 500 | 0 | ms | Wie lange das Gate offen bleibt, nachdem das Signal wieder unter seinen Threshold gefallen ist. Stelle es länger als die Lücken ein, die du ignorieren willst (das Ausklingen einer Note, der Abstand zwischen zwei Schlägen desselben Parts), und das Gate hört auf, sie zu zerhacken. Der Timer startet bei jeder neuen Überschreitung neu, sodass eine Folge eng aufeinanderfolgender Schläge das Gate durchgehend offen hält. |
+| **Gate Hyst** (Gate Hysteresis) | 0 – 12 | 0 | dB | Trennt den Pegel, bei dem das Gate *öffnet*, von dem, bei dem es *schließt*, und schließt um so viele dB tiefer. Das ist die Abhilfe gegen Chattern — ein Signal, das genau am Threshold schwebt und das Gate viele Male pro Sekunde auf- und zuklappen lässt. Stelle es einige dB über die hörbare Welligkeit; 3–6 dB decken die meisten Materialien ab. |
+
+Beide stehen per Default auf 0, was exakt dem Gate aus v0.4.0 entspricht. Beide sind zudem so implementiert, dass keines klicken kann: Hold arbeitet auf der Hüllkurve des Gates, statt seinen Ausgangs-Gain festzunageln, und der Threshold bewegt sich durch denselben 50-ms-Glätter, den jede andere Threshold-Änderung nutzt.
+
+### Gain-Reduktions-Meter *(neu in v0.5.0)*
+
+Jede Bandspalte trägt einen schmalen vertikalen Balken, der zeigt, wie stark dieses Band das Signal gerade herunterzieht (Kompressor und Gate zusammen), mit einer langsam abfallenden Peak-Hold-Linie. Vollausschlag sind 24 dB. Sie sind schreibgeschützt — es gibt sie, damit du auf einen Blick siehst, welches Band die Arbeit macht.
+
 ### Mute/Solo je Band (Low, Mid, High)
 
 | Parameter | Values | Default | Was es bewirkt |
@@ -107,9 +145,50 @@ Da L + R nach dem Dekodieren nur von Mid abhängt (algebraisch unabhängig davon
 |---|---|---|---|---|
 | **Output** | -24 – +24 | 0 | dB | Master-Trim, der angewendet wird, nachdem die drei Bänder summiert wurden — die finale Gain-Stufe im Plugin. Nutze ihn, um den Ausgangspegel von Triptych an das anzupassen, was als Nächstes in der Kette folgt (typischerweise ein Brickwall-Limiter auf dem Master-Bus). |
 
+## Latenz und Host-Delay-Kompensation *(neu in v0.5.0)*
+
+Steht **Lookahead** auf dem Default *Off*, meldet Triptych **null Latenz** — die Weichen sind minimalphasige IIR-Filter und die Detektoren kausal, es verzögert also nichts in der Kette das Signal. Jede vor v0.5.0 gespeicherte Session behält dieses Verhalten, weil es den Parameter nicht gab.
+
+Lookahead zu aktivieren meldet exakt Folgendes, und Hosts kompensieren automatisch:
+
+| Lookahead | 44,1 kHz | 48 kHz | 88,2 kHz | 96 kHz | 192 kHz |
+|---|---|---|---|---|---|
+| Off | 0 | 0 | 0 | 0 | 0 |
+| 1,5 ms | 66 | 72 | 132 | 144 | 288 |
+| 3 ms | 132 | 144 | 265 | 288 | 576 |
+| 5 ms | 221 | 240 | 441 | 480 | 960 |
+
+(Samples, auf ganze Samples gerundet — Hosts akzeptieren nur ganzzahlige Delay-Kompensation.)
+
+Lookahead bei laufendem Transport zu ändern lässt den Host seine Delay-Kompensation neu aushandeln, was die meisten Hosts mit einer kurzen Unterbrechung erledigen. Das ist branchenüblich für jeden Lookahead-Regler; wenn es dich stört, stelle ihn ein, bevor du auf Play drückst.
+
+## Sidechain-Routing pro Host
+
+Der Sidechain-Input ist **optional und standardmäßig deaktiviert**, sodass Triptych auch in Hosts normal lädt, die keinen anbieten (einschließlich des eigenen Standalone-Builds, der überhaupt keinen Sidechain hat).
+
+- **Logic Pro (AU)**: Wähle die Quellspur im *Side Chain*-Menü im Plugin-Header und stelle dann **SC Source** auf *External*.
+- **Cubase / Nuendo (VST3)**: Aktiviere den Sidechain-Input über den Sidechain-Button im Plugin-Header und route dann einen Send von der Quellspur dorthin.
+- **Reaper (VST3)**: Gib der Triptych-Spur 4 Eingangskanäle, route die Quellspur auf deren Kanäle 3/4 und pinne Kanäle 3/4 in der Routing-Matrix des Plugins auf dessen Sidechain-Input.
+- **Ableton Live (VST3/AU)**: Live legt Sidechain-Inputs für Drittanbieter-Plugins nicht so offen wie für seine eigenen Devices; nutze einen Return-/Aux-Routing-Workaround oder lass **SC Source** auf *Internal*.
+- **Standalone**: Es existiert kein Sidechain-Bus. *External* fällt stillschweigend auf *Internal* zurück.
+
+Ein Mono-Sidechain wird auf beide Detektorkanäle dupliziert. Das **Gate** keyt unabhängig von dieser Einstellung immer intern, auf dem bandeigenen Signal — ein Gate ist ein Bleed-/Noise-Werkzeug für das Material, das tatsächlich im Band liegt.
+
+## Crossover-Flanken und Phase
+
+Triptychs drei Bänder entstehen aus zwei in Serie kaskadierten Weichen: Die erste trennt Low von allem anderen, die zweite teilt den Rest in Mid und High. Dieser Baum ist **unkompensiert** — die Phasendrehung der zweiten Aufteilung landet auf Mid und High, aber nicht auf Low. Die Bandsumme bleibt magnitudenflach (das ist die Linkwitz-Riley-Eigenschaft, auf der Triptych aufbaut), aber sie ist nicht phasenflach, und der Betrag der Drehung skaliert mit der gewählten Flanke:
+
+| Flanke | Genauigkeit der flachen Summe | Phasenverhalten |
+|---|---|---|
+| 12 dB/Okt. | innerhalb ±0,25 dB | halb so viel Drehung wie der Default |
+| 24 dB/Okt. | innerhalb ±0,1 dB | das Referenzverhalten, unverändert seit v0.1 |
+| 48 dB/Okt. | innerhalb ±0,25 dB | doppelt so viel Drehung wie der Default |
+
+Das zählt in genau zwei Situationen: wenn du Triptychs Output gegen eine Dry-Kopie desselben Signals mischst (der **Mix**-Regler oder ein externer Parallelbus), und wenn jemand das Plugin mit einem phasenbewussten Analyzer misst. Für normalen seriellen Einsatz spielt es keine Rolle. Allpass-Kompensation des Low-Zweigs und ein linearphasiger Modus sind gemeinsam für v0.6.0 eingeplant, wo sich die Änderung des Default-Klangs mit einer ordentlichen state-versionierten Migration abfangen lässt.
+
 ## Presets
 
-Triptych bringt acht Werkspresets mit (Default, Density Glue, Peak Control, Low-End Tighten, De-Harsh Highs, Mastering Safety Ceiling, Parallel-Style Density, Hard Limiter Ceiling), die sowohl die Peak-Control- als auch die Density-Mastering-Philosophie abdecken — beide in [`docs/research-notes.md`](research-notes.md) dokumentiert —, dazu Workflow-Presets mit Fokus auf einzelne Bänder. Wofür jedes einzelne gedacht ist, steht in [`docs/presets.md`](presets.md). Die Preset-Leiste am oberen Rand des Plugin-Fensters lässt dich Werks- und eigene Presets durchstöbern, deine eigenen speichern/umbenennen/löschen, einen Default festlegen, der bei jeder frischen Instanz automatisch geladen wird, und einzelne Presets oder ganze Preset-Bänke importieren/exportieren (`.basilicapreset`/`.zip`). Eigene Presets werden pro Plugin unter `~/Library/Audio/Presets/Yves Vogl/Triptych/` auf macOS gespeichert (`%APPDATA%\Yves Vogl\Triptych\Presets\` unter Windows).
+Triptych bringt neun Werkspresets mit (Default, Density Glue, Peak Control, Low-End Tighten, De-Harsh Highs, Mastering Safety Ceiling, Parallel-Style Density, Hard Limiter Ceiling, Glue Master), die sowohl die Peak-Control- als auch die Density-Mastering-Philosophie abdecken — beide in [`docs/research-notes.md`](research-notes.md) dokumentiert —, dazu Workflow-Presets mit Fokus auf einzelne Bänder. Wofür jedes einzelne gedacht ist, steht in [`docs/presets.md`](presets.md). Die Preset-Leiste am oberen Rand des Plugin-Fensters lässt dich Werks- und eigene Presets durchstöbern, deine eigenen speichern/umbenennen/löschen, einen Default festlegen, der bei jeder frischen Instanz automatisch geladen wird, und einzelne Presets oder ganze Preset-Bänke importieren/exportieren (`.basilicapreset`/`.zip`). Eigene Presets werden pro Plugin unter `~/Library/Audio/Presets/Yves Vogl/Triptych/` auf macOS gespeichert (`%APPDATA%\Yves Vogl\Triptych\Presets\` unter Windows).
 
 ## Lokalisierung
 
@@ -124,3 +203,8 @@ Die Beschriftungen, Menüs und Dialoge der Preset-Leiste folgen automatisch dein
 - **Mute, statt Makeup einfach auf -12 dB zu ziehen**, wenn du einen Mix wirklich ohne den Beitrag eines Bands beurteilen willst — Mute (und Solo) tasten die Kompressor-Einstellungen dieses Bands überhaupt nicht an, sodass dein Feintuning vom A/B-Vergleich unberührt bleibt.
 - **Stell das Makeup je Band ein, um die Gain Reduction auszugleichen, und nutze den Master-Output für die Gesamtpegel-Anpassung** — diese beiden Aufgaben getrennt zu halten, macht es viel einfacher zu erkennen, ob ein Mix-Problem ein Balance-Problem zwischen den Bändern ist oder schlicht „alles zu laut/zu leise".
 - **Aktiviere Range, bevor du die Ratio unter 1:1 schiebst** (aufwärtsgerichtete Kompression/Expansion) — der Boost eines aufwärtsgerichteten Bands wächst weiter, je weiter das Signal über dem Threshold liegt, ohne eigene Obergrenze. Range gibt dir ein musikalisch sinnvolles Maximum, bevor du eine aggressive Aufwärts-Einstellung reindrehst, statt die Grenze erst nachträglich mit dem Ohr zu entdecken.
+- **Dreh Stereo Link hoch, bevor du einem wandernden Klangbild hinterherjagst.** Wenn ein hart gepannter Schlag den Mix bei aktivem Triptych zu einer Seite kippen lässt, sind das die unabhängig arbeitenden Detektoren beider Kanäle. Link auf 100 % zwingt beide Kanäle zum selben Gain und behebt es rundheraus; 60–80 % behalten etwas Reaktionsfähigkeit pro Seite und nageln das Bild trotzdem fest.
+- **Greife zu Auto Release, bevor du zu einem langsameren Release-Regler greifst.** Ein langsames Release stoppt das Pumpen, macht das Band aber auch träge bei Transienten. Auto Release gibt dir beides: schnelle Erholung von kurzen Spitzen, einen langen Ausklang nur dann, wenn das Band wirklich arbeitet.
+- **Nutze SC Listen, um Sidechain-Thresholds einzustellen, nicht deine Vorstellungskraft.** Schalte es auf das Band, das du keyst, stelle den Threshold des Bands nach Gehör gegen das ein, was du tatsächlich hörst, und schalte es dann wieder auf Off. Es spielt das Key-Signal ab, nicht das Band — und genau darauf bezieht sich ein Threshold.
+- **Lookahead ist für das Safety Ceiling, nicht für alles.** Sein eigentlicher Nutzen ist der Brickwall des High-Bands, der mit aktivem Lookahead wirklich überschwingfrei wird. Nutzt du den Limiter nicht, lohnt sich die Latenz meist nicht.
+- **Wähle die Crossover-Flanke nach der Aufgabe, nicht nach der Zahl.** 48 dB/Okt., wenn die Bearbeitung eines Bands nicht in seine Nachbarn bluten darf (ein harter De-Esser-Band, eine straffe Low-End-Klemme); 12 dB/Okt., wenn die Bänder sanft ineinander übergeben und sich eher wie ein Breitbandkompressor mit Tilt verhalten sollen.

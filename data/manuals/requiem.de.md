@@ -10,6 +10,10 @@
 
 Requiem ist ein Convolution-Reverb, der gezielt für die orchestrale/chorische Ebene eines Heavy-Music-Mixes entwickelt wurde — Streicher, Chor, Pads, Ambient-Texturen — statt als Allzweck-Reverb für jede beliebige Quelle. Er erzeugt seine Impulsantwort prozedural (keine mitgelieferte Sample-Library, die lizenziert oder verwaltet werden muss), geformt durch Regler, die auf musikalisch sinnvolle Entscheidungen abbilden: wie groß der Raum ist, wie hell oder dunkel der Tail klingt, wie ausgeprägt ein deutlicher früher „Slap" gegenüber einer glatten, homogenen Klangfläche ist, und ob er endlos aushalten statt abklingen soll. Du kannst außerdem eine eigene, aufgenommene Impulsantwort laden (eine echte Kathedrale, Halle, Plate oder irgendetwas anderes im WAV-/AIFF-Format o. Ä.), wenn du stattdessen einen bestimmten, nicht-prozeduralen Raum möchtest.
 
+### v0.3.0: das „Living Tail"-Release
+
+v0.3.0 ergänzt eine zweite Art, einen Reverb-Tail zu erzeugen. Neben der Convolution-Engine, die Requiem immer schon hatte, gibt es jetzt ein **Feedback Delay Network**, dessen Decay automatisch an die jeweils geladene Impulsantwort angepasst wird — und das sich, anders als eine feste Impulsantwort, nie wiederholt. Drei Engine-Modi bestimmen, wie die beiden kombiniert werden, und für den Mix kamen ein EQ auf dem Wet-Pfad sowie ein Ducker hinzu. Alles steht per Default auf dem Verhalten von v0.2.0: Eine bestehende Session klingt exakt wie zuvor.
+
 ### v0.2.0: ein recherchebasiertes Voicing-Rework
 
 Requiems Verhalten bei Early Reflections und Tail-Verdunkelung wurde in v0.2.0 neu aufgebaut, ausgerichtet an den *dokumentierten* Designprinzipien kategorieprägender cineastischer/orchestraler Reverb-Einheiten sowie an allgemeiner Raumakustik-Literatur — öffentliche Handbücher, Entwickler-Interviews, Fachpresse-Reviews und DSP-Literaturartikel, niemals am tatsächlich gemessenen Output irgendeiner Hardware oder eines kommerziellen Plugins, und es wurde keine Impulsantwort eines Drittanbieters gesampelt oder approximiert (die vollständige Quellenangabe findest du in `docs/research-notes.md`; was dies als Aussage rechtfertigt und was nicht, steht im Honesty-Abschnitt von `docs/design-brief.md`). Die beiden wichtigsten Korrekturen: Early Reflections bauen sich jetzt in ihrer *Dichte* über die ersten paar Dutzend Millisekunden auf, statt von einem lauten initialen Tap abzuklingen, und der Tail verdunkelt sich jetzt *progressiv*, während er abklingt (wobei der Bass messbar länger nachklingt als die Höhen), statt für seine gesamte Länge eine einzige statische Filterfarbe anzuwenden. Zwei neue Regler — **Size** und **Bass Decay** — sind aus diesem Recherche-Durchgang hervorgegangen; siehe ihre Einträge unten.
@@ -35,6 +39,42 @@ input -> Pre-Delay -> Convolution (procedural or user IR) -> Modulation (chorus,
 Decay, Damping, Space, Early/Late Balance, Freeze, Size und Bass Decay formen die Impulsantwort selbst (im Hintergrund neu generiert, nicht bei jedem Sample); Pre-Delay, Modulation, Width, Mix und Output bestimmen, wie diese Impulsantwort in Echtzeit auf dein Signal angewendet wird. Die vollständige technische Erklärung, warum das so aufgeteilt ist, findest du in [`docs/architecture.md`](architecture.md).
 
 ## Parameterreferenz
+
+### Engine
+
+Wählt, wie der Reverb-Tail erzeugt wird.
+
+- **Classic Convolution** (Default) — die Engine, die Requiem immer genutzt hat: eine Impulsantwort, gefaltet. Jede bestehende Session und jedes Preset nutzt sie, und sie klingt exakt wie in v0.2.0.
+- **Hybrid Tail** — die Impulsantwort liefert nur die Early Reflections, bis zu dem Punkt, an dem das Reflexionsmuster statistisch nicht mehr von Rauschen zu unterscheiden ist (die *Mixing Time*, automatisch gemessen). Von dort übernimmt ein Feedback Delay Network mit sechzehn Linien, dessen Decay pro Oktave an das gemessene Abklingen der Impulsantwort angepasst wird. Das Ergebnis klingt ab wie der aufgenommene Raum, loopt aber nie, weil nichts wiedergegeben wird.
+- **Tail Bloom** — die vollständige, unangetastete Impulsantwort, mit einem modulierenden Tail darunter. Nimm das, wenn du den Charakter einer bestimmten Aufnahme willst, sie aber atmen soll.
+
+Ein Moduswechsel ist klickfrei. Für kontinuierliche Automation ist er nicht gedacht.
+
+### Tail Mod Mode / Tail Mod Depth / Tail Mod Rate
+
+Bewegung im Tail, für die beiden Feedback-Delay-Network-Modi. In Classic Convolution stumm.
+
+- **Matrix** (Default) — moduliert, wie die Delay-Linien einander speisen, über Rotationen, die mathematisch garantiert energieerhaltend sind. Da sich keine Delay-Länge je ändert, bringt das Bewegung, **ohne irgendetwas zu verstimmen**: Die gemessene Tonhöhenabweichung liegt bei voller Depth unter einem Hundertstel Halbton. Nimm das für alles Harmonische.
+- **Lush** — moduliert die Delay-Längen selbst, der klassische Vintage-Ansatz. Das *verstimmt* hörbar und absichtlich. Nimm es, wenn du diesen Charakter willst, und sei vorsichtig bei getragenem tonalem Material.
+- **Off** — keine Modulation.
+
+Depth legt fest wie viel; Rate skaliert wie schnell, als Prozentsatz der eingebauten Raten.
+
+### Bloom
+
+Wie viel des modulierenden Tails im Modus **Tail Bloom** unter die Impulsantwort gelegt wird. In den anderen beiden Modi unhörbar. Die Kennlinie ist am unteren Ende des Bereichs bewusst sanft, damit niedrige Einstellungen brauchbar sind, statt gleich zu einer offensichtlichen zweiten Ebene zu springen.
+
+### Low Cut / High Cut
+
+Ein Hochpass und ein Tiefpass mit 12 dB/Oktave, ausschließlich auf dem **Wet-Signal** — das Dry-Signal wird nie angetastet. Low Cut ist die übliche Abhilfe für einen Reverb, der das Low End vermatscht; High Cut nimmt einem hellen Tail die Schärfe, ohne die Quelle stumpf zu machen.
+
+Beide sind an ihren Bereichsenden (20 Hz und 20 kHz) hart gebypasst, und das sind die Defaults. Bei diesen Einstellungen laufen die Filter gar nicht, der Wet-Pfad ist also bit-identisch zu v0.2.0.
+
+### Duck / Duck Attack / Duck Release
+
+Zieht den Reverb herunter, während der Input spielt, und lässt ihn in den Lücken wieder hoch — der Standardtrick, damit ein großer Reverb einen Gesang oder eine Dialogspur nicht zuschüttet. Der Sidechain ist der Dry-Input, es triggert also die Quelle, nicht der Tail.
+
+Duck steht per Default auf 0 %, und bei 0 % ist der Wet-Gain exakt 1 — es findet überhaupt keine Verarbeitung statt. Attack und Release bestimmen, wie schnell der Duck eingreift und sich erholt, und sind wirkungslos, solange Duck auf 0 % steht.
 
 ### Decay
 **Bereich:** 0.1 – 10.0 s · **Standard:** 2.5 s
@@ -81,7 +121,15 @@ Blendet zwischen der Early-Reflection-Ebene (0 %, geformt durch Space) und dem d
 Fügt dem Reverb-Tail eine subtile, langsame, Chorus-artige Bewegung hinzu — niemals dem Dry-Signal. Prozedural generierte Impulsantworten können gelegentlich etwas statisch oder metallisch klingen im Vergleich zu einem echten aufgenommenen Raum; eine kleine Menge Modulation (10–30 %) mildert das, ohne als offensichtlicher Chorus-/Vibrato-Effekt hörbar zu sein. Bei 0 % ist die Modulation-Stufe vollständig bypassed (identischer Output, als gäbe es sie gar nicht) — es ist unbedenklich, sie auf Standard zu lassen, sofern du nicht gezielt diese zusätzliche Bewegung willst.
 
 ### Freeze
+
 **Off / On** · **Standard:** off
+
+**Was Freeze tut, hängt jetzt von der Engine-Einstellung ab**, und die beiden Verhaltensweisen unterscheiden sich wirklich:
+
+- **In Classic Convolution** funktioniert es exakt wie in v0.2.0 — unten vollständig beschrieben. Der Tail wird mit einer flachen Hüllkurve neu erzeugt, das Aushalten ist also durch die Decay-Einstellung begrenzt.
+- **In Hybrid Tail und Tail Bloom** ist es *strukturell und wirklich unendlich*. Die Dämpfung pro Linie des Feedback Delay Network wird über 20 ms auf Unity ausgeblendet, womit ein verlustfreies Netzwerk übrig bleibt: Es hält das bereits darin zirkulierende Audio exakt und unbegrenzt. Es wird nichts neu erzeugt, der Schalter greift also innerhalb eines einzigen Audioblocks statt auf den nächsten Regenerations-Tick zu warten, und es gibt keine durch Decay gesetzte Obergrenze. Die gemessene Haltestabilität liegt über zwanzig Sekunden innerhalb von 0,2 dB.
+
+Der Rest dieses Abschnitts beschreibt das Classic-Verhalten.
 
 Wenn aktiviert, hält der Reverb-Tail seinen aktuellen spektralen Inhalt aus, statt abzuklingen — nützlich, um einen Akkord oder eine Textur unter einem Übergang, Breakdown oder Ambient-Abschnitt zu halten, ohne ein separates Pad-/Drone-Instrument zu benötigen. Freeze ist Convolution-basiert, daher ist das Aushalten durch die Decay-Einstellung begrenzt (bis zu 10 s), nicht buchstäblich unendlich — stell es dir eher als „halte diesen Schnappschuss des Tails für bis zu Decay Sekunden" vor statt als Feedback-Loop-artiges unendliches Freeze. Damping beeinflusst weiterhin die Helligkeit der eingefrorenen Textur, während sie aktiv ist (dabei auf einer konsistenten Farbe gehalten, statt sich weiter zu verdunkeln); Early/Late Balance und die Early-Reflection-Ebene werden im eingefrorenen Zustand ignoriert (ein eingefrorener Tail ist immer die volle diffuse Fläche).
 

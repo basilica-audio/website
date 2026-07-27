@@ -62,6 +62,18 @@ Crypta bringt ein Preset-System mit: Eine horizontale Leiste am oberen Rand des 
 
 Eine frische Instanz lädt ein eigenes „Default"-Preset, falls du eines gespeichert hast („Set current as default" im Preset-Menü), sonst das Werks-„Default"-Preset (das den unten dokumentierten reinen Parameter-Defaults entspricht).
 
+## Engines (NEU in v0.3.0)
+
+Drei Parameter wählen zwischen dem DSP aus v0.2.0 und seinem Ersatz aus v0.3.0. Eine **neue** Instanz startet in den neuen Engines; **jede Session und jedes Preset, das du vor v0.3.0 gespeichert hast, behält die alten**, sodass sich an nichts, was du bereits gemacht hast, der Klang ändert. Wechsle frei — die Änderung ist überblendet, nicht gestuft.
+
+| Parameter | Optionen | Default (frische Instanz) | Was sich ändert |
+|---|---|---|---|
+| Drive Engine | Classic / Circuit | Circuit | *Classic* ist exakt das Mid- und High-Band aus v0.2.0. *Circuit* baut beide aus Schaltungsmodellen neu auf, mit weit weniger Aliasing (25–30 dB besser) und Pre-/Post-Emphasis-Netzwerken pro Voicing. |
+| Low Comp Detector | Classic Peak / Smooth RMS | Smooth RMS | *Classic Peak* ist der Detektor aus v0.2.0. *Smooth RMS* misst über ein Fenster, das länger als eine Bassperiode ist, sodass das Low-Band bei getragenen tiefen Noten nicht mehr tremoliert. |
+| Gate Mode | Classic / Modern | Modern | *Classic* ist das Gate aus v0.2.0. *Modern* ergänzt Hysterese, Hold, einen Sidechain-Hochpass nur im Detektor und ein geradliniges Release. |
+
+**Wenn dir der alte Sound lieber war**, stelle die betreffende Engine auf Classic — sie ist exakt erhalten, nicht angenähert.
+
 ## Parameter-Referenz
 
 Sofern nicht anders angegeben, sind alle kontinuierlichen Parameter geglättet (Smoothing), um Zipper-Noise bei Automation zu vermeiden.
@@ -73,11 +85,14 @@ Sofern nicht anders angegeben, sind alle kontinuierlichen Parameter geglättet (
 | Input Gain | −24 … +24 | 0 | dB | Trimmt das Signal, bevor irgendetwas anderes in der Kette passiert. Nutze das, um ein hohes, aber nicht clippendes Signal in die Gate-/Kompressor-/Drive-/Voicing-Stufen zu bekommen — all ihre Thresholds sind unter der Annahme eines einigermaßen „Line-Level"-Eingangs kalibriert. |
 | Output Gain | −24 … +24 | 0 | dB | Finaler Output-Trim, angewendet nach allem anderen (einschließlich des Safety Clip). |
 | Bypass | off/on | off | — | Erzwingt einen bitgenauen Durchlauf des Eingangssignals. Auch als hostseitiger Bypass-Parameter des Plugins verfügbar, sodass auch der eigene Bypass-Button/die Automationsspur deiner DAW funktioniert. |
-| Safety Clip | off/on | off | — | Ein weicher (tanh) Limiter auf der allerletzten Stufe vor dem Output-Trim. Standardmäßig aus; schalte ihn als Sicherheitsnetz gegen versehentliches hartes Clipping ein, nicht als Tone-Shaping-Werkzeug — bei typischen Spielpegeln ist er unhörbar und beginnt erst, Peaks zu runden, wenn sie sich 0 dBFS nähern. |
+| Safety Clip | off/on | off | — | Ein weicher Ceiling-Clip auf der allerletzten Stufe vor dem Output-Trim. Standardmäßig aus; schalte ihn als Sicherheitsnetz gegen versehentliches hartes Clipping ein, nicht als Tone-Shaping-Werkzeug. Seit v0.3.0 ist er antialiased und unterhalb des Ceilings wirklich transparent — ihn scharf zu stellen färbt nichts mehr, bis tatsächlich etwas das Ceiling erreicht. |
+| Clip Ceiling | −12 … 0 | 0 | dBFS | Wo der Safety Clip zu arbeiten beginnt. Wird nur gelesen, solange Safety Clip an ist. 0 dBFS reproduziert das Verhalten aus v0.2.0. |
 
 ### Noise Gate (Full-Band, vor dem Crossover-Split)
 
 Sitzt vor beiden Frequenzweichen, gatet also das Eingangssignal als Ganzes statt pro Band.
+
+**Gate Ratio ist Classic-only.** Modern ist ein Gate mit einer Range-Untergrenze statt eines Ratio-Expanders und ignoriert es.
 
 | Parameter | Range | Default | Unit | Was es bewirkt |
 |---|---|---|---|---|
@@ -86,6 +101,10 @@ Sitzt vor beiden Frequenzweichen, gatet also das Eingangssignal als Ganzes statt
 | Gate Ratio | 1 … 20 | 10 | :1 | Wie aggressiv das Gate unterhalb des Thresholds dämpft. Höher = näher an einem harten Mute. |
 | Gate Attack | 0.1 … 50 | 1 | ms | Wie schnell das Gate öffnet, sobald das Signal wieder über den Threshold steigt. |
 | Gate Release | 5 … 500 | 100 | ms | Wie schnell das Gate schließt, sobald das Signal unter den Threshold fällt. |
+| Gate Hysteresis | 0 … 12 | 4 | dB | *Nur Modern.* Wie weit unter den Threshold das Signal fallen muss, bevor das Gate zu schließen beginnt. Das ist es, was verhindert, dass eine durch den Threshold ausklingende Note das Gate stottern lässt. |
+| Gate Hold | 0 … 500 | 20 | ms | *Nur Modern.* Hält das Gate nach dem Abfallen des Signals so lange offen und startet bei jedem neuen Transienten neu — damit es zwischen schnellen Noten nicht zuschlägt. |
+| Gate SC Highpass | 20 … 400 | 80 | Hz | *Nur Modern.* Hochpasst ausschließlich den **Detektor** des Gates; das Audio bleibt unangetastet. Höher drehen, wenn eine klingende tiefe Saite das Gate offen hält. |
+| Gate Range | 6 … 90 | 60 | dB | *Nur Modern.* Wie stark ein vollständig geschlossenes Gate dämpft, und die Höhe, durch die die Release-Rampe fällt. Ein Gate, das nur 12 dB absenkt, klingt oft natürlicher als eines, das ganz zumacht. |
 
 ### Split Low / Split High (zwei kaskadierte Frequenzweichen, NEUE Topologie in v0.2.0)
 
@@ -109,6 +128,9 @@ Das Low-Band wird **parallel** komprimiert: Das komprimierte Signal wird über M
 | Low Comp Makeup | −12 … +24 | 0 | dB | Gain, der auf das komprimierte (Wet-)Signal angewendet wird, bevor es mit dem trockenen Low-Band zurückgemischt wird — nutze das, um das komprimierte Signal wieder auf den Pegel des trockenen Signals zu bringen, damit Mix wirklich als „wie viel Kompressions-Charakter"-Regler funktioniert, statt auch die Gesamtlautheit zu verändern. |
 | Low Comp Mix | 0 … 100 | 100 | % | Blend zwischen dem trockenen (unkomprimierten) und dem nassen (komprimierten + Makeup) Low-Band. 0 % = Kompressor hat keine hörbare Wirkung; 100 % = vollständig komprimiert. |
 | Low Level | −24 … +12 | 0 | dB | Pegel-Trim auf dem Low-Band, angewendet nach der Kompression und bevor die Bänder wieder summiert werden. |
+| Low Comp Knee | 0 … 18 | 6 | dB | *Nur Smooth RMS.* Breite des Soft Knee um den Threshold. 0 dB ist ein Hard Knee; breitere Einstellungen beginnen allmählich zu komprimieren, während sich das Signal dem Threshold nähert, was bei getragenem Bass deutlich unauffälliger ist. |
+| Low Comp Auto Release | off/on | on | — | *Nur Smooth RMS.* Dehnt das Release bei getragenem Material und lässt es bei Transienten auf dem eingestellten Wert, sodass eine gehaltene tiefe Note nicht gepumpt wird. |
+| Low Comp Auto Makeup | off/on | off | — | Wird von **beiden** Detektoren gelesen. Fügt einen festen Boost hinzu, der etwa die Hälfte des am Threshold weggenommenen Gains kompensiert, sodass eine Threshold-Änderung nicht auch deinen Pegel ändert. Wird mit dem manuellen Makeup-Regler summiert. |
 
 ### Mid-Band: Drive + Level (NEU in v0.2.0)
 
@@ -131,6 +153,7 @@ Drei wählbare Distortion-Voicings, jedes oversampled (4x), um das Aliasing der 
 | High Tone | 0 … 100 | 50 | % | Tone-Regler nach dem Shaper: ein Low-Pass, der von dunkel (0 %) zu hell (100 %) fährt und Fizz/Härte aus der Distortion-Stufe wegräumt oder öffnet. |
 | High Blend | 0 … 100 | 100 | % | Blend zwischen dem sauberen (Pre-Voicing-) und dem voll verzerrten High-Band. 0 % = sauberes High-Band (Voicing hat keine hörbare Wirkung); 100 % = vollständig verzerrt. |
 | High Level | −24 … +12 | 0 | dB | Pegel-Trim auf dem High-Band, angewendet nach Voicing/Blend und bevor die Bänder wieder summiert werden. |
+| High Bias | 0 … 100 | 0 | % | *Nur Circuit.* Versetzt den Clipper so, dass er asymmetrisch sättigt, was geradzahlige Harmonische hinzufügt — ein wärmerer, „röhrenartigerer" Charakter als der symmetrische Default. 0 % ist exakt der Charakter aus v0.2.0. Der Versatz wird weiter hinten wieder entfernt, das legt also nie DC auf deinen Output. |
 
 **Voicings:**
 
@@ -169,7 +192,17 @@ Eine faltungsbasierte (Convolution) Cab-Sim-Stufe, die jetzt **nur das Mid+High-
 
 *Impulsantworten laden:* v0.2.0 liefert weiterhin keinen In-Plugin-Dateibrowser und keine Factory-Cabinet-IRs (beides steht für einen späteren Milestone zusammen mit dem Custom-GUI auf der Roadmap). Die IR-Loading-DSP-Engine selbst ist vollständig implementiert und echtzeitsicher.
 
-## State-Migration (v0.1.x → v0.2.0)
+## State-Migration
+
+### v0.2.x → v0.3.0
+
+Eine vor v0.3.0 gespeicherte Session zu öffnen oder ein solches Preset zu laden setzt **Drive Engine**, **Low Comp Detector** und **Gate Mode** auf ihre Classic-Werte, sodass deine gespeicherte Arbeit exakt wie zuvor klingt. Das gilt gleichermaßen für Host-Sessions und für deine eigenen gespeicherten Presets, einschließlich eines eigenen Presets namens „Default" — hattest du also deinen eigenen Default gespeichert, bekommst du bei einer neuen Instanz weiterhin genau den.
+
+Die eine bewusste Ausnahme ist der **Safety Clip**: Hattest du ihn eingeschaltet, ist der Clipper von v0.3.0 nicht bit-identisch mit dem von v0.2.0. Er aliast weit weniger und ist unterhalb des Ceilings transparent; der Unterschied beschränkt sich auf Material, das tatsächlich geclippt wurde.
+
+Neue Parameter (High Bias, die Knee- und Auto-Regler, die Regler des Modern-Gates, Clip Ceiling) sind entweder per Default neutral oder werden nur gelesen, wenn ihre Engine gewählt ist — und die wählt Legacy-State nie.
+
+### v0.1.x → v0.2.0
 
 Öffnest du eine Crypta-v0.1.x-Session, wird der alte einzelne Wert `Crossover Frequency` auf den neuen Parameter **Split High** migriert, begrenzt auf dessen neuen Bereich von 300–2000 Hz (der eigene Werks-Default von v0.1.x, 250 Hz, liegt unterhalb dieser Untergrenze, sodass eine unveränderte v0.1.x-Session beim erneuten Öffnen exakt bei 300 Hz landet). Split Low und jeder neue Mid-Band-/Tight-Parameter fallen auf ihre v0.2.0-Defaults zurück. Alle Low-Band-Kompressor-Einstellungen, die du bewusst von den alten Defaults von v0.1.x abweichend geändert hattest, bleiben unverändert erhalten — nur der *Werks-Default* hat sich geändert, nicht deine eigenen bewussten Einstellungen. Das ist eine Best-Effort-, verlustbehaftete Migration in eine Richtung; prüfe nach dem Wiederöffnen einer alten Session dein Low-/Mid-/High-Gleichgewicht erneut.
 

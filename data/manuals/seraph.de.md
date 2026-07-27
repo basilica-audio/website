@@ -15,7 +15,7 @@ Es vereint vier Processing-Stufen, zu denen man bei einem Vocal normalerweise se
 1. **De-Ess** — zähmt Zischlaute („s", „sch", „t"-Konsonanten), die durch ein helles Vocal-Mikro und starkes Top-End-EQ an anderer Stelle im Mix (Becken, verzerrtes Gitarren-Fizz, Streichersektionen) tendenziell ermüdend werden.
 2. **Air** — fügt das Gefühl luftiger Offenheit oberhalb des natürlichen Präsenzbereichs des Vocals hinzu (oder entfernt es) – die Art von Schimmer, die einem opernhaften Sopran hilft, sich gegen eine Wand aus Gitarren durchzusetzen.
 3. **Gentle Compressor** — gleicht die Dynamik mit einem „Glue"-artigen Kompressor aus, sodass das Vocal auf einem konstanten Pegel im Mix sitzt, ohne hörbar zu pumpen.
-4. **Doubler** — ein click-freier Vier-Stimmen-Doubler/Chorus, der einen einzelnen Take zu einer kleinen Chor-Fläche verdickt, ohne die diskreten Pitch-Shift-Artefakte granularer Doubler.
+4. **Doubler** — ein Vier-Stimmen-Vocal-Doubler, der einen einzelnen Take zu einer kleinen Chor-Fläche verdickt, in drei wählbaren Engines (siehe [Doubler-Modi](#doubler-modi) unten).
 
 Alles bis Mix/Output ist ein einziger, in sich geschlossener Channel Strip: Setze Seraph auf einen Vocal- oder Chor-Bus, stelle De-Essing und Air nach Geschmack ein, füge bei dynamisch unruhigen Takes einen Hauch Glue-Kompression hinzu, und nutze den Doubler, um eine Leadlinie zu verbreitern oder einen Chor-Part zu verdicken.
 
@@ -27,7 +27,7 @@ Seraph ist dafür gedacht, auf Vocal-/Chor-Spuren oder einem Vocal-Bus zu laufen
 Vocal/choir recording -> (tuning/editing, if used) -> Seraph -> reverb/delay send -> mix bus
 ```
 
-Da Seraph **0 Samples Latenz** meldet, braucht es nie eine host-seitige Plugin-Delay-Compensation-Berechnung — es lässt sich gefahrlos an jeder Stelle einer Vocal-Kette einsetzen, auch parallel (z. B. auf einem gedoppelten/gemischten parallelen Vocal-Bus), ohne Phasenausrichtungs-Überraschungen gegenüber einem Dry-Pfad.
+In seiner Default-Konfiguration meldet Seraph **0 Samples Latenz**, braucht also keine host-seitige Delay-Compensation-Berechnung und lässt sich gefahrlos an jeder Stelle einer Vocal-Kette einsetzen, auch parallel. Zwei Einstellungen ändern das bewusst — siehe [Latenz und Delay-Kompensation](#latenz-und-delay-kompensation).
 
 Ein paar praktische Platzierungen in einer Heavy-Music-Produktion:
 
@@ -38,8 +38,9 @@ Ein paar praktische Platzierungen in einer Heavy-Music-Produktion:
 ## Signalfluss
 
 ```
-input -> De-Ess (sibilance dynamic EQ, + Width + Listen mode) -> Air (12 kHz high-shelf)
-       -> Gentle Compressor (broadband glue, auto-release) -> Doubler (4 voices, per-voice pan)
+input -> De-Ess (sibilance dynamic EQ, + Width/Knee/Link/Lookahead + Listen mode)
+       -> Air (10/12/15 kHz high-shelf) -> Gentle Compressor (broadband glue, auto-release, + Link)
+       -> Doubler (4 voices, per-voice pan, Classic/Micro/Shift + Humanize)
        -> Output trim -> Mix -> output
 ```
 
@@ -47,7 +48,7 @@ Das vollständige technische Signalfluss-Diagramm und die DSP-Design-Notizen fin
 
 ## Presets
 
-Seraph bringt eine Preset-Leiste mit, die oben im Plugin-Fenster andockt: Durchstöbere Werkspresets und eigene Presets über das Namensmenü, blättere mit den `<`/`>`-Pfeilen hindurch, und nutze Save/Save As.../Delete/Import.../Export..., um deine eigenen zu verwalten. Neun Werkspresets decken Lead-, Chor-, Spoken-Interlude- und Single-Stage-Utility-Anwendungsfälle ab — die vollständige Liste mit der Absicht hinter jedem Preset findest du in [`presets.md`](presets.md). „Set current as default" (im Preset-Namensmenü) legt fest, was beim nächsten Öffnen einer frischen Instanz von Seraph geladen wird. Eigene Presets werden pro Benutzer gespeichert (`~/Library/Audio/Presets/Yves Vogl/Seraph/` auf macOS) und lassen sich als einzelne Dateien exportieren/importieren oder als Bank teilen.
+Seraph bringt eine Preset-Leiste mit, die oben im Plugin-Fenster andockt: Durchstöbere Werkspresets und eigene Presets über das Namensmenü, blättere mit den `<`/`>`-Pfeilen hindurch, und nutze Save/Save As.../Delete/Import.../Export..., um deine eigenen zu verwalten. Zwölf Werkspresets decken Lead-, Chor-, Spoken-Interlude- und Single-Stage-Utility-Anwendungsfälle ab — die vollständige Liste mit der Absicht hinter jedem Preset findest du in [`presets.md`](presets.md). „Set current as default" (im Preset-Namensmenü) legt fest, was beim nächsten Öffnen einer frischen Instanz von Seraph geladen wird. Eigene Presets werden pro Benutzer gespeichert (`~/Library/Audio/Presets/Yves Vogl/Seraph/` auf macOS) und lassen sich als einzelne Dateien exportieren/importieren oder als Bank teilen.
 
 ## Parameterreferenz
 
@@ -64,8 +65,45 @@ Seraph bringt eine Preset-Leiste mit, die oben im Plugin-Fenster andockt: Durchs
 | **Double Width** | 0-100 | 100 | % | Stereo-Streuung der vier Doubler-Stimmen. 0 % hält alle vier Stimmen zentriert (mono-kompatibel, nützlich, wenn das Vocal in einem mono-fold-down-sensiblen Mix zentriert bleiben muss); 100 % verteilt sie über das gesamte Stereofeld für einen breiten Chor-Effekt. |
 | **Mix** | 0-100 | 100 | % | Gesamte Dry/Wet-Mischung. Steht standardmäßig auf 100 % (vollständig prozessiert), da Seraph als vollwertiger Channel Strip laufen soll, nicht eingemischt werden — senke ihn nur für Parallel-Processing-Setups (z. B. um ein de-essed/gedoppeltes Signal unter ein ansonsten unangetastetes Dry-Vocal zu mischen). |
 | **Output** | -24 to +24 | 0 | dB | Output-Trim, angewendet nach dem Doubler und vor Mix. Nutze ihn, um Pegeländerungen durch Comp oder Double auszugleichen, bevor das Signal die nächste Stufe deiner Kette erreicht. |
+| **De-Ess Knee** | 0-12 | 0 | dB | Wie allmählich das De-Essing um seinen Threshold herum einsetzt. Bei 0 schnappt die Reduktion in dem Moment zu, in dem Zischlaute den Threshold überschreiten — chirurgisch, und bei Grenzfall-Konsonanten als „Zupacken" hörbar. Höher gedreht beginnt es schon unterhalb des Thresholds sanft zu reduzieren und erreicht oberhalb die volle Stärke, was sich wie ein De-Esser liest, der einfach immer leicht da ist, statt wie einer, der zuschnappt. 4–8 dB passen zu einem Lead-Vocal; für chirurgische Reparaturarbeit lass es bei 0. |
+| **De-Ess Lookahead** | 0-2 | 0 | ms | Lässt den De-Esser das Ess kommen sehen, sodass der Gain schon unten ist, wenn es eintrifft, statt in der ersten Millisekunde hinterherzulaufen. Entfernt den hellen „Tick" am Anfang eines harten Konsonanten, den keine noch so hohe zusätzliche Reduktion behebt. **Fügt Latenz hinzu** (siehe unten) und ist nicht automatisierbar. 1–2 ms genügen völlig; mehr bringt nichts, weshalb der Bereich dort endet. |
+| **De-Ess Link** | off/on | off | - | Aus wird jeder Kanal von seinem eigenen Detektor de-esst. An werden beide Kanäle gemeinsam um den jeweils lauteren reduziert. Schalte es für alles Stereophone ein, bei dem ein Ess das Klangbild nicht seitlich verschieben soll — ein gedoppelter oder gespreizter Chor, eine Stereo-Raumaufnahme. Bei zwei wirklich unabhängigen Mono-Quellen lass es aus. |
+| **Comp Link** | off/on | off | - | Dieselbe Idee für den Kompressor: An treibt eine gemeinsame Hüllkurve (inklusive Auto-Release) beide Kanäle, sodass das Stereobild unter Kompression stehen bleibt. Auf einem Stereo-Vocal-Bus empfohlen. |
+| **Air Freq** | 10/12/15 kHz | 12 kHz | - | Wo der Air-Shelf zu heben beginnt. 12 kHz ist das, was Seraph immer genutzt hat. 10 kHz greift weiter herunter in die Präsenz, nützlich bei einem dunkleren Take oder einem dumpferen Mikrofon. 15 kHz bleibt vollständig aus dem Zischlautbereich heraus, was gut zu starkem De-Essing passt — du kannst Offenheit hinzufügen, ohne das gerade entfernte Ess wieder zu füttern. |
+| **Double Mode** | Classic / Micro / Shift | Classic | - | Welche Doubler-Engine läuft. Siehe [Doubler-Modi](#doubler-modi). Nicht automatisierbar, da zwei der drei eine unterschiedliche Latenz melden. |
+| **Humanize** | 0-100 | 0 | % | Wie stark jede gedoppelte Stimme für sich driftet — langsam, in Timing, Tonhöhe und Pegel. Bei 0 stehen die Stimmen mathematisch zueinander in Beziehung, so wie ein Doubler immer geklungen hat. Höher gedreht dekorreliert sie so, wie vier echte Sänger sich nie ganz einig sind. 20–40 % reichen, um das Maschinenhafte zu nehmen; höhere Einstellungen werden lose und chorartig. Deterministisch: Dieselben Einstellungen erzeugen immer denselben Drift. |
+| **Formant Preserve** | off/on | on | - | Nur im Shift-Modus aktiv. An behält die Stimme ihren eigenen Vokalcharakter, während sich die Tonhöhe bewegt. Aus wandern die Formanten mit der Tonhöhe. Innerhalb von Seraphs Bereich von +/-50 Cent ist der Unterschied so oder so subtil, das hier ist also vor allem eine Absicherung für den höherwertigen Pfad der Shift-Engine. |
 
-Alle Parameter sind geglättet (kein Zipper-Noise bei Automation oder manuellen Reglerbewegungen) und automationssicher.
+Alle Parameter sind geglättet (kein Zipper-Noise bei Automation oder manuellen Reglerbewegungen). Alle sind automationssicher außer **Double Mode** und **De-Ess Lookahead**, die die gemeldete Latenz ändern — siehe unten.
+
+## Doubler-Modi
+
+Die drei Modi teilen sich dieselben vier Stimmen, dieselben Panoramapositionen pro Stimme und dieselben Amount-/Detune-/Width-Kennlinien; ein Wechsel zwischen ihnen behält also das Arrangement und ändert nur, wie das Detune erzeugt wird. Ein Wechsel wird von einer kurzen Blende verdeckt, du kannst sie also bei laufendem Audio abhören.
+
+| Modus | Was er tut | Latenz | Wofür |
+|---|---|---|---|
+| **Classic** | Die Engine, die Seraph immer schon hatte: Die Delay-Linie jeder Stimme wird von einem langsamen Sinus gewobbelt, was die Tonhöhe kontinuierlich um die Note herum auf und ab verschiebt. Nie in Stimmung, nie verstimmt. | Keine | Der vertraute Seraph-Doubler-Sound. Alles, was vor v0.3.0 entstanden ist, nutzt ihn und bleibt unverändert. |
+| **Micro** | Ein echtes konstantes Detune — jede Stimme sitzt eine feste Anzahl Cent daneben und bleibt dort. Genau auf deutlich unter ein Cent. | Keine | Stacks, die ein Intervall halten müssen: Chor-Parts, weite Lead-Doubles, überall dort, wo das Classic-Wobble sich als „Chorus" liest, wo du „noch ein Sänger" wolltest. Konstruktionsbedingt slappiger als Classic (siehe unten). |
+| **Shift** | Spektrales Pitch-Shifting, mit der Option, den Vokalcharakter festzuhalten, während sich die Tonhöhe bewegt. Der genaueste und der teuerste. | ~30 ms | Das sauberste Doubling, und der Modus, zu dem du greifst, wenn Detune Richtung oberes Ende seines Bereichs geschoben wird. |
+
+Zwei Dinge sind zu **Micro** wissenswert. Seine Stimmen sitzen zeitlich weiter hinten als die von Classic — rund 34–49 ms statt 9–24 ms —, weil der Pitch-Shift durch kontinuierliches Gleiten der Delay-Linie erzeugt wird. Das ist ein bewusster Charakterunterschied, kein Fehler: Micro ist slappiger und liest sich als breiteres, stärker abgesetztes Double. Und weil diese ~25 ms der Effekt selbst und keine Verarbeitungsverzögerung sind, meldet Micro überhaupt keine Latenz; brauchst du die gedoppelten Stimmen eng am Dry-Signal, ist Classic der strammere Modus.
+
+**Shift** ist der einzige Modus, der Latenz meldet, und der einzige, bei dem das Plugin vom Host delay-kompensiert werden muss. Jede aktuelle DAW erledigt das automatisch.
+
+## Latenz und Delay-Kompensation
+
+| Einstellung | Gemeldete Latenz bei 48 kHz |
+|---|---|
+| Default (Classic, kein Lookahead) | 0 Samples |
+| Micro-Modus | 0 Samples |
+| Shift-Modus | 1440 Samples (30,0 ms) |
+| De-Ess Lookahead auf 2 ms | 96 Samples |
+
+Die beiden addieren sich: Shift-Modus mit 2 ms Lookahead meldet 1536 Samples. Der Wert skaliert mit der Samplerate — der Shift-Modus liegt immer bei ~30 ms, also 2880 Samples bei 96 kHz.
+
+Beide Einstellungen sind **nicht automatisierbar**, mit Absicht. Hosts kommen mit einer Latenzänderung mitten in einer Automation schlecht zurecht, deshalb ändert Seraph das Gemeldete nur als Reaktion auf eine bewusste Bewegung deinerseits und verdeckt die Änderung selbst mit einer 10-ms-Blende. Du kannst die Modi weiterhin bei laufendem Audio umschalten; du kannst es nur nicht in eine Automations-Lane zeichnen.
+
+Ist eines von beiden aktiv, wird das gesamte Plugin — inklusive der Dry-Seite des Mix-Reglers — um den gemeldeten Betrag verzögert, sodass Mix eine saubere Mischung bleibt statt zu verschmieren. Paralleles Routing funktioniert weiterhin; die Delay-Kompensation deiner DAW richtet den Seraph-bearbeiteten Pfad automatisch gegen den unangetasteten aus.
 
 ## Tipps
 
@@ -76,10 +114,16 @@ Alle Parameter sind geglättet (kein Zipper-Noise bei Automation oder manuellen 
 - **Comp ist ein Glue-Regler, kein Leveling-Werkzeug.** Wenn ein Take stark inkonsistente Pegel hat (sehr leise Strophen, sehr laute Refrains), behebe das zuerst mit Clip Gain oder einem dedizierten Leveling-Kompressor vorgeschaltet; Comps sanftes 3:1-Maximum-Ratio soll einem bereits einigermaßen ausgeglichenen Take Konsistenz und Kohäsion geben, nicht einen wild unebenen retten.
 - **Double ist additiv, kein Ersatz für echte gedoppelte Takes.** Bei Chor-Parts klingt eine Prise Double in niedriger bis moderater Menge zusätzlich zu ein paar echten aufgenommenen Layern meist voller und natürlicher, als sich allein auf Double zu verlassen, um aus einem einzigen Take einen ganzen Chor zu simulieren.
 - **Behalte Width bei einem mono-sensiblen Mix im Blick.** Falls dein Material auf Mono gefaltet werden könnte (Streaming-Plattformen, manche Broadcast-Ketten), prüfe den Doubler mit Width Richtung 0 % zurückgezogen, um sicherzustellen, dass sich die gedoppelten Stimmen beim Summieren nicht unangenehm auslöschen.
-- **Null Latenz bedeutet, Seraph ist sicher in Parallelketten.** Da Seraph nie eine Plugin-Delay meldet, kannst du einen Seraph-bearbeiteten Vocal-Bus frei gegen einen unangetasteten Dry-Vocal-Bus mischen (oder eine Spur duplizieren und zwei unterschiedliche Seraph-Einstellungen darauf laufen lassen), ohne dass deine DAW irgendetwas zeitlich ausrichten muss.
+- **Probiere Micro, bevor du zu mehr Detune greifst.** Klingt ein Double eher nach Chorus-Effekt als nach einem zweiten Sänger, liegt das Problem meist am Wobble der Classic-Engine, nicht an der Menge des Detunes. Micro bei 8–14 Cent liest sich oft als „noch ein Take", wo Classic bei derselben Einstellung als „Effekt" liest.
+- **Humanize ist das, was einen Stack davon abhält, synthetisch zu klingen.** Vier Stimmen mit exaktem Detune sind immer noch vier Kopien einer Performance. Ein wenig Drift — 20–30 % — ist meist der Unterschied zwischen einem Doubler, den man bemerkt, und einem, den man nicht bemerkt.
+- **Schalte die Links bei Stereoquellen ein.** De-Ess Link und Comp Link kosten beide nichts und verhindern beide dasselbe Problem: dass ein lauter Moment auf einer Seite still das ganze Klangbild verschiebt.
+- **Kombiniere Air Freq auf 15 kHz mit stärkerem De-Essing.** So fügst du Offenheit oberhalb des Zischlautbereichs hinzu statt obendrauf.
+- **Seraph ist weiterhin sicher in Parallelketten.** In seiner Default-Konfiguration meldet es überhaupt keine Latenz; sind Shift-Modus oder Lookahead aktiv, übernimmt die Delay-Kompensation deiner DAW die Ausrichtung, und die Dry-Seite von Mix wird intern passend verzögert.
 
-## Bekannte Einschränkungen (v0.2.0)
+## Bekannte Einschränkungen (v0.3.0)
 
 - Die GUI ist ein funktionaler Slider-/Knob-Editor plus eine einfache Preset-Leiste (eine eigene, vektorgezeichnete GUI ist ein späterer Meilenstein — siehe die Projekt-Roadmap).
-- Das Detune des Doublers ist ein kontinuierliches, vibrato-artiges Pitch-Wobble, kein vollständiger formant-erhaltender Pitch-Shift — innerhalb seines 0–50-Cent-Bereichs erzeugt das keine hörbaren „Chipmunk"-Formant-Artefakte, ist aber kein Ersatz für ein dediziertes Harmonizer-/Pitch-Shifter-Plugin, falls du größere, formant-korrigierte Tonhöhenintervalle brauchst.
-- Der Erkennungs-Threshold von De-Ess ist weiterhin ein fixer, absoluter Pegel (nicht pegel-relativ/adaptiv) — bei einem sehr leisen Take muss dessen Gain eventuell erst hochgezogen werden, bevor De-Ess spürbar reagiert. Die ehrliche Begründung, warum das in v0.2.0 nicht geändert wurde, findest du in `docs/design-brief.md` ss2.1.
+- Detune ist in jedem Modus auf +/-50 Cent begrenzt. Die Engine des Shift-Modus kann weit mehr, aber größere Intervalle brauchen Kontrolle pro Stimme und die Oberfläche eines Harmonizers, und das ist ein eigenes Feature statt einer größeren Zahl an diesem Regler.
+- Formant-Erhaltung ist nur im Shift-Modus sinnvoll; Classic und Micro resampeln das Spektrum nicht, es gibt dort also nichts zu korrigieren.
+- Der Erkennungs-Threshold von De-Ess ist weiterhin ein fixer, absoluter Pegel (nicht pegel-relativ/adaptiv) — bei einem sehr leisen Take muss dessen Gain eventuell erst hochgezogen werden, bevor De-Ess spürbar reagiert. Die Begründung findest du in `docs/design-brief.md` ss2.1.
+- Der Air-Shelf ist nicht dekrampft, seine Kurve ist bei 15 kHz in einer 44,1-kHz-Session nahe Nyquist also etwas steiler als bei derselben Einstellung mit 96 kHz. Das zu korrigieren würde den Klang bei der Default-Einstellung verändern und braucht einen eigenen Voicing-Durchgang.
