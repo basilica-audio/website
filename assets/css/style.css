@@ -701,3 +701,13 @@ main {
   font-style: italic;
   color: var(--gold);
 }
+
+/* ---- "Under the hood" engineering section (product pages) ----
+   Reuses .manual's article typography (headings unused here, paragraph
+   spacing, strong/code/list/table rules) for a rendered-Markdown block
+   that sits inside a regular .section instead of the manual article, so
+   the outer padding needs trimming back down to the section's own. */
+.manual.engineering-body {
+  max-width: var(--measure);
+  padding: 0;
+}

@@ -94,6 +94,7 @@ STRINGS = {
         "formats_line": "AU · VST3 · Standalone&ensp;·&ensp;macOS &amp; Windows&ensp;·&ensp;AGPL-3.0",
         "about_heading": "About",
         "lore_heading": "Why the name?",
+        "engineering_heading": "Under the hood",
         "signed_note": ("The macOS binaries are Developer-ID-signed, notarized by Apple "
                         "and stapled — they install and open without Gatekeeper warnings. "
                         "Windows builds are not yet Authenticode-signed; SmartScreen may "
@@ -165,6 +166,7 @@ STRINGS = {
         "formats_line": "AU · VST3 · Standalone&ensp;·&ensp;macOS &amp; Windows&ensp;·&ensp;AGPL-3.0",
         "about_heading": "Über dieses Plugin",
         "lore_heading": "Woher der Name?",
+        "engineering_heading": "Unter der Haube",
         "signed_note": ("Die macOS-Binaries sind Developer-ID-signiert, von Apple "
                         "notarisiert und gestapelt — sie installieren und öffnen ohne "
                         "Gatekeeper-Warnung. Windows-Builds sind noch nicht "
@@ -612,6 +614,7 @@ def build_plugin_page(lang: str, plugin_tpl: str, base_tpl: str, plugin: dict, m
         "signing_note": s["signed_note"],
         "daws_section": daws_section(lang, root),
         "lore_section": lore_section(plugin, lang, s),
+        "engineering_section": engineering_section(plugin, lang, s),
         "screenshots_section": screenshots_section(plugin, lang, root),
         "audio_section": audio_section(plugin, lang, root),
         "support_heading": s["support_heading"],
@@ -636,6 +639,25 @@ def lore_section(plugin: dict, lang: str, s: dict) -> str:
         '<section class="section" aria-labelledby="lore-heading">\n'
         f'  <h2 id="lore-heading">{s["lore_heading"]}</h2>\n'
         f'  <p class="prose lore">{html.escape(lore)}</p>\n'
+        '</section>'
+    )
+
+
+def engineering_section(plugin: dict, lang: str, s: dict) -> str:
+    """The 'Under the hood' engineering deep-dive — sourced from the SOTA
+    dossiers (see .scaffold/research/2026-07-25-sota/website-dossier-*.md),
+    authored per plugin as Markdown (bold-lead paragraphs, occasionally a
+    table) and rendered through the same vendored lib_md renderer the manual
+    pages use, so it gets identical typography for free. Optional per
+    plugin, same English-fallback convention as lore_section above."""
+    engineering = loc(plugin, lang, "engineering") if plugin.get("engineering") else ""
+    if not engineering:
+        return ""
+    body_html = lib_md.render(engineering)
+    return (
+        '<section class="section" aria-labelledby="engineering-heading">\n'
+        f'  <h2 id="engineering-heading">{s["engineering_heading"]}</h2>\n'
+        f'  <div class="manual engineering-body">\n{body_html}\n  </div>\n'
         '</section>'
     )
 
