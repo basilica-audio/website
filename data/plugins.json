@@ -444,7 +444,7 @@
       "description": "A lookahead brickwall true-peak limiter for the master bus — the final gate before export: input gain drives an oversampled true-peak detector, a lookahead delay makes gain reduction instantaneous rather than reactive, and a smooth release relaxes it back once the peak has passed. With the opt-in True Peak Guard engaged, a BS.1770-4-compliant meter reads the finished output's true (inter-sample) peak at or below the Ceiling.",
       "features": [
         "True-peak detection — 4×, 8× or 16× oversampled, so inter-sample peaks are caught and limited, not just sample-domain peaks (v0.4.0)",
-        "Ceiling — −12 to 0 dBTP target, default −1.0 dBTP; the output never exceeds it",
+        "Ceiling — −12 to 0 dBTP target, default −1.0 dBTP; the oversampled true-peak detector holds the output at or below it, with an exact BS.1770-4 measurement available via True Peak Guard",
         "Lookahead — 0.1–20 ms; makes gain-reduction attack instantaneous and click-free",
         "Release — 5–1000 ms, log-mapped, with Exponential / Linear / Smooth curve shapes",
         "Attack — transient/sustain classifier for near-instant recovery on brief peaks (v0.2.0)",
@@ -466,7 +466,7 @@
         "description": "Ein Lookahead-Brickwall-True-Peak-Limiter für den Master-Bus — das letzte Tor vor dem Export: Input Gain steuert einen oversampelten True-Peak-Detektor, ein Lookahead-Delay macht die Gain Reduction instantan statt reaktiv, und ein sanftes Release entspannt sie wieder, sobald der Peak vorüber ist. Mit aktiviertem, optionalem True Peak Guard liest ein BS.1770-4-konformes Meter den True (Inter-Sample-)Peak des fertigen Outputs auf oder unter der Ceiling.",
         "features": [
           "True-Peak-Erkennung — 4×, 8× oder 16× oversampelt, sodass Inter-Sample-Peaks erfasst und limitiert werden, nicht nur Peaks im Sample-Bereich (v0.4.0)",
-          "Ceiling — Zielwert −12 bis 0 dBTP, Standard −1,0 dBTP; der Output überschreitet ihn nie",
+          "Ceiling — Zielwert −12 bis 0 dBTP, Standard −1,0 dBTP; der oversamplete True-Peak-Detektor hält den Output auf oder unter diesem Wert, mit einer exakten BS.1770-4-Messung über True Peak Guard",
           "Lookahead — 0,1–20 ms; macht den Attack der Gain Reduction instantan und klickfrei",
           "Release — 5–1000 ms, logarithmisch gemappt, mit den Kurvenformen Exponential / Linear / Smooth",
           "Attack — Transient/Sustain-Klassifikator für nahezu sofortige Erholung bei kurzen Peaks (v0.2.0)",
