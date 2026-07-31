@@ -71,6 +71,7 @@
         "Power Amp — modelled output stage with a saturating transformer, plus Resonance and supply Sag; Triode engine only, off by default (v0.3.0)",
         "Factory presets & preset management — browse/save/import/export via the in-plugin preset bar"
       ],
+      "mockup": {"file": "mockup.png"},
       "de": {
         "role": "High-Gain-Distortion",
         "tagline": "Eine Liturgie der Schatten — kaskadierte High-Gain-Distortion für den schwersten Rhythmus-Sound.",
@@ -170,6 +171,7 @@
         "Smooth Open — shapes the opening into a ramp that fits inside the lookahead window, so even Attack at 0 ms opens without a step, at no extra latency (v0.4.0)",
         "Factory presets & preset management — browse/save/import/export via the in-plugin preset bar"
       ],
+      "mockup": {"file": "mockup.png", "is_screenshot": true},
       "de": {
         "role": "Lookahead-Noise-Gate",
         "tagline": "Stille zwischen den Stürmen — ein straffes Lookahead-Noise-Gate für Rhythmusgitarre mit Palm Mutes.",
@@ -220,6 +222,7 @@
         "Duck — pulls the reverb down while the dry input plays and lets it back up in the gaps, with its own Attack and Release (v0.3.0)",
         "Factory presets & preset management — browse/save/import/export via the in-plugin preset bar"
       ],
+      "mockup": {"file": "mockup.png"},
       "de": {
         "role": "Cinematic-Convolution-Reverb",
         "tagline": "Eine Kathedrale in der Box — Cinematic Convolution Reverb für orchestralen und chorischen Raum.",
@@ -308,6 +311,7 @@
         "Auto Gain — compensates most of the level Drive adds on the wet path, so A/B-ing Drive compares character rather than loudness (v0.3.0)",
         "Factory presets & preset management — browse/save/import/export via the in-plugin preset bar"
       ],
+      "mockup": {"file": "mockup.png"},
       "de": {
         "role": "Orchester-Saturation-Glue",
         "tagline": "Vergolde das Orchester — Tape- und Console-Saturation-Glue für Streicher, Blech und Layer.",
@@ -460,6 +464,7 @@
         "Factory presets & preset management — browse/save/import/export via the in-plugin preset bar",
         "Full state save/recall"
       ],
+      "mockup": {"file": "mockup.png"},
       "de": {
         "role": "True-Peak-Brickwall-Limiter",
         "tagline": "Die letzte Erhebung — ein Lookahead-True-Peak-Brickwall-Limiter für den Master.",

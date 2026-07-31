@@ -209,6 +209,27 @@ real media exists. To populate them for a plugin:
 
    When these fields exist they take precedence over auto-discovery.
 
+**Placeholder mockups before real screenshots exist.** A plugin without any
+`screenshots` (listed or auto-discovered) can carry a single `"mockup"`
+object instead, shown in the same Screenshots section slot until real
+screenshots replace it:
+
+```json
+{
+  "slug": "requiem",
+  "mockup": { "file": "mockup.png", "is_screenshot": true }
+}
+```
+
+The file resolves against `assets/<slug>/` like any other screenshot. Omit
+`is_screenshot` (or set it `false`) for an early marketing render of the
+planned faceplate — captioned "product mockup" / "Produkt-Mockup" — or set it
+`true` for a plugin's actual, approved GUI shown ahead of a full screenshot
+gallery — captioned "screenshot" / "Screenshot". `collect_media()` excludes
+the mockup file from screenshot auto-discovery, so dropping real screenshots
+into the same directory later cleanly supersedes it (`mockup_figure()` in
+`build.py` is skipped as soon as `screenshots` is non-empty).
+
 ## Donations
 
 The "Support development" section is a deliberate stub: visually present,

@@ -120,6 +120,8 @@ STRINGS = {
         "screenshots_empty": "Coming with the next release.",
         "screenshots_empty_sub": ("The custom interface is currently in design — "
                                    "screenshots will appear here as soon as it ships."),
+        "mockup_caption": "product mockup",
+        "screenshot_caption": "screenshot",
         "audio_heading": "Audio examples",
         "audio_empty": "Coming with the next release.",
         "audio_empty_sub": ("Before/after clips are being recorded — audio examples will "
@@ -196,6 +198,8 @@ STRINGS = {
         "screenshots_empty_sub": ("Die individuelle Oberfläche befindet sich aktuell in "
                                    "der Gestaltung — Screenshots erscheinen hier, sobald "
                                    "sie fertig ist."),
+        "mockup_caption": "Produkt-Mockup",
+        "screenshot_caption": "Screenshot",
         "audio_heading": "Hörbeispiele",
         "audio_empty": "Kommt mit dem nächsten Release.",
         "audio_empty_sub": ("Vorher/Nachher-Clips werden gerade aufgenommen — "
@@ -390,6 +394,11 @@ def collect_media(plugin: dict, exts: set[str], field: str) -> list[tuple[str, s
       1. plugins.json field (list of {"file": ..., "caption": ...}) — files
          resolved against assets/<slug>/, silently skipped if missing.
       2. Auto-discovery: every matching file in assets/<slug>/, sorted.
+
+    Auto-discovery skips the plugin's "mockup" file (if any) for the
+    "screenshots" field — that file lives in the same assets/<slug>/
+    directory but is rendered separately, with its own caption, by
+    mockup_figure()/screenshots_section() until real screenshots exist.
     """
     slug = plugin["slug"]
     media_dir = ROOT / "assets" / slug
@@ -402,16 +411,53 @@ def collect_media(plugin: dict, exts: set[str], field: str) -> list[tuple[str, s
             if file.is_file() and file.suffix.lower() in exts:
                 found.append((name, entry.get("caption") or caption_from_filename(file)))
     elif media_dir.is_dir():
+        mockup = plugin.get("mockup")
+        skip = mockup.get("file") if field == "screenshots" and isinstance(mockup, dict) else None
         for file in sorted(media_dir.iterdir()):
+            if file.name == skip:
+                continue
             if file.is_file() and file.suffix.lower() in exts:
                 found.append((file.name, caption_from_filename(file)))
     return found
+
+
+def mockup_figure(plugin: dict, lang: str, root: str) -> str | None:
+    """A single-image fallback for the Screenshots section: plugins.json may
+    carry an optional "mockup" object ({"file": ..., "is_screenshot": bool})
+    pointing at a file under assets/<slug>/. Used only until real screenshots
+    (auto-discovered or listed in the "screenshots" field) exist for that
+    plugin — see screenshots_section. "is_screenshot" is true for the one
+    plugin (Silentium) whose mockup file is already its real, approved GUI;
+    every other plugin's mockup is an early marketing render of the planned
+    faceplate, captioned accordingly so it's never mistaken for a screenshot
+    of a finished, ready plugin."""
+    s = STRINGS[lang]
+    mockup = plugin.get("mockup")
+    if not isinstance(mockup, dict) or not mockup.get("file"):
+        return None
+    slug = plugin["slug"]
+    name = mockup["file"]
+    if not (ROOT / "assets" / slug / name).is_file():
+        return None
+    caption = s["screenshot_caption"] if mockup.get("is_screenshot") else s["mockup_caption"]
+    return f"""    <figure>
+      <img src="{root}assets/{slug}/{html.escape(name)}" alt="{html.escape(caption)}" loading="lazy">
+      <figcaption>{html.escape(caption)}</figcaption>
+    </figure>"""
 
 
 def screenshots_section(plugin: dict, lang: str, root: str) -> str:
     s = STRINGS[lang]
     shots = collect_media(plugin, IMAGE_EXTS, "screenshots")
     if not shots:
+        figure = mockup_figure(plugin, lang, root)
+        if figure:
+            return f"""<section class="section" aria-labelledby="screenshots-heading">
+  <h2 id="screenshots-heading">{s['screenshots_heading']}</h2>
+  <div class="shot-grid">
+{figure}
+  </div>
+</section>"""
         return f"""<section class="section" aria-labelledby="screenshots-heading">
   <h2 id="screenshots-heading">{s['screenshots_heading']}</h2>
   <div class="empty-state">
