@@ -123,3 +123,7 @@ Praktische Mastering-Zielwerte, als Ausgangspunkte: Ein **streaming-taugliches M
 - [Crypta](../crypta/guide/index.html) — Bass-Prozessor
 - [Aureate](../aureate/guide/index.html) — Orchestrale Sättigungs-Glue
 - [Triptych](../triptych/guide/index.html) — 3-Band-Multiband-Kompressor
+- [Apotheosis](../apotheosis/guide/index.html) — True-Peak-Brickwall-Limiter
+- [Miserere](../miserere/guide/index.html) — Paralleler Vocal-Chain
+- [Seraph](../seraph/guide/index.html) — Chor- & Vocal-Prozessor
+- [Lancet](../lancet/guide/index.html) — Dynamic EQ

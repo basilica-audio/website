@@ -123,3 +123,7 @@ Practical mastering targets, as starting points: a **streaming-safe master** typ
 - [Crypta](../crypta/guide/index.html) — bass processor
 - [Aureate](../aureate/guide/index.html) — orchestral saturation glue
 - [Triptych](../triptych/guide/index.html) — 3-band multiband compressor
+- [Apotheosis](../apotheosis/guide/index.html) — true-peak brickwall limiter
+- [Miserere](../miserere/guide/index.html) — parallel vocal chain
+- [Seraph](../seraph/guide/index.html) — choir & vocal processor
+- [Lancet](../lancet/guide/index.html) — dynamic EQ
