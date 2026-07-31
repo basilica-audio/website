@@ -119,3 +119,7 @@ Practical mastering targets, as starting points: a **streaming-safe master** typ
 - [Overture](../overture/guide/index.html) — guitar tight boost
 - [Tenebrae](../tenebrae/guide/index.html) — high-gain distortion
 - [Nave](../nave/guide/index.html) — cabinet IR loader
+- [Silentium](../silentium/guide/index.html) — lookahead noise gate
+- [Crypta](../crypta/guide/index.html) — bass processor
+- [Aureate](../aureate/guide/index.html) — orchestral saturation glue
+- [Triptych](../triptych/guide/index.html) — 3-band multiband compressor

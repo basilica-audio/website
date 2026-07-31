@@ -119,3 +119,7 @@ Praktische Mastering-Zielwerte, als Ausgangspunkte: Ein **streaming-taugliches M
 - [Overture](../overture/guide/index.html) — Tight-Boost für Gitarre
 - [Tenebrae](../tenebrae/guide/index.html) — High-Gain-Distortion
 - [Nave](../nave/guide/index.html) — Cabinet-IR-Loader
+- [Silentium](../silentium/guide/index.html) — Lookahead-Noise-Gate
+- [Crypta](../crypta/guide/index.html) — Bass-Prozessor
+- [Aureate](../aureate/guide/index.html) — Orchestrale Sättigungs-Glue
+- [Triptych](../triptych/guide/index.html) — 3-Band-Multiband-Kompressor
