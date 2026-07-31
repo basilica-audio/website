@@ -127,3 +127,5 @@ Praktische Mastering-Zielwerte, als Ausgangspunkte: Ein **streaming-taugliches M
 - [Miserere](../miserere/guide/index.html) — Paralleler Vocal-Chain
 - [Seraph](../seraph/guide/index.html) — Chor- & Vocal-Prozessor
 - [Lancet](../lancet/guide/index.html) — Dynamic EQ
+- [Requiem](../requiem/guide/index.html) — Kinematischer Convolution-Reverb
+- [Firmament](../firmament/guide/index.html) — Stereo-Widener & -Imager

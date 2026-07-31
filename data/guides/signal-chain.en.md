@@ -127,3 +127,5 @@ Practical mastering targets, as starting points: a **streaming-safe master** typ
 - [Miserere](../miserere/guide/index.html) — parallel vocal chain
 - [Seraph](../seraph/guide/index.html) — choir & vocal processor
 - [Lancet](../lancet/guide/index.html) — dynamic EQ
+- [Requiem](../requiem/guide/index.html) — cinematic convolution reverb
+- [Firmament](../firmament/guide/index.html) — stereo widener & imager
