@@ -107,6 +107,14 @@ Die vollständige implementierungsseitige Aufschlüsselung (State-Machine-
 Details, Echtzeit-Sicherheitshinweise, die hier beschriebene `GateEngine`-
 Klasse) findest du in [`docs/architecture.md`](architecture.md).
 
+### Gemeldete Latenz
+
+Lookahead ist Silentiums einzige Quelle gemeldeter Latenz. Bei `prepareToPlay()` meldet das Plugin `Lookahead × Samplerate`, auf Samples gerundet, über `setLatencySamples()` — bei Lookahead 0 ms ist das exakt 0 Samples, und nichts sonst im Signalpfad fügt welche hinzu.
+
+*(v0.4.0)* Lookahead während laufendem Audio zu bewegen wartet nicht mehr darauf, dass der Host das Plugin neu vorbereitet: Die Delay selbst überblendet sofort auf ihre neue Länge (eine 10-ms-Equal-Power-Blende zwischen dem alten und dem neuen Tap), aber die *gemeldete* Zahl, die der Host für die Delay-Kompensation nutzt, zieht erst einen Moment später nach, beim nächsten Tick eines 25-ms-Pollings — der Audio-Thread ruft `setLatencySamples()` nie direkt auf, weil dieser Aufruf von dort aus nicht sicher ist. In der Praxis bedeutet das: Ein Host, der seine Message-Loop am Laufen hält, übernimmt die neue Latenz innerhalb von etwa 25 ms nach der Reglerbewegung, aber ein Host, der diese Loop nicht pumpt (z. B. mitten in einem Bounce), erfährt nie von der Änderung — Lookahead während eines Bounce/Renders zu bewegen ist also keine gute Idee.
+
+**Smooth Open** einzuschalten fügt überhaupt keine gemeldete Latenz hinzu: aktiviert oder umgangen, sieht der Host bei Lookahead 0, 2,5, 5 und 20 ms dieselbe Zahl — die Öffnungs-Rampe wird vollständig innerhalb des Lookahead-Fensters geformt, das ohnehin schon bezahlt ist.
+
 ## Parameterreferenz
 
 | Parameter | Range | Default | Unit | Was es bewirkt |
@@ -159,6 +167,20 @@ Reproduktion des) „program dependent"/„AutoDynamic"-Release-Verhaltens, das
 für Hardware-Noise-Gates dieser Kategorie dokumentiert ist — die vollständige
 Quellenlage und die Einschränkungen findest du im „Honesty"-Abschnitt von
 `docs/design-brief.md`.
+
+## Unter der Haube
+
+Ein paar Mechanismen, die es wert sind zu kennen, wenn du verstehen willst, warum sich v0.4.0 so verhält, wie es das tut — nicht nur, wofür die Regler beschriftet sind:
+
+**Ratio ist ein echtes Downward-Expander-Gesetz, und der Default ist der buchstäbliche alte Code.** Unterhalb von Threshold wendet Ratio (Ratio − 1) dB Dämpfung für jedes dB an, um das das Signal fällt, gemessen auf 0,25 dB genau zu diesem Gesetz bei 2:1, 4:1 und 8:1, mit einem Knee, der an beiden Kanten sowohl im Wert als auch in der Steigung stetig ist, sodass ein breiteres Knee nie eine Ecke einführt. Am oberen Ende des Bereichs — ∞:1, der Default — springt der Gain-Computer in den exakten Code-Pfad von vor v0.4.0, statt in eine Näherung mit sehr hoher Ratio, „unverändert im Default" ist also ein Fakt auf Code-Ebene, kein numerischer Zufall.
+
+**Smooth Open formt das Öffnen mit einem Moving-Max plus zwei kaskadierten Box-Filtern**, alle im dB-Bereich laufend, so bemessen, dass sie vollständig innerhalb des aktuellen Lookahead-Fensters passen. Ein rückwärtsgerichtetes Moving-Max verzögert Abfälle, nicht Anstiege, eine steigende Flanke passiert es also sofort, und die Box-Filter-Kaskade verteilt diese Flanke dann linear über das Fenster — fertig genau in dem Moment, in dem der verzögerte Transient die Lookahead-Delay-Line verlässt. Gemessen an einem Stille-zu−6-dBFS-Burst bei 0 ms Attack / 5 ms Lookahead: Der steilste Ein-Sample-Schritt sinkt von 59,5 dB/Sample auf 0,50 dB/Sample (eine 119-fache Reduktion), innerhalb von 0,01 % des theoretischen Dreieck-Kernel-Peaks, und die Rampe ist durchgehend monoton. Sie läuft in Reihe mit der ballistischen Gain statt als parallele „was auch immer offener ist"-Mischung, weil genau diese parallele Version probiert wurde und scheiterte: Bei 0 ms Attack gewinnt der rohe Schritt das Max, und der Klick, den sie entfernen soll, überlebt unangetastet.
+
+**Die Lookahead-Überblendung ist konstruktionsbedingt echtzeitsicher.** Die 10-ms-Tap-Überblendung und die atomare Übergabe an das 25-ms-Message-Thread-Polling (siehe [Gemeldete Latenz](#gemeldete-latenz) oben) wurden gezielt so gebaut, dass `processBlock()` nie alloziert — verifiziert unter einem ersetzten Allocator über abgesicherte Blöcke, einschließlich des exakten Blocks, in dem sich Lookahead bewegt.
+
+**Zwei Detektoren und zwei Sidechain-Flankensteilheiten laufen in jedem Block, ob ausgewählt oder nicht.** Der RMS-Detektor (5 ms Mean-Square) und die 24-dB/Okt.-Sidechain-Filterkette sind beide immer warm, sodass ein Wechsel von Detector oder SC Slope eine Überblendung zwischen zwei lebenden Signalen ist statt ein Sprung zu einem kalten Filter mit eigener Einschwing-Transiente. Gemessene Unterdrückung eine Oktave unter der Grenzfrequenz: 12,30 dB bei 12 dB/Okt. und 24,11 dB bei 24 dB/Okt., gegen eine Theorie von 12,3/24,1.
+
+**Engineering-Hygiene:** 114 Testfälle und 9156 Assertions laufen auf macOS und Windows bei jedem Push, plus pluginval bei Strictness 10 und `auval -strict`. Keine Heap-Allokationen auf dem Audio-Thread unter einem ersetzten Allocator bei jedem aktivierten v0.4.0-Feature (einschließlich Live-Lookahead-Änderungen), Renders unabhängig von der Host-Blockgröße innerhalb von 1e-6 RMS, und ein offenes Gate, das mit allen neuen Stufen gleichzeitig eingeschaltet immer noch bis besser als −120 dBFS als reine Delay misst.
 
 ## Externer Sidechain-Input
 
@@ -240,3 +262,13 @@ werden.
   Performance zu aggressiv/schaltend, verbreitere Knee auf 6–12 dB für einen
   weicheren Übergang, und prüfe danach erneut, ob der Rauschteppich zwischen
   den Phrasen weiterhin ausreichend gedämpft wird.
+
+## Bekannte Einschränkungen (v0.4.0)
+
+- **Keine veröffentlichte CPU-Zahl.** Es gibt in diesem Projekt keinen CPU-Benchmark und kein CI-Performance-Gate — behandle jede CPU-Auslastungszahl, die du woanders siehst, als unverifiziert; dieses Handbuch behauptet keine. Mehrere Erkennungspfade (beide Detektoren, beide Sidechain-Flankensteilheiten, der Smooth-Open-Smoother) laufen bei jedem Block bedingungslos, ob ausgewählt oder nicht, gezielt damit ein Wechsel zwischen ihnen immer eine klickfreie Überblendung ist statt ein Sprung zu einem kalten Filter; das ist eine bewusste feste Kostenstelle, kein Versehen.
+- **RMS ist nicht universell „ruhiger" als Peak.** Bei einem gehaltenen tiefen Ton (um 70 Hz) glättet das 5-ms-RMS-Fenster das Mean-Square-Ripple nicht so gut wie das eigene Release von Peak, Peak ist dort also tatsächlich der ruhigere Detektor. Der echte Vorteil von RMS liegt bei Material mit hohem Crest-Faktor — isolierte Spitzen (Bundgeräusche, ein knisterndes DI-Signal), die kaum Energie tragen und das Gate nicht öffnen sollten.
+- **Smooth Open formt auch die schließende Flanke**, nicht nur die öffnende: Es hält das Öffnungsziel für bis zu die Hälfte der Lookahead-Zeit, nachdem das Signal abgefallen ist, bevor die Schließ-Rampe beginnt. Meist unhörbar, gelegentlich nützlich, aber deshalb lassen die straffsten, chirurgischsten Presets es aus.
+- **Die sechs neuen v0.4.0-Parameter haben noch keine dedizierten Bildschirm-Regler.** Sie sind vollständig host-automatisierbar und erscheinen in der generischen Parameteransicht deines Hosts, aber der eigens gestaltete, photoreale Editor (eingeführt in v0.3.0) wurde von diesem Release nicht angefasst — ein Screenshot der aktuellen GUI zeigt den Regler-Satz von v0.3.0.
+- **Die Erkennung ist konstruktionsbedingt stereo-gelinkt**, ohne nutzerseitige Kontrolle darüber: Alle Kanäle werden vor der Erkennung über `max(|Kanal|)` kombiniert, und eine Gain wird identisch auf jeden Kanal angewendet. Es gibt keinen Stereo-Link-Prozentsatz, keinen Dual-Mono-Modus und keine M/S-Erkennungsoption.
+- **Kein Oversampling.** Die einzige Nichtlinearität in Silentiums Signalpfad ist eine multiplikative Gain, deren Bandbreite durch die Ballistik begrenzt ist, Antiderivative Anti-Aliasing greift hier also nicht — eine bewusste Design-Entscheidung, nichts von der Roadmap Ausgelassenes.
+- **Pre-1.0, AGPLv3.** Breaking Changes bleiben bis v1.0.0 möglich.
