@@ -25,18 +25,35 @@ Greife danach, wenn ein Single-Band-Kompressor entweder die Tiefen übermäßig 
 ## Signalfluss
 
 ```
-                    +-> BandComp (Low)  --------------------------------+
-Input --> LR4 @ Low/Mid Split             |                             |
-                    \-> LR4 @ Mid/High Split                            |
-                              +-> BandComp (Mid)  ----------------------+--> Mute/Solo gate --> Sum --> Output --> Out
-                              \-> BandComp (High) + optional Limiter ---+
+                    +-> Band-Strip (Low)  ------------------------------+
+Input --> Split @ Low/Mid                 |                             |
+                    \-> Split @ Mid/High                                |
+                              +-> Band-Strip (Mid)  -------------------+--> Mute/Solo gate --> Sum --> Mix --> Output --> Out
+                              \-> Band-Strip (High) + optionaler Limiter-+                      ^
+                                                                                                 |
+Input (dry, verzögert passend zu Lookahead) --------------------------------------------------------+
+
+Sidechain (optional) --> eigenes Split-Paar, dieselben Frequenzen + Flanke --> Detektor-Key pro Band
 ```
 
-Der eigene Kompressor jedes Bands (Knee → Threshold/Ratio → Range → Attack/Release + Makeup) läuft zuerst; das High-Band kann danach zusätzlich einen Brickwall-artigen Limiter nach seinem Kompressor aktivieren. Der Beitrag jedes Bands wird anschließend von seinem eigenen Mute/Solo-Status gegatet, bevor die drei Bänder summiert und vom Master-Output-Regler getrimmt werden. Die vollständige technische Aufschlüsselung (Flat-Sum-Eigenschaft der Frequenzweiche, der Soft-Knee-Gain-Computer, die Ratio-Aufwärts-/Range-Erweiterung aus v0.3.0, Bypass-Identität des Kompressors, Limiter-Verhalten, Parameter-Smoothing) findest du in [`docs/architecture.md`](architecture.md).
+Jedes Band ist ein Strip statt eines einzelnen Kompressors. Innerhalb eines Strips:
+
+```
+key   --> Detektor (Peak-/RMS-Kennlinie -> Auto Release -> Stereo Link -> Character)
+             |  Hüllkurve
+audio --> Gate (eigener Threshold, eigener Detektor) --> Kompressor (Knee -> Threshold/Ratio -> Range) --> Makeup
+             \___ optional in eine Mid/Side-Kodierung/-Dekodierung gewrappt ___/
+```
+
+Der **Key** ist das Signal, auf das der Detektor des Kompressors hört: das eigene Audio des Bands (SC Source *Internal*), oder das passende Band des Sidechains (*External*). Das **Gate** keyt immer intern auf das eigene Audio des Bands, unabhängig davon, worauf SC Source steht. Die Gain von Gate und die Gain des Kompressors multiplizieren sich, das Gaten eines Bands wird also nie von der eigenen Kompressionskurve dieses Bands maskiert.
+
+Das High-Band kann danach zusätzlich einen Brickwall-artigen Limiter nach seinem Kompressor aktivieren. Der Beitrag jedes Bands wird anschließend von seinem eigenen Mute/Solo-Status gegatet, die drei Bänder werden summiert, per **Mix** gegen das delay-kompensierte trockene Signal gemischt und vom Master-**Output**-Regler getrimmt.
+
+Die beiden Split-Punkte nutzen dasselbe **Slope**-Setting (12, 24 oder 48 dB/Okt.), ebenso das eigene Crossover-Paar des Sidechains. Die vollständige technische Aufschlüsselung (Flat-Sum-Eigenschaft der Frequenzweiche, der Soft-Knee-Gain-Computer, die Ratio-Aufwärts-/Range-Erweiterung aus v0.3.0, Detektor v2, der Zero-Overshoot-Beweis des Lookahead-Brickwalls, Bypass-Identität des Kompressors, Limiter-Verhalten, Parameter-Smoothing) findest du in [`docs/architecture.md`](architecture.md).
 
 **Ein Hinweis zum Voicing.** Die unten stehenden Per-Band-Defaults (und die Werkspresets in [`docs/presets.md`](presets.md)) sind **recherchebasiert** — sie stützen sich auf veröffentlichte Hersteller-Handbücher und Fachartikel von Mastering-Engineers zur Referenzklasse der Multiband-Kompression, nicht auf Messungen gegen Referenz-Hardware. Die zitierten Quellen/URLs findest du in [`docs/research-notes.md`](research-notes.md), die Begründung für den Soft-Knee aus v0.2.0 in [`docs/design-brief.md`](design-brief.md), und die Ratio/Range-Dynamik-Erweiterung aus v0.3.0 in [`docs/design-brief-v3-dynamics.md`](design-brief-v3-dynamics.md).
 
-**v0.5.0: der Flaggschiff-Dynamikkern.** Der Detektor jedes Bands bekommt eine wählbare **Peak-/RMS**-Kennlinie, ein programmabhängiges **Auto Release**, einen **VCA**-Charakter und einen **Stereo-Link**-Regler. Dazu ein globales **Lookahead** und **Mix**, wählbare **Crossover-Flanken** (12/24/48 dB/Okt.), ein **externer Sidechain** mit Keying pro Band und Detektor-Key-Monitoring sowie **Hold + Hysterese** an jedem Gate. Alle dreiundzwanzig neuen Regler stehen per Default auf einem vollständig neutralen Zustand, sodass eine in v0.4.0 gespeicherte Session in v0.5.0 exakt wie zuvor klingt — und dieselbe Null-Latenz meldet.
+**v0.5.0: der Flaggschiff-Dynamikkern.** Der Detektor jedes Bands bekommt eine wählbare **Peak-/RMS**-Kennlinie, ein programmabhängiges **Auto Release**, einen **VCA**-Charakter und einen **Stereo-Link**-Regler. Dazu ein globales **Lookahead** und **Mix**, wählbare **Crossover-Flanken** (12/24/48 dB/Okt.), ein **externer Sidechain** mit Keying pro Band und Detektor-Key-Monitoring sowie **Hold + Hysterese** an jedem Gate. Alle dreiundzwanzig neuen Regler stehen per Default auf einem vollständig neutralen Zustand, sodass eine in v0.4.0 gespeicherte Session in v0.5.0 exakt wie zuvor klingt — und dieselbe Null-Latenz meldet. Auch bestehende Automation überlebt: Die neuen Parameter wurden hinter die neunundfünfzig bereits ausgelieferten angehängt statt dazwischen eingefügt, sodass sich an nichts, was eine ältere Session bereits automatisiert, die Position ändert.
 
 **v0.3.0: echtes dynamisches Multiband.** Die Ratio jedes Bands reicht jetzt von **0.2:1 bis 20:1** (vorher 1:1–20:1) — Werte unter 1:1 sind *aufwärtsgerichtete* Kompression/Expansion: Signal oberhalb des Thresholds wird angehoben statt geschnitten, mit sanftem Übergang durch einen exakten Nullpunkt bei 1:1. Ein neuer Per-Band-Regler **Range** begrenzt die maximale Gain-Änderung (nach oben oder unten), damit eine aggressive Ratio-Einstellung musikalisch nutzbar bleibt, statt durchzugehen. Beide werden in den Tabellen unten beschrieben.
 
@@ -112,6 +129,8 @@ Identische Bereiche in jedem Band.
 
 **Ein Hinweis zum VCA-Knee nahe einem 0-dB-Threshold.** Triptychs Knee ist konstruktionsbedingt *threshold-relativ* (seine Breite skaliert damit, wie weit der Threshold unter 0 dBFS liegt — siehe [`docs/architecture.md`](architecture.md)). Das bedeutet, dass die Ziel-Knee-Breite des VCA-Charakters unerreichbar wird, sobald der Threshold innerhalb einer halben Knee-Breite von 0 dB liegt: Ab etwa -3 dB aufwärts verengt sich die erreichte Breite gleichmäßig Richtung Hard Knee und erreicht bei einem 0-dB-Threshold exakt Hard Knee. Das ist eine Eigenschaft des Knee-Modells und kein Bug, und numerisch verhält sich dort nichts daneben. Willst du die volle VCA-Rundung, halte den Threshold des Bands bei -3 dB oder darunter — dort sitzt der Threshold eines Multiband-Kompressors ohnehin normalerweise.
 
+Diese vier Regler formen nur den Detektor des **Kompressors**. Das Gate des Bands behält seinen eigenen, separaten Envelope-Follower mit eigenem Attack/Release — ein Band auf RMS zu stellen, oder Auto Release oder VCA-Charakter zu aktivieren, ändert also, wie das Band *komprimiert*, ohne zu ändern, wie es *gatet*.
+
 ### Gate-Formung je Band *(neu in v0.5.0)*
 
 | Parameter | Range | Default | Unit | Was es bewirkt |
@@ -144,6 +163,21 @@ Jede Bandspalte trägt einen schmalen vertikalen Balken, der zeigt, wie stark di
 | Parameter | Range | Default | Unit | Was es bewirkt |
 |---|---|---|---|---|
 | **Output** | -24 – +24 | 0 | dB | Master-Trim, der angewendet wird, nachdem die drei Bänder summiert wurden — die finale Gain-Stufe im Plugin. Nutze ihn, um den Ausgangspegel von Triptych an das anzupassen, was als Nächstes in der Kette folgt (typischerweise ein Brickwall-Limiter auf dem Master-Bus). |
+
+### Regler, die man bei gestopptem Transport ändert
+
+Jeder **kontinuierliche** Regler in Triptych ist konstruktionsbedingt klickfrei — Thresholds, Ratios, Knees, Ranges, Gains, Stereo Link und Hold/Hysterese des Gates laufen allesamt durch Smoother, und das Gate ist so spezifiziert, dass seine Gain in einem einzigen Sample nie mehr als 0,5 dB springen kann. Automatisiere sie frei.
+
+Vier **gestufte** Regler bauen den Signalpfad um, statt nur einen Wert zu bewegen, und können klicken, wenn du sie mitten in der Wiedergabe änderst:
+
+- **Slope** — setzt die Crossover-Filter zurück.
+- **M/S On** — ändert, worauf sich die Gain-Berechnung des Bands anwendet.
+- **Limiter (enable)** — für sich genommen klickfrei, aber während **Lookahead** aktiv ist, verschiebt das Umschalten, wo dieses Band seine Verzögerung verbringt (siehe unten), was das Band umbaut.
+- **Lookahead** — ändert die gemeldete Latenz, sodass der Host die Delay-Kompensation neu aushandeln muss.
+
+Keiner davon ist ein Defekt, und keiner ist ungewöhnlich für die Aufgabe, die er erfüllt; es sind schlicht Konfigurationsänderungen statt Performance-Regler.
+
+**Wo die Lookahead-Verzögerung lebt.** Bei aktiviertem Lookahead verbringt ein Band seine Verzögerung an einem von zwei Orten: Entweder bekommt der Kompressor den Vorsprung (das Audio wird verzögert, während der Detektor vorausliest), oder — falls der Brickwall-Limiter dieses Bands ebenfalls aktiv ist — übernimmt der Limiter stattdessen die Verzögerung, was ihn erst wirklich überschwing-sicher macht. Genau einer von beiden besitzt sie, sodass das Band immer exakt die Lookahead-Länge hinzufügt und alle drei Bänder in der Summe ausgerichtet bleiben. Der Trade-off: Der Kompressor des High-Bands gibt seinen Vorsprung auf, während der Brickwall an ist — die richtige Entscheidung für eine Stufe, deren gesamter Job die Ceiling ist.
 
 ## Latenz und Host-Delay-Kompensation *(neu in v0.5.0)*
 
@@ -208,3 +242,12 @@ Die Beschriftungen, Menüs und Dialoge der Preset-Leiste folgen automatisch dein
 - **Nutze SC Listen, um Sidechain-Thresholds einzustellen, nicht deine Vorstellungskraft.** Schalte es auf das Band, das du keyst, stelle den Threshold des Bands nach Gehör gegen das ein, was du tatsächlich hörst, und schalte es dann wieder auf Off. Es spielt das Key-Signal ab, nicht das Band — und genau darauf bezieht sich ein Threshold.
 - **Lookahead ist für das Safety Ceiling, nicht für alles.** Sein eigentlicher Nutzen ist der Brickwall des High-Bands, der mit aktivem Lookahead wirklich überschwingfrei wird. Nutzt du den Limiter nicht, lohnt sich die Latenz meist nicht.
 - **Wähle die Crossover-Flanke nach der Aufgabe, nicht nach der Zahl.** 48 dB/Okt., wenn die Bearbeitung eines Bands nicht in seine Nachbarn bluten darf (ein harter De-Esser-Band, eine straffe Low-End-Klemme); 12 dB/Okt., wenn die Bänder sanft ineinander übergeben und sich eher wie ein Breitbandkompressor mit Tilt verhalten sollen.
+
+## Bekannte Einschränkungen
+
+- **Der Spectrum-on-Curve-Analyzer ist nicht Teil dieses Releases.** v0.5.0 liefert nur die drei Gain-Reduktions-Balken pro Band (siehe „Gain-Reduktions-Meter" oben); ein Frequenzbereich-Analyzer-Overlay ist für den M3-Custom-GUI-Meilenstein vorgesehen, nicht spät gestrichen.
+- **Verschoben auf v0.6.0+**: ein linearphasiger FIR-Crossover-Modus (gepaart mit Allpass-Kompensation für das Phasenverhalten darunter), Sidechain-EQ pro Band, Dry/Wet-Mix pro Band, sample-genaue Parameter-Interpolation (das heutige Smoothing löst über einen 50-ms-Timer auf statt pro Sample), sowie ein Gate-Range-Boden.
+- **Der Drei-Band-Crossover-Baum ist magnitudenflach, aber nicht phasenflach** bei keinem Slope-Setting — siehe „Crossover-Flanken und Phase" oben. Das spielt nur eine Rolle, wenn Triptychs Output gegen eine trockene Kopie desselben Signals gemischt wird (auch über **Mix**) oder bei Messung mit einem phasenbewussten Analyzer; für normalen seriellen Einsatz spielt es keine Rolle.
+- **Die Ziel-Breite des VCA-Knees wird innerhalb von etwa 3 dB eines 0-dB-Thresholds unerreichbar** — siehe den Hinweis unter „Detektor je Band" oben. Die erreichte Breite verengt sich gleichmäßig Richtung Hard Knee, je näher der Threshold an 0 dB kommt; nichts verhält sich dabei numerisch daneben, aber die volle VCA-Rundung braucht einen Threshold bei -3 dB oder darunter.
+- **Vier gestufte Regler können klicken, wenn man sie mitten in der Wiedergabe ändert** — Slope, M/S On, Limiter (enable) bei aktivem Lookahead, und Lookahead selbst — siehe „Regler, die man bei gestopptem Transport ändert" oben. Jeder kontinuierliche, automatisierbare Regler ist konstruktionsbedingt klickfrei.
+- **Das Voicing ist durchgehend recherchebasiert**, entnommen aus veröffentlichten Hersteller-Handbüchern und Fachartikeln von Mastering-Engineers zur Referenzklasse der Multiband-Kompression — nicht gegen Referenz-Hardware gemessen. Die belegten Erkenntnisse stehen in [`docs/research-notes.md`](research-notes.md).
