@@ -1,6 +1,6 @@
 <!-- German translation of miserere.en.md — maintained by hand; re-translate after the English source changes (see website/README.md). -->
 
-# Miserere — Bedienungsanleitung (v0.3.0)
+# Miserere — Bedienungsanleitung (v0.5.0)
 
 *Vier Stimmen, ein Gebet — die parallele Vocal-Vorlage in einem einzigen Plug-in.*
 
@@ -31,15 +31,17 @@ Standardmäßig aus, Sektion für Sektion, in Signalreihenfolge:
 
 - **De-Ess Pre** — Split-Band-De-Esser, 4–9 kHz einstellbar, bis zu 10 dB Reduktion, platziert dort, wo die Dynamik der Vocal am größten ist (die dokumentierte „de-esse ganz am Anfang"-Regel).
 - **FET Comp** — ein leichter, threshold-basierter Kompressor im FET-Stil, fest bei 4:1, ausgelegt auf sanfte 3–4 dB Peak Gain Reduction — „die einzige Stelle, an der serielle Kompression authentisch ist" in dieser Topologie.
-- **Console EQ** — ein Raster im Stil der 1073-Klasse: HPF (18 dB/oct, 50/80/160/300 Hz), Low Shelf (±16 dB, 35/60/110/220 Hz), eine Mid Bell mit fixem Q (±18 dB, sechs gestufte Mittenfrequenzen), ein fixer 12-kHz-High-Shelf (±16 dB) und ein Drive-Regler, der dezente, Richtung 2./3. Ordnung tendierende Transformer-artige Harmonische beimischt.
-- **Sat** — der aus v1 übernommene Sättiger im Tape-Stil, eine optionale „Grit"-Stufe.
+- **Console EQ** — ein Raster im Stil britischer Konsolen-EQs: HPF (18 dB/oct, 50/80/160/300 Hz), Low Shelf (±16 dB, 35/60/110/220 Hz), eine Mid Bell mit fixem Q (±18 dB, sechs gestufte Mittenfrequenzen), ein fixer 12-kHz-High-Shelf (±16 dB) und ein Drive-Regler, der dezente, Richtung 2./3. Ordnung tendierende Transformer-artige Harmonische beimischt.
+
+  Seit v0.5.0 ist Drive ein Übertrager-Modell statt eines addierten Harmonischen-Terms: Das Signal läuft durch einen Fluss-Integrator in einen gebiasten Sättiger und zurück durch die exakte Inverse dieses Integrators. Weil magnetischer Fluss als Spannung geteilt durch Frequenz skaliert, steigt die dritte Harmonische zum Bassbereich hin von selbst an (gemessen +12 dB beim Übergang von 100 Hz zu 50 Hz), statt von Hand gewichtet zu werden. Bei 0 dB ist Drive ein bit-exakter Bypass. Der 12-kHz-Shelf ist seit v0.5.0 ebenfalls magnitude-matched, sodass er bei 44,1 kHz seine analoge Form in der obersten Oktave behält, statt Richtung Nyquist gequetscht zu werden.
+- **Sat** — der aus v1 übernommene Sättiger im Tape-Stil, eine optionale „Grit"-Stufe. Seit v0.5.0 berechnet er seine Distortion in der Alias-unterdrückenden Form, die unter *Latenz und Aliasing* weiter unten beschrieben ist; bei 0 dB Drive ist er weiterhin ein bit-exakter Bypass.
 - **De-Ess Post** — eine zweite De-Esser-Instanz am Ende der Kette, für Zischlaute, die Kompression oder EQ hervorgehoben haben.
 
 ## Die vier Return-Busse
 
 ### ① CRUSH — FET-Limiter, All-Buttons-Charakter
 
-Kein Threshold-Regler: **Input** treibt das Signal in eine fixe, ratio-abhängige Threshold-/Knee-Tabelle. **Ratio** wählt 4:1/8:1/12:1/20:1/ALL (ALL ist eine plateauförmige Kurve mit bewusstem Give-back und einer kurzen Attack-Verzögerung, die Transienten durchschlagen lässt, bevor geklemmt wird — der „Snap"). **Attack**/**Release** sind 1–7-Regler, bei denen eine HÖHERE Zahl SCHNELLER bedeutet, passend zur Hardware-Konvention, an der sich das orientiert; Release ist zweistufig und programmabhängig (schnell nach kurzen Transienten, mehrfach langsamer nach anhaltend starker Kompression). **Style** schaltet zwischen All-Buttons und einer weicheren, fixen 2:1-**Gentle**-Voicing um. Dieser Bus soll solo „furchtbar" klingen (nutze Audition) und im Mix gut.
+Kein Threshold-Regler: **Input** treibt das Signal in einen fixen, ratio-abhängigen Threshold und Knee. **Ratio** wählt 4:1/8:1/12:1/20:1/ALL (ALL ist eine plateauförmige Kurve mit bewusstem Give-back und einer kurzen Attack-Verzögerung, die Transienten durchschlagen lässt, bevor geklemmt wird — der „Snap"). **Attack**/**Release** sind 1–7-Regler, bei denen eine HÖHERE Zahl SCHNELLER bedeutet, passend zur Hardware-Konvention, an der sich das orientiert; Release ist programmabhängig (schnell nach kurzen Transienten, mehrfach langsamer nach anhaltend starker Kompression). **Style** schaltet zwischen All-Buttons und einer weicheren, fixen 2:1-**Gentle**-Voicing um. Dieser Bus soll solo „furchtbar" klingen (nutze Audition) und im Mix gut.
 
 CRUSH bringt außerdem einen Hauch programmabhängiger Färbung mit: Mit wachsender Gain
 Reduction mischen sich eine Transformer-artige Tiefton-Sättigung und die zweite Harmonische,
@@ -81,6 +83,8 @@ statt allein eingesetzt wird.
 
 Zwei kurze Delay-Taps (~30 ms hochgepitcht, ~50 ms runtergepitcht), hart nach L/R gepannt. **Detune** setzt den Pitch-Offset in Cents (Default 6 — bewusst klein, damit das Ohr „nach außen geschoben" liest statt Chorus). **Time** skaliert beide Basis-Delays gemeinsam; **Width** blendet von einer vollständig mittigen Summe (0 %) zum vollen harten Pan (100 %).
 
+Seit v0.5.0 werden beide Shifter-Delay-Lines mit Lagrange-Interpolation 3. Ordnung statt eines linearen Reads ausgelesen, was 0,90 dB Höhenanteil bei 10 kHz zurückholt, den der lineare Read verlor; die Grain-Überblendung ist länger und equal-power, was das periodische Pegel-Ripple auf gehaltenen Tönen messbar senkt; und Detune sowie Time werden per Sample geglättet, sodass eine Automation von beiden nicht mehr an Block-Grenzen springt.
+
 ### ④ SLAP — Single-Repeat Dark Delay
 
 **Time** (50–160 ms, Default 110 ms, reine Millisekunden — bewusst nicht tempo-synchronisiert). Feedback ist in v2 fest auf 0: Es gibt genau eine Wiederholung, und ihre Dunkelheit kommt aus einer eingebauten Voicing im Tape-Stil (**Tone** fährt einen progressiven HF-Verlust plus sanfte Sättigung, fest in diese eine Wiederholung eingebacken) statt aus einer gefilterten Feedback-Loop. **Stereo** schaltet vom standardmäßigen Mono-Return (der klassische Mono-Slap hinter einer stereoverbreiterten Vocal) auf unabhängige L/R-Delays um.
@@ -110,10 +114,11 @@ nie auf den Direct-Pfad. Bei 0 wird überhaupt nichts erzeugt.
 - **Mute gewinnt gegen Audition** auf demselben Bus, wie an einer Konsole.
 - **Link** (standardmäßig aus) lässt die Detektoren von Crush und Sandwich einem kombinierten L/R-Signal folgen statt jedem Kanal unabhängig — „Dual Mono" (ungelinkt) ist das dokumentierte Standardverhalten für diesen Verarbeitungsstil.
 - **Parallel** ist ein Makro-Trim (−24…+6 dB), der alle vier Return-Fader gemeinsam verschiebt — die „VCA-Ride-back"-Geste, um die gesamte Parallel-Ebene schnell zurückzunehmen.
+- **Mute und Audition klicken nicht.** Seit v0.5.0 fährt das Bus-Routing auf einer 3-ms-Rampe statt hart zwischen an und aus umzuschalten. Die Rampe landet auf exakten Werten, ein gemuteter Bus liefert also weiterhin digitale Stille — exakte Nullen, nicht „sehr leise" —, sobald er sich eingeschwungen hat.
 
 ## Presets
 
-Am oberen Rand des Editors sitzt eine Preset-Leiste: `[<] [Preset-Name*] [>] [Save] [Save As...] [Delete] [Import...] [Export...]`. Ein Klick auf den Preset-Namen öffnet ein Factory/User-Menü; ein angehängtes `*` bedeutet, dass das aktuelle Preset ungespeicherte Änderungen hat. Zehn Werkspresets sind ab Werk dabei (was jedes einzelne bewirkt, steht in `presets.md`); eigene Presets speichert Miserere unter `~/Library/Audio/Presets/Yves Vogl/Miserere/` auf macOS (`%APPDATA%/Yves Vogl/Miserere/Presets/` unter Windows). „Set current as default" im Preset-Menü macht ein beliebiges Preset — Werks- oder eigenes — zu dem, das auf jeder frischen Instanz automatisch geladen wird; „Import..." akzeptiert sowohl einzelne Preset-Dateien als auch Zip-Preset-Bänke.
+Am oberen Rand des Editors sitzt eine Preset-Leiste: `[<] [Preset-Name*] [>] [Save] [Save As...] [Delete] [Import...] [Export...]`. Ein Klick auf den Preset-Namen öffnet ein Factory/User-Menü; ein angehängtes `*` bedeutet, dass das aktuelle Preset ungespeicherte Änderungen hat. Zwölf Werkspresets sind ab Werk dabei (was jedes einzelne bewirkt, steht in `presets.md`) — einschließlich **Tape Slap 7.5** und **Worn Slap**, die in v0.5.0 hinzukamen, um Wobble und Age vorzuführen; eigene Presets speichert Miserere unter `~/Library/Audio/Presets/Yves Vogl/Miserere/` auf macOS (`%APPDATA%/Yves Vogl/Miserere/Presets/` unter Windows). „Set current as default" im Preset-Menü macht ein beliebiges Preset — Werks- oder eigenes — zu dem, das auf jeder frischen Instanz automatisch geladen wird; „Import..." akzeptiert sowohl einzelne Preset-Dateien als auch Zip-Preset-Bänke.
 
 ## Starter-Rezept
 
@@ -151,10 +156,6 @@ du solltest das von keinem Zero-Latency-Design erwarten. Willst du, dass ein ges
   gleichmäßig gehaltener Vokal) auf einen milden Kamm trifft, dessen Tiefe von der Note abhängt.
   Bei echtem Programmmaterial ist das unhörbar; eine intelligentere Verbindung steht auf der
   Roadmap.
-- Nach längerer Stille pendelt sich der SANDWICH-Bus um −150 dBFS ein statt bei echter digitaler
-  Stille — rund 30 dB unter dem kleinsten Wert, den eine 24-Bit-Datei fassen kann. Jeder andere
-  Bus erreicht exakt null.
-
 - Das GUI ist ein funktionaler Slider-/Knob-Editor (ein individuelles Vektor-GUI mit Nadelinstrumenten pro Bus ist Milestone M3); die Preset-Leiste ist ein rein funktionaler Streifen, noch nicht neu gestaltet.
 - Außerhalb des Scopes von v2, als M2+/M3-Issues erfasst: ein kurzes Plate-Reverb-Modul, ein „BV Mode"-Preset, austauschbare Kompressor-Farben über die beiden CRUSH-Styles hinaus, externer Sidechain, ein Output-Limiter.
 - Die Dynamikerkennung ist bei Crush und Sandwich standardmäßig ungelinkt (unabhängiges L/R); Link lässt beide Kanäle einem gemeinsamen Detektor folgen.
