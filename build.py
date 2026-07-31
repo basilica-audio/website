@@ -401,6 +401,14 @@ def guides_nav_href(lang: str, dir_: str) -> str:
     return rel_link(dir_, lang_dir(lang, "signal-chain"))
 
 
+def home_href(lang: str, dir_: str) -> str:
+    """Language-correct relative href to that language's overview page —
+    used by the brand/logo link and the Plugins nav link (base_context),
+    which previously used the depth-only "root" prefix and therefore always
+    landed on the English overview even from German pages."""
+    return rel_link(dir_, lang_dir(lang))
+
+
 # ---------------------------------------------------------------------------
 # Page-fragment builders
 # ---------------------------------------------------------------------------
@@ -642,6 +650,7 @@ def base_context(lang: str, dir_: str, alt_dir: str, title: str, description: st
         "nav_plugins": s["nav_plugins"],
         "nav_guides": s["nav_guides"],
         "guides_href": guides_nav_href(lang, dir_),
+        "home_href": home_href(lang, dir_),
         "nav_github": s["nav_github"],
         "lang_switch": lang_switch_nav(lang, dir_, alt_dir),
         "hreflang_tags": hreflang_tags(dir_, dir_ if lang == "en" else alt_dir, alt_dir if lang == "en" else dir_),
