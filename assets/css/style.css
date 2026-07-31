@@ -222,6 +222,13 @@ main {
   font-size: 0.98rem;
 }
 
+.guides-callout {
+  text-align: center;
+  margin: 1.8rem auto 0;
+  font-size: 0.98rem;
+}
+.guides-callout a { letter-spacing: 0.02em; }
+
 /* ---- plugin card grid ---- */
 .plugin-grid {
   display: grid;

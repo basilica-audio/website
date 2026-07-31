@@ -63,6 +63,7 @@ DAWS = [
 ]
 
 MANUALS_DIR = ROOT / "data" / "manuals"
+GUIDES_DIR = ROOT / "data" / "guides"
 
 # ---------------------------------------------------------------------------
 # UI chrome strings — every piece of site chrome (nav, buttons, empty
@@ -147,6 +148,14 @@ STRINGS = {
         "manual_back": "Back to {name}",
         "manual_title_suffix": "User manual",
         "manual_description": "User manual for {name} — {site_name}.",
+        "nav_guides": "Guides",
+        "guide_label": "How-to guide",
+        "guide_description": "Practical settings guide for {name} — {site_name}.",
+        "signal_chain_title": "Signal chain guide",
+        "signal_chain_description": ("How the thirteen Basilica Audio plugins fit together in a "
+                                      "heavy-music production — guitars, bass, buses, mastering, "
+                                      "vocals & choir, and space."),
+        "signal_chain_callout": "Read the signal-chain guide →",
     },
     "de": {
         "html_lang": "de",
@@ -225,6 +234,14 @@ STRINGS = {
         "manual_back": "Zurück zu {name}",
         "manual_title_suffix": "Bedienungsanleitung",
         "manual_description": "Bedienungsanleitung für {name} — {site_name}.",
+        "nav_guides": "Guides",
+        "guide_label": "Praxis-Guide",
+        "guide_description": "Praxis-Guide mit Einstellungsempfehlungen für {name} — {site_name}.",
+        "signal_chain_title": "Signalketten-Guide",
+        "signal_chain_description": ("Wie die dreizehn Basilica-Audio-Plugins in einer "
+                                      "Heavy-Music-Produktion zusammenspielen — Gitarren, Bass, "
+                                      "Busse, Mastering, Vocals & Chor und Raum."),
+        "signal_chain_callout": "Signalketten-Guide lesen →",
     },
 }
 
@@ -369,6 +386,19 @@ def load_manual_markdown(path: Path) -> str:
 
 def manual_path(slug: str, lang: str) -> Path:
     return MANUALS_DIR / f"{slug}.{lang}.md"
+
+
+def guide_path(slug: str, lang: str) -> Path:
+    return GUIDES_DIR / f"{slug}.{lang}.md"
+
+
+def guides_nav_href(lang: str, dir_: str) -> str:
+    """Relative href from any page to that language's signal-chain guide —
+    the 'Guides' header nav link (base_context). Unlike nav_plugins/brand
+    (which use the depth-only "root" prefix and always land on the English
+    tree), this is computed with rel_link so it stays language-correct on
+    German pages too."""
+    return rel_link(dir_, lang_dir(lang, "signal-chain"))
 
 
 # ---------------------------------------------------------------------------
@@ -566,6 +596,28 @@ def manual_link_item(plugin: dict, lang: str, manuals_present: dict) -> str:
     return f'    <li><a href="{href}">{s["link_manual"]}{hint}</a></li>\n'
 
 
+def guide_link_item(plugin: dict, lang: str, guides_present: dict) -> str:
+    """The 'How-to guide' <li> in a product page's Links section, or "" if
+    this plugin has no guide in any language yet — same English-fallback
+    convention as manual_link_item above (guides land bilingually per
+    batch in practice, but the build must never depend on that)."""
+    s = STRINGS[lang]
+    slug = plugin["slug"]
+    has_en = guides_present.get((slug, "en"), False)
+    has_de = guides_present.get((slug, "de"), False)
+    if not has_en and not has_de:
+        return ""
+    this_dir = lang_dir(lang, slug)
+    if lang == "en" or has_de:
+        target_dir = lang_dir(lang, slug, "guide")
+        hint = ""
+    else:
+        target_dir = lang_dir("en", slug, "guide")
+        hint = s["link_manual_other_lang_hint"]
+    href = rel_link(this_dir, target_dir)
+    return f'    <li><a href="{href}">{s["guide_label"]}{hint}</a></li>\n'
+
+
 def build_download_fallback(lang: str, org: str, repo: str) -> str:
     s = STRINGS[lang]
     link = (f'<a href="https://github.com/{org}/{repo}/releases/latest" '
@@ -588,6 +640,8 @@ def base_context(lang: str, dir_: str, alt_dir: str, title: str, description: st
         "skip_link": s["skip_link"],
         "brand_name": s["brand_name"],
         "nav_plugins": s["nav_plugins"],
+        "nav_guides": s["nav_guides"],
+        "guides_href": guides_nav_href(lang, dir_),
         "nav_github": s["nav_github"],
         "lang_switch": lang_switch_nav(lang, dir_, alt_dir),
         "hreflang_tags": hreflang_tags(dir_, dir_ if lang == "en" else alt_dir, alt_dir if lang == "en" else dir_),
@@ -615,6 +669,8 @@ def build_index(lang: str, index_tpl: str, base_tpl: str, plugins: list[dict]) -
         "brand_name": s["brand_name"],
         "cards": cards,
         "root": root,
+        "signal_chain_href": rel_link(dir_, lang_dir(lang, "signal-chain")),
+        "signal_chain_callout": s["signal_chain_callout"],
         "daws_section": daws_section(lang, root, centered=True),
     })
     ctx = base_context(lang, dir_, alt_dir, f"{SITE_NAME} — {s['site_tagline']}", s["site_description"], index_content)
@@ -623,7 +679,7 @@ def build_index(lang: str, index_tpl: str, base_tpl: str, plugins: list[dict]) -
     write_page(dir_, base_tpl, ctx)
 
 
-def build_plugin_page(lang: str, plugin_tpl: str, base_tpl: str, plugin: dict, manuals_present: dict) -> None:
+def build_plugin_page(lang: str, plugin_tpl: str, base_tpl: str, plugin: dict, manuals_present: dict, guides_present: dict) -> None:
     s = STRINGS[lang]
     slug = plugin["slug"]
     dir_ = lang_dir(lang, slug)
@@ -668,6 +724,7 @@ def build_plugin_page(lang: str, plugin_tpl: str, base_tpl: str, plugin: dict, m
         "donate_note": s["donate_note"],
         "links_heading": s["links_heading"],
         "link_source": s["link_source"],
+        "guide_link_item": guide_link_item(plugin, lang, guides_present),
         "manual_link_item": manual_link_item(plugin, lang, manuals_present),
         "link_releases": s["link_releases"],
         "link_license": s["link_license"],
@@ -739,6 +796,64 @@ def build_manual_page(lang: str, manual_tpl: str, base_tpl: str, plugin: dict, m
     write_page(dir_, base_tpl, ctx)
 
 
+def build_guide_page(lang: str, guide_tpl: str, base_tpl: str, plugin: dict, guides_present: dict) -> None:
+    """Per-plugin 'How-to guide' — hand-authored Markdown (not repo-synced,
+    unlike manuals) under data/guides/<slug>.<lang>.md, rendered through the
+    same lib_md renderer and the .manual typography, at /<slug>/guide/."""
+    s = STRINGS[lang]
+    slug = plugin["slug"]
+    path = guide_path(slug, lang)
+    if not path.is_file():
+        return
+    dir_ = lang_dir(lang, slug, "guide")
+
+    has_en = guides_present.get((slug, "en"), False)
+    has_de = guides_present.get((slug, "de"), False)
+    if lang == "en":
+        alt_dir = lang_dir("de", slug, "guide") if has_de else lang_dir("de", slug)
+    else:
+        alt_dir = lang_dir("en", slug, "guide") if has_en else lang_dir("en", slug)
+
+    markdown_text = path.read_text(encoding="utf-8")
+    body_html = lib_md.render(markdown_text)
+
+    name = plugin["name"]
+    content = render(guide_tpl, {
+        "guide_back_href": "../index.html",
+        "guide_back_label": s["manual_back"].format(name=html.escape(name)),
+        "guide_content": body_html,
+    })
+    title = f"{name} — {s['guide_label']} | {SITE_NAME}"
+    description = s["guide_description"].format(name=name, site_name=SITE_NAME)
+    ctx = base_context(lang, dir_, alt_dir, title, description, content)
+    write_page(dir_, base_tpl, ctx)
+
+
+def build_signal_chain_page(lang: str, guide_tpl: str, base_tpl: str) -> None:
+    """The one suite-level guide page — /signal-chain/ + /de/signal-chain/ —
+    sits at the same tree depth as a product page, so its breadcrumb reuses
+    the "All plugins" back-link the exact same way plugin.html's does."""
+    s = STRINGS[lang]
+    path = GUIDES_DIR / f"signal-chain.{lang}.md"
+    if not path.is_file():
+        return
+    dir_ = lang_dir(lang, "signal-chain")
+    alt_dir = lang_dir("de" if lang == "en" else "en", "signal-chain")
+
+    markdown_text = path.read_text(encoding="utf-8")
+    body_html = lib_md.render(markdown_text)
+
+    content = render(guide_tpl, {
+        "guide_back_href": "../index.html",
+        "guide_back_label": s["all_plugins"],
+        "guide_content": body_html,
+    })
+    title = f"{s['signal_chain_title']} | {SITE_NAME}"
+    description = s["signal_chain_description"]
+    ctx = base_context(lang, dir_, alt_dir, title, description, content)
+    write_page(dir_, base_tpl, ctx)
+
+
 # ---------------------------------------------------------------------------
 # Build
 # ---------------------------------------------------------------------------
@@ -763,6 +878,7 @@ def build_site() -> tuple[list[str], list[str], int]:
     index_tpl = read_template("index.html")
     plugin_tpl = read_template("plugin.html")
     manual_tpl = read_template("manual.html")
+    guide_tpl = read_template("guide.html")
 
     manuals_present: dict[tuple[str, str], bool] = {}
     manuals_synced: list[str] = []
@@ -778,16 +894,28 @@ def build_site() -> tuple[list[str], list[str], int]:
         else:
             manuals_missing.append(slug)
 
+    guides_present: dict[tuple[str, str], bool] = {}
+    for plugin in plugins:
+        slug = plugin["slug"]
+        guides_present[(slug, "en")] = guide_path(slug, "en").is_file()
+        guides_present[(slug, "de")] = guide_path(slug, "de").is_file()
+
     page_count = 0
     for lang in LANGS:
         build_index(lang, index_tpl, base, plugins)
         page_count += 1
+        build_signal_chain_page(lang, guide_tpl, base)
+        if (GUIDES_DIR / f"signal-chain.{lang}.md").is_file():
+            page_count += 1
         for plugin in plugins:
-            build_plugin_page(lang, plugin_tpl, base, plugin, manuals_present)
+            build_plugin_page(lang, plugin_tpl, base, plugin, manuals_present, guides_present)
             page_count += 1
             manual_path_for_lang = manual_path(plugin["slug"], lang)
             if manual_path_for_lang.is_file():
                 build_manual_page(lang, manual_tpl, base, plugin, manuals_present)
+                page_count += 1
+            if guide_path(plugin["slug"], lang).is_file():
+                build_guide_page(lang, guide_tpl, base, plugin, guides_present)
                 page_count += 1
 
     print(f"built {page_count} pages -> {DIST}")
