@@ -37,6 +37,18 @@ ORG = "basilica-audio"
 
 SITE_NAME = "Basilica Audio"
 
+# Absolute site base — canonical URLs, hreflang alternates, Open Graph
+# metadata, the sitemap and the 404 page's links all derive from this one
+# constant (hreflang/canonical URLs must be fully qualified per Google's
+# documentation, so relative links are not an option there).
+BASE_URL = "https://basilica-audio.github.io/website/"
+
+# The pre-composed 1200x630 Open Graph card (assets/og-card.png) shared by
+# every page — scrapers do not follow relative URLs, hence BASE_URL.
+OG_IMAGE = {"file": "assets/og-card.png", "width": 1200, "height": 630}
+
+OG_LOCALES = {"en": "en_GB", "de": "de_DE"}
+
 LANGS = ("en", "de")
 
 IMAGE_EXTS = {".png", ".jpg", ".jpeg", ".webp", ".gif"}
@@ -49,7 +61,7 @@ AUDIO_MIME = {
 PLACEHOLDER_RE = re.compile(r"\{\{[a-z_]+\}\}")
 
 # Compatible-DAW logo strip, rendered on every product page and on the
-# overview page. Keys map to assets/daws/daw-<key>.png. Pro Tools is
+# overview page. Keys map to assets/daws/daw-<key>.webp. Pro Tools is
 # deliberately absent: it only loads AAX plugins, which the suite does not
 # ship (its logo tile sits unused in assets/daws/ alongside the others).
 DAWS = [
@@ -96,7 +108,7 @@ STRINGS = {
         "about_heading": "About",
         "lore_heading": "Why the name?",
         "engineering_heading": "Under the hood",
-        "signed_note": ("The macOS binaries are Developer-ID-signed, notarized by Apple "
+        "signed_note": ("The macOS binaries are Developer-ID-signed, notarised by Apple "
                         "and stapled — they install and open without Gatekeeper warnings. "
                         "Windows builds are not yet Authenticode-signed; SmartScreen may "
                         "warn about an unknown publisher."),
@@ -106,7 +118,7 @@ STRINGS = {
         "download_fallback_link": "GitHub&nbsp;Releases",
         "unsigned_title": "A note on unsigned binaries.",
         "unsigned_body": ("These builds are not yet code-signed — the signing and "
-                           "notarization pipeline is still in progress. Your operating "
+                           "notarisation pipeline is still in progress. Your operating "
                            "system will warn you on first launch:"),
         "unsigned_macos": ("<strong>macOS</strong> — Gatekeeper will block the first open. "
                             "Right-click the plugin or app and choose <em>Open</em>, or "
@@ -144,7 +156,7 @@ STRINGS = {
         "link_license": "License — GNU AGPL-3.0",
         "release_notes_label": "Release notes & previous versions",
         "footer_note": ("Free and open-source software under the GNU AGPL-3.0. "
-                         "macOS binaries are Developer-ID-signed and notarized."),
+                         "macOS binaries are Developer-ID-signed and notarised."),
         "manual_back": "Back to {name}",
         "manual_title_suffix": "User manual",
         "manual_description": "User manual for {name} — {site_name}.",
@@ -155,7 +167,7 @@ STRINGS = {
         "signal_chain_description": ("How the thirteen Basilica Audio plugins fit together in a "
                                       "heavy-music production — guitars, bass, buses, mastering, "
                                       "vocals & choir, and space."),
-        "signal_chain_callout": "Read the signal-chain guide →",
+        "signal_chain_callout": "Read the signal-chain guide",
     },
     "de": {
         "html_lang": "de",
@@ -241,7 +253,7 @@ STRINGS = {
         "signal_chain_description": ("Wie die dreizehn Basilica-Audio-Plugins in einer "
                                       "Heavy-Music-Produktion zusammenspielen — Gitarren, Bass, "
                                       "Busse, Mastering, Vocals & Chor und Raum."),
-        "signal_chain_callout": "Signalketten-Guide lesen →",
+        "signal_chain_callout": "Signalketten-Guide lesen",
     },
 }
 
@@ -332,14 +344,79 @@ def lang_dir(lang: str, *parts: str) -> str:
     return "/".join(segments)
 
 
+def page_url(dir_: str) -> str:
+    """Absolute canonical URL of the page living at dist/<dir_>/index.html."""
+    return BASE_URL if not dir_ else f"{BASE_URL}{dir_}/"
+
+
+def image_size(path: Path) -> tuple[int, int] | None:
+    """Pixel dimensions of a PNG or WebP file, stdlib-only (no Pillow in CI).
+
+    Supports PNG (IHDR) and all three WebP flavours (VP8X extended header,
+    VP8 lossy frame header, VP8L lossless stream header). Returns None for
+    anything it cannot parse — callers then simply omit width/height.
+    """
+    try:
+        head = path.read_bytes()[:64]
+    except OSError:
+        return None
+    if head[:8] == b"\x89PNG\r\n\x1a\n" and head[12:16] == b"IHDR":
+        return (int.from_bytes(head[16:20], "big"), int.from_bytes(head[20:24], "big"))
+    if head[:4] == b"RIFF" and head[8:12] == b"WEBP":
+        chunk = head[12:16]
+        if chunk == b"VP8X":
+            return (int.from_bytes(head[24:27], "little") + 1,
+                    int.from_bytes(head[27:30], "little") + 1)
+        if chunk == b"VP8 " and head[23:26] == b"\x9d\x01\x2a":
+            return (int.from_bytes(head[26:28], "little") & 0x3FFF,
+                    int.from_bytes(head[28:30], "little") & 0x3FFF)
+        if chunk == b"VP8L" and head[20:21] == b"\x2f":
+            bits = int.from_bytes(head[21:25], "little")
+            return ((bits & 0x3FFF) + 1, ((bits >> 14) & 0x3FFF) + 1)
+    return None
+
+
 def hreflang_tags(this_dir: str, en_dir: str, de_dir: str) -> str:
-    en_href = rel_link(this_dir, en_dir)
-    de_href = rel_link(this_dir, de_dir)
+    """Fully-qualified alternate links — Google requires absolute URLs here."""
+    en_href = page_url(en_dir)
+    de_href = page_url(de_dir)
     return (
         f'<link rel="alternate" hreflang="en" href="{en_href}">\n'
         f'<link rel="alternate" hreflang="de" href="{de_href}">\n'
         f'<link rel="alternate" hreflang="x-default" href="{en_href}">'
     )
+
+
+def seo_head(lang: str, dir_: str, en_dir: str, de_dir: str,
+             title: str, description: str, jsonld: str = "") -> str:
+    """Canonical + hreflang + Open Graph + Twitter card (+ optional JSON-LD)."""
+    url = page_url(dir_)
+    esc_title = html.escape(title, quote=True)
+    esc_desc = html.escape(description, quote=True)
+    locale = OG_LOCALES[lang]
+    alt_locale = OG_LOCALES["de" if lang == "en" else "en"]
+    lines = [
+        hreflang_tags(dir_, en_dir, de_dir),
+        f'<link rel="canonical" href="{url}">',
+        '<meta property="og:type" content="website">',
+        f'<meta property="og:site_name" content="{SITE_NAME}">',
+        f'<meta property="og:title" content="{esc_title}">',
+        f'<meta property="og:description" content="{esc_desc}">',
+        f'<meta property="og:url" content="{url}">',
+        f'<meta property="og:image" content="{BASE_URL}{OG_IMAGE["file"]}">',
+        f'<meta property="og:image:width" content="{OG_IMAGE["width"]}">',
+        f'<meta property="og:image:height" content="{OG_IMAGE["height"]}">',
+        f'<meta property="og:image:alt" content="{SITE_NAME}">',
+        f'<meta property="og:locale" content="{locale}">',
+        f'<meta property="og:locale:alternate" content="{alt_locale}">',
+        '<meta name="twitter:card" content="summary_large_image">',
+        f'<meta name="twitter:title" content="{esc_title}">',
+        f'<meta name="twitter:description" content="{esc_desc}">',
+        f'<meta name="twitter:image" content="{BASE_URL}{OG_IMAGE["file"]}">',
+    ]
+    if jsonld:
+        lines.append(f'<script type="application/ld+json">{jsonld}</script>')
+    return "\n".join(lines)
 
 
 def lang_switch_nav(lang: str, this_dir: str, alt_dir: str) -> str:
@@ -459,6 +536,18 @@ def collect_media(plugin: dict, exts: set[str], field: str) -> list[tuple[str, s
     return found
 
 
+def media_figure(src: str, file: Path, caption: str) -> str:
+    """One gallery <figure> — explicit width/height (read from the image
+    header, stdlib-only) so lazy-loaded galleries reserve their box and
+    never shift layout."""
+    size = image_size(file)
+    dims = f' width="{size[0]}" height="{size[1]}"' if size else ""
+    return f"""    <figure>
+      <img src="{html.escape(src)}" alt="{html.escape(caption)}"{dims} loading="lazy" decoding="async">
+      <figcaption>{html.escape(caption)}</figcaption>
+    </figure>"""
+
+
 def mockup_figure(plugin: dict, lang: str, root: str) -> str | None:
     """A single-image fallback for the Screenshots section: plugins.json may
     carry an optional "mockup" object ({"file": ..., "is_screenshot": bool})
@@ -478,10 +567,7 @@ def mockup_figure(plugin: dict, lang: str, root: str) -> str | None:
     if not (ROOT / "assets" / slug / name).is_file():
         return None
     caption = s["screenshot_caption"] if mockup.get("is_screenshot") else s["mockup_caption"]
-    return f"""    <figure>
-      <img src="{root}assets/{slug}/{html.escape(name)}" alt="{html.escape(caption)}" loading="lazy">
-      <figcaption>{html.escape(caption)}</figcaption>
-    </figure>"""
+    return media_figure(f"{root}assets/{slug}/{name}", ROOT / "assets" / slug / name, caption)
 
 
 def screenshots_section(plugin: dict, lang: str, root: str) -> str:
@@ -505,10 +591,8 @@ def screenshots_section(plugin: dict, lang: str, root: str) -> str:
   </div>
 </section>"""
     figures = "\n".join(
-        f"""    <figure>
-      <img src="{root}assets/{plugin['slug']}/{html.escape(name)}" alt="{html.escape(caption)}" loading="lazy">
-      <figcaption>{html.escape(caption)}</figcaption>
-    </figure>"""
+        media_figure(f"{root}assets/{plugin['slug']}/{name}",
+                     ROOT / "assets" / plugin["slug"] / name, caption)
         for name, caption in shots
     )
     return f"""<section class="section" aria-labelledby="screenshots-heading">
@@ -553,8 +637,8 @@ def daws_section(lang: str, root: str, centered: bool = False) -> str:
     """The compatible-DAWs logo strip (product pages + overview page)."""
     s = STRINGS[lang]
     tiles = "\n".join(
-        f'    <li><img src="{root}assets/daws/daw-{key}.png" alt="{name}" '
-        f'title="{name}" width="56" height="56" loading="lazy"></li>'
+        f'    <li><img src="{root}assets/daws/daw-{key}.webp" alt="{name}" '
+        f'title="{name}" width="56" height="56" loading="lazy" decoding="async"></li>'
         for key, name in DAWS
     )
     cls = " daw-section-centered" if centered else ""
@@ -572,11 +656,11 @@ def build_card(plugin: dict, lang: str, root: str) -> str:
     slug, name = plugin["slug"], plugin["name"]
     role = loc(plugin, lang, "role")
     return f"""  <article class="card">
-    <img class="card-icon" src="{root}assets/icons/{slug}.png" alt="" width="92" height="92">
+    <img class="card-icon" src="{root}assets/icons/{slug}-184.webp" alt="" width="92" height="92" loading="lazy" decoding="async">
     <h2><a class="card-link" href="{slug}/index.html">{html.escape(name)}</a></h2>
     <p class="card-role">{html.escape(role)}</p>
     <p class="card-actions">
-      <span class="details-hint" aria-hidden="true">{s['details_hint']}&nbsp;&rarr;</span>
+      <span class="details-hint" aria-hidden="true">{s['details_hint']}</span>
       <a href="{slug}/index.html#download">{s['download_label']}</a>
     </p>
   </article>"""
@@ -636,7 +720,8 @@ def build_download_fallback(lang: str, org: str, repo: str) -> str:
 # ---------------------------------------------------------------------------
 # Page assembly
 # ---------------------------------------------------------------------------
-def base_context(lang: str, dir_: str, alt_dir: str, title: str, description: str, content: str) -> dict:
+def base_context(lang: str, dir_: str, alt_dir: str, title: str, description: str, content: str,
+                 jsonld: str = "") -> dict:
     s = STRINGS[lang]
     return {
         "html_lang": s["html_lang"],
@@ -653,7 +738,12 @@ def base_context(lang: str, dir_: str, alt_dir: str, title: str, description: st
         "home_href": home_href(lang, dir_),
         "nav_github": s["nav_github"],
         "lang_switch": lang_switch_nav(lang, dir_, alt_dir),
-        "hreflang_tags": hreflang_tags(dir_, dir_ if lang == "en" else alt_dir, alt_dir if lang == "en" else dir_),
+        "seo_head": seo_head(
+            lang, dir_,
+            dir_ if lang == "en" else alt_dir,
+            alt_dir if lang == "en" else dir_,
+            title, description, jsonld,
+        ),
         "extra_head": "",
         "footer_note": s["footer_note"],
     }
@@ -682,7 +772,25 @@ def build_index(lang: str, index_tpl: str, base_tpl: str, plugins: list[dict]) -
         "signal_chain_callout": s["signal_chain_callout"],
         "daws_section": daws_section(lang, root, centered=True),
     })
-    ctx = base_context(lang, dir_, alt_dir, f"{SITE_NAME} — {s['site_tagline']}", s["site_description"], index_content)
+    jsonld = json.dumps({
+        "@context": "https://schema.org",
+        "@graph": [
+            {
+                "@type": "Organization",
+                "name": SITE_NAME,
+                "url": BASE_URL,
+                "logo": f"{BASE_URL}assets/favicon-192.png",
+                "sameAs": [f"https://github.com/{ORG}"],
+            },
+            {
+                "@type": "WebSite",
+                "name": SITE_NAME,
+                "url": BASE_URL,
+                "inLanguage": ["en", "de"],
+            },
+        ],
+    }, ensure_ascii=False)
+    ctx = base_context(lang, dir_, alt_dir, f"{SITE_NAME} — {s['site_tagline']}", s["site_description"], index_content, jsonld=jsonld)
     if lang == "en":
         ctx["extra_head"] = ROOT_REDIRECT_SCRIPT
     write_page(dir_, base_tpl, ctx)
@@ -739,7 +847,22 @@ def build_plugin_page(lang: str, plugin_tpl: str, base_tpl: str, plugin: dict, m
         "link_license": s["link_license"],
         "release_notes_label": html.escape(s["release_notes_label"]),
     })
-    ctx = base_context(lang, dir_, alt_dir, f"{name} — {role} | {SITE_NAME}", tagline, content)
+    jsonld = json.dumps({
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": name,
+        "description": description,
+        "url": page_url(dir_),
+        "image": f"{BASE_URL}assets/icons/{slug}-352.webp",
+        "applicationCategory": "MultimediaApplication",
+        "applicationSubCategory": "Audio plugin",
+        "operatingSystem": "macOS, Windows",
+        "offers": {"@type": "Offer", "price": "0", "priceCurrency": "EUR"},
+        "license": "https://www.gnu.org/licenses/agpl-3.0",
+        "downloadUrl": f"https://github.com/{ORG}/{plugin['repo']}/releases",
+        "author": {"@type": "Organization", "name": SITE_NAME, "url": BASE_URL},
+    }, ensure_ascii=False)
+    ctx = base_context(lang, dir_, alt_dir, f"{name} — {role} | {SITE_NAME}", tagline, content, jsonld=jsonld)
     write_page(dir_, base_tpl, ctx)
 
 
@@ -863,6 +986,87 @@ def build_signal_chain_page(lang: str, guide_tpl: str, base_tpl: str) -> None:
     write_page(dir_, base_tpl, ctx)
 
 
+def build_404(base_tpl: str) -> None:
+    """Bilingual 404 page. GitHub Pages serves dist/404.html for any missing
+    path, at any depth — so every internal reference on this one page must be
+    absolute (root=BASE_URL takes care of the template chrome)."""
+    en, de = STRINGS["en"], STRINGS["de"]
+    content = f"""<section class="hero">
+  <img class="hero-emblem" src="{BASE_URL}assets/org-300.webp" alt="" width="150" height="150">
+  <h1 class="hero-title">404</h1>
+  <p class="hero-tagline">This page does not exist.</p>
+  <div class="ornament" role="presentation"><span></span></div>
+  <p class="hero-sub">The page you were looking for has moved or never existed.<br>
+  <span lang="de">Die gesuchte Seite wurde verschoben oder hat nie existiert.</span></p>
+  <p class="guides-callout"><a href="{BASE_URL}">{html.escape(en["all_plugins"])}</a>
+  &ensp;<span aria-hidden="true">·</span>&ensp;
+  <a href="{BASE_URL}de/" lang="de">{html.escape(de["all_plugins"])}</a></p>
+</section>"""
+    ctx = {
+        "html_lang": "en",
+        "title": f"404 — {SITE_NAME}",
+        "description": "Page not found.",
+        "root": BASE_URL,
+        "org": ORG,
+        "content": content,
+        "skip_link": en["skip_link"],
+        "brand_name": en["brand_name"],
+        "nav_plugins": en["nav_plugins"],
+        "nav_guides": en["nav_guides"],
+        "guides_href": f"{BASE_URL}signal-chain/",
+        "home_href": BASE_URL,
+        "nav_github": en["nav_github"],
+        "lang_switch": "",
+        "seo_head": '<meta name="robots" content="noindex">',
+        "extra_head": "",
+        "footer_note": en["footer_note"],
+    }
+    (DIST / "404.html").write_text(render(base_tpl, ctx), encoding="utf-8")
+
+
+def write_sitemap_and_robots() -> None:
+    """sitemap.xml with bilingual xhtml:link alternates + robots.txt.
+
+    English URLs carry their German twin as an alternate (and vice versa is
+    implied); a German-only page (possible in theory, never in practice)
+    would still get its own <url> entry.
+    """
+    dirs = sorted(
+        "" if (rel := str(p.parent.relative_to(DIST))) == "." else rel
+        for p in DIST.rglob("index.html")
+    )
+    dir_set = set(dirs)
+    entries = []
+    for d in dirs:
+        is_de = d == "de" or d.startswith("de/")
+        if is_de:
+            en_twin = d[3:] if d.startswith("de/") else ""
+            if en_twin in dir_set:
+                continue  # listed as alternate of its English twin
+            entries.append(f"  <url>\n    <loc>{page_url(d)}</loc>\n  </url>")
+            continue
+        de_twin = f"de/{d}" if d else "de"
+        alt = ""
+        if de_twin in dir_set:
+            alt = (
+                f'\n    <xhtml:link rel="alternate" hreflang="en" href="{page_url(d)}"/>'
+                f'\n    <xhtml:link rel="alternate" hreflang="de" href="{page_url(de_twin)}"/>'
+                f'\n    <xhtml:link rel="alternate" hreflang="x-default" href="{page_url(d)}"/>'
+            )
+        entries.append(f"  <url>\n    <loc>{page_url(d)}</loc>{alt}\n  </url>")
+    sitemap = (
+        '<?xml version="1.0" encoding="UTF-8"?>\n'
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"\n'
+        '        xmlns:xhtml="http://www.w3.org/1999/xhtml">\n'
+        + "\n".join(entries)
+        + "\n</urlset>\n"
+    )
+    (DIST / "sitemap.xml").write_text(sitemap, encoding="utf-8")
+    (DIST / "robots.txt").write_text(
+        f"User-agent: *\nAllow: /\n\nSitemap: {BASE_URL}sitemap.xml\n", encoding="utf-8"
+    )
+
+
 # ---------------------------------------------------------------------------
 # Build
 # ---------------------------------------------------------------------------
@@ -926,6 +1130,10 @@ def build_site() -> tuple[list[str], list[str], int]:
             if guide_path(plugin["slug"], lang).is_file():
                 build_guide_page(lang, guide_tpl, base, plugin, guides_present)
                 page_count += 1
+
+    build_404(base)
+    page_count += 1
+    write_sitemap_and_robots()
 
     print(f"built {page_count} pages -> {DIST}")
     return manuals_synced, manuals_missing, page_count

@@ -34,7 +34,8 @@
   function humanDate(iso) {
     var d = new Date(iso);
     if (isNaN(d.getTime())) { return ""; }
-    return d.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
+    var lang = document.documentElement.lang === "de" ? "de-DE" : "en-GB";
+    return d.toLocaleDateString(lang, { year: "numeric", month: "short", day: "numeric" });
   }
 
   function platformOf(assetName) {
