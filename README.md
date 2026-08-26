@@ -27,8 +27,11 @@ templates/plugin.html     Product page (about, features, downloads, stubs, links
 templates/manual.html     User-manual page (breadcrumb + rendered manual article)
 assets/css/style.css      Suite stylesheet (charcoal + antique gold, system fonts)
 assets/js/releases.js     Client-side latest-release download buttons
-assets/icons/<slug>.png   Plugin icons (256 px)
-assets/org.png            Org emblem (512 px)
+assets/icons/<slug>-*.webp Plugin icons (184 px cards / 352 px product hero,
+                           derived from basilica-audio/brand v2-plastic/cut)
+assets/org-*.webp         Org emblem (72 px header / 300 px hero, same source)
+assets/favicon-*.png      Favicons + apple-touch-icon (derived from the emblem)
+assets/og-card.png        1200x630 Open Graph / Twitter share card
 dist/                     Build output (gitignored, built in CI)
 ```
 
@@ -217,7 +220,7 @@ screenshots replace it:
 ```json
 {
   "slug": "requiem",
-  "mockup": { "file": "mockup.png", "is_screenshot": true }
+  "mockup": { "file": "mockup.webp", "is_screenshot": true }
 }
 ```
 

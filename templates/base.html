@@ -3,17 +3,21 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0e0d0f">
 {{extra_head}}<title>{{title}}</title>
 <meta name="description" content="{{description}}">
-{{hreflang_tags}}
+{{seo_head}}
 <link rel="stylesheet" href="{{root}}assets/css/style.css">
-<link rel="icon" type="image/png" href="{{root}}assets/org.png">
+<link rel="icon" type="image/png" sizes="32x32" href="{{root}}assets/favicon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="{{root}}assets/favicon-192.png">
+<link rel="apple-touch-icon" href="{{root}}assets/apple-touch-icon.png">
 </head>
 <body data-org="{{org}}">
 <a class="skip-link" href="#main">{{skip_link}}</a>
 <header class="site-header">
   <a class="brand" href="{{home_href}}">
-    <img src="{{root}}assets/org.png" alt="" width="36" height="36">
+    <img src="{{root}}assets/org-72.webp" alt="" width="36" height="36" decoding="async">
     <span>{{brand_name}}</span>
   </a>
   <div class="header-nav-group">

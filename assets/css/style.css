@@ -5,6 +5,7 @@
    ============================================================ */
 
 :root {
+  color-scheme: dark;
   --bg: #0e0d0f;
   --bg-raised: #141216;
   --bg-card: #131115;
@@ -14,7 +15,7 @@
   --hairline: rgba(201, 162, 94, 0.26);
   --ink: #e9e4da;
   --ink-muted: #a99f8f;
-  --ink-faint: #7c7365;
+  --ink-faint: #8f8677;
   --serif: "Didot", "Bodoni 72", "Bodoni MT", "Playfair Display", Georgia, "Times New Roman", serif;
   --sans: "Optima", "Avenir Next", "Avenir", "Gill Sans", "Segoe UI", system-ui, sans-serif;
   --mono: "SF Mono", "Menlo", "Consolas", monospace;
@@ -25,6 +26,8 @@
 *, *::before, *::after { box-sizing: border-box; }
 
 html { scroll-behavior: smooth; }
+
+[id] { scroll-margin-top: 1.5rem; }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
@@ -45,6 +48,7 @@ body {
 img { max-width: 100%; height: auto; }
 
 h1, h2, h3 {
+  text-wrap: balance;
   font-family: var(--serif);
   font-weight: 400;
   color: var(--ink);
@@ -194,9 +198,21 @@ main {
 }
 
 .hero-emblem {
-  /* icons are cut out (transparent PNG) — glow must follow the alpha shape */
+  /* icons are cut out (transparent alpha) — glow must follow the alpha shape */
   filter: drop-shadow(0 0 30px rgba(201, 162, 94, 0.18));
 }
+
+/* Gentle rise on load — transform only, never opacity: the hero title is
+   the page's LCP element and must be paintable from the first frame. */
+@keyframes hero-rise {
+  from { transform: translateY(0.55rem); }
+  to { transform: none; }
+}
+.hero > * { animation: hero-rise 480ms ease-out backwards; }
+.hero > *:nth-child(3) { animation-delay: 60ms; }
+.hero > *:nth-child(4) { animation-delay: 120ms; }
+.hero > *:nth-child(5) { animation-delay: 180ms; }
+.hero > *:nth-child(6) { animation-delay: 240ms; }
 
 .hero-title {
   font-size: clamp(2.1rem, 6vw, 3.6rem);
@@ -250,7 +266,8 @@ main {
   border-radius: 6px;
   transition: border-color 180ms ease, transform 180ms ease, box-shadow 180ms ease;
 }
-.card:hover {
+.card:hover,
+.card:focus-within {
   border-color: rgba(201, 162, 94, 0.45);
   transform: translateY(-3px);
   box-shadow: 0 14px 34px rgba(0, 0, 0, 0.45);
@@ -259,10 +276,13 @@ main {
 .card-icon {
   width: 92px;
   height: 92px;
-  /* icons are cut out (transparent PNG) — no clipping ring */
+  /* icons are cut out (transparent alpha) — no clipping ring */
   filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.5));
   margin-bottom: 0.9rem;
+  transition: transform 180ms ease;
 }
+.card:hover .card-icon,
+.card:focus-within .card-icon { transform: scale(1.05); }
 
 .card h2 {
   font-size: 1.35rem;
@@ -293,7 +313,8 @@ main {
   gap: 1.4rem;
 }
 .card-actions .details-hint { color: var(--ink-faint); }
-.card:hover .details-hint { color: var(--gold); }
+.card:hover .details-hint,
+.card:focus-within .details-hint { color: var(--gold); }
 
 /* ---- product page ---- */
 .breadcrumb { padding: 1.8rem 0 0; }
