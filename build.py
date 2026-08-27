@@ -994,7 +994,7 @@ def build_404(base_tpl: str) -> None:
     content = f"""<section class="hero">
   <img class="hero-emblem" src="{BASE_URL}assets/org-300.webp" alt="" width="150" height="150">
   <h1 class="hero-title">404</h1>
-  <p class="hero-tagline">This page does not exist.</p>
+  <p class="hero-tagline">This page does not exist. <span lang="de">Diese Seite existiert nicht.</span></p>
   <div class="ornament" role="presentation"><span></span></div>
   <p class="hero-sub">The page you were looking for has moved or never existed.<br>
   <span lang="de">Die gesuchte Seite wurde verschoben oder hat nie existiert.</span></p>
