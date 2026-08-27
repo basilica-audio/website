@@ -147,10 +147,11 @@ cp ../<repo>/docs/manual.md data/manuals/<slug>.en.md
 # then prepend the generated-from comment line above (with today's date)
 ```
 
-`<slug>` is the plugin's site slug, `<repo>` is its GitHub repo name — these
-differ for one plugin: **Crypta** ships from the `twist-your-guts` repo (a
-pre-rename holdover), so `data/manuals/crypta.en.md` is generated from
-`twist-your-guts/docs/manual.md`.
+`<slug>` is the plugin's site slug and `<repo>` is its GitHub repo name; they
+are the same word for all thirteen plugins. (Crypta was generated from the
+pre-rename `twist-your-guts` repo until v0.2.0 — it has shipped from
+`basilica-audio/Crypta` since, and the older `Generated from` banners in
+`data/manuals/crypta.*.md` are historical, not instructions.)
 
 If a plugin repo has no `docs/manual.md`, it simply has no
 `data/manuals/<slug>.en.md` — `build.py` skips its manual page entirely and

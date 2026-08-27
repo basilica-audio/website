@@ -1,4 +1,4 @@
-<!-- German translation of crypta.en.md (source repo twist-your-guts, pre-rename; this plugin now ships as Crypta) — maintained by hand; re-translate after the English source changes (see website/README.md). -->
+<!-- German translation of crypta.en.md — maintained by hand; re-translate after the English source changes (see website/README.md). -->
 
 <p align="center"><img src="assets/icon.png" alt="Crypta-Icon" width="120"/></p>
 

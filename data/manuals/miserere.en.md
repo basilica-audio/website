@@ -1,5 +1,5 @@
-<!-- Generated from miserere/docs/manual.md on 2026-07-31 — do not hand-edit; re-run the manual sync described in website/README.md. -->
-# Miserere — user manual (v0.5.0)
+<!-- Generated from Miserere/docs/manual.md on 2026-08-27 — do not hand-edit; re-run the manual sync described in website/README.md. -->
+# Miserere — user manual (v0.7.0)
 
 *Four voices, one prayer — the parallel vocal template in a single unit.*
 
@@ -29,7 +29,8 @@ in → [In Trim] → DIRECT PATH (serial; every section optional, ALL OFF by def
         ├─→ ② SANDWICH : Passive EQ → Opto Leveler → Passive EQ    → return fader
         ├─→ ③ SPREAD   : dual micro-pitch (≈30/50 ms, ±cents, L/R) → return fader
         └─→ ④ SLAP     : ≈110 ms dark single-repeat delay          → return fader
-   Σ (direct + returns) → [Parallel macro trim scales returns ①–④] → [Out Trim] → out
+   Σ (direct + returns) → [Parallel macro trim scales returns ①–④] → [Out Trim]
+                        → [Output Limiter — off by default] → out
 ```
 
 Busses ①/② are minimum-phase and add zero latency, so they stay sample-aligned with the
@@ -45,7 +46,13 @@ Off by default, section by section, in signal order:
   the vocal's dynamics are greatest (the documented "de-ess at the very beginning" rule).
 - **FET Comp** — a light, threshold-based FET-style compressor, fixed 4:1, aiming for a
   gentle 3–4 dB of peak gain reduction — "the one place serial compression is authentic" in
-  this topology.
+  this topology. Since v0.6.0 a **Character** switch selects the insert-compressor family
+  (generic descriptors, as everywhere in this plugin): **FET** (the default — hard knee,
+  panel timing, clean; exactly the previous behaviour), **VCA** (clean bus-style voicing
+  with a 6 dB soft knee and a snappier attack; below the knee it is bit-transparent), and
+  **Tube Mu** (a wide 12 dB knee, slower attack, longer release, and a touch of
+  second-harmonic warmth that only appears while the compressor is actually working —
+  gain-reduction-gated, so unity passages stay clean).
 - **Console EQ** — a British-console-class grid: HPF (18 dB/oct, 50/80/160/300 Hz), low shelf
   (±16 dB, 35/60/110/220 Hz), a fixed-Q mid bell (±18 dB, six stepped centre frequencies), a
   fixed 12 kHz high shelf (±16 dB), and a Drive control blending subtle 2nd/3rd-leaning
@@ -73,9 +80,12 @@ No threshold knob: **Input** drives the signal into a fixed per-ratio threshold 
 give-back and a short attack lag that lets transients punch through before clamping — the
 "snap"). **Attack**/**Release** are 1–7 dials where a HIGHER number is FASTER, matching the
 hardware convention this is modelled on; release is program-dependent (fast after brief
-transients, several times slower after sustained heavy compression). **Style**
-switches between All-Buttons and a softer, fixed 2:1 **Gentle** voicing. This bus is meant to
-sound "terrible" soloed (use Audition) and good blended in.
+transients, several times slower after sustained heavy compression). **Style** selects
+the limiter's voicing: **All-Buttons** (default), a softer, fixed 2:1 **Gentle** voicing, or
+— since v0.6.0 — **Vintage**, an early-revision hot-bias state that keeps the full ratio row
+active but bites two dB earlier, runs the feedback loop hotter and more than doubles the FET
+cell's residual second-harmonic "hair", for a rattier, more coloured crush at the same
+settings. This bus is meant to sound "terrible" soloed (use Audition) and good blended in.
 
 CRUSH also carries a touch of program-dependent colour: as gain reduction builds, a
 transformer-style low-frequency saturation and the FET cell's own residual second harmonic
@@ -110,6 +120,14 @@ program-dependent attack are all consequences of how charge carriers in the cell
 drain away. There is no ratio control because there is no ratio parameter in the circuit;
 what you hear is the cell's own behaviour, which is the whole appeal of this style of leveler.
 
+Since v0.6.0 a **Colour** switch selects the cell's era: **Classic** (the default — the
+photocell calibration exactly as before), **Quick** (a later solid-state-era optical voicing:
+faster recovery, much less release memory, an almost clean output stage) and **Deep** (an
+earlier-era voicing: slower recovery, a longer memory tail, and a thicker tube/transformer
+output stage). The switch changes the cell's charge-carrier kinetics, not its level
+calibration — all three land in the same gain-reduction class at the same Peak Reduction
+setting, and swapping colours mid-performance is click-free.
+
 The LF Boost and Cut network is likewise now the hardware ladder's exact response. Two
 practical consequences: running Boost and Cut together gives the classic low-end shape (a lift
 underneath with a dip just above it) because the cut corner genuinely sits above the boost
@@ -129,6 +147,20 @@ of a linear read, which recovers 0.90 dB of high-frequency content at 10 kHz tha
 read was losing; the grain crossfade is longer and equal-power, which measurably lowers the
 periodic level ripple on sustained tones; and Detune and Time are smoothed per sample, so
 automating either no longer steps at block boundaries.
+
+Since v0.6.0 the splice is period-adaptive: a pitch tracker (autocorrelation on a lowpassed,
+decimated copy of the input — a few percent of the bus's CPU) watches the material, and when
+it is confidently pitched, the spacing between each shifter's two crossfading taps snaps to a
+multiple of the note's period while the crossfade law shifts to amplitude-complementary. Both
+taps then reinforce at every harmonic instead of interfering, which removes the note-dependent
+level ripple sustained tones used to meet (see Known limitations). Unpitched material leaves
+the tracker below its confidence gate and passes through the identical v0.5.0 path. The
+tracker only ever reads signal history — reported latency stays 0.
+
+Also since v0.6.0 the crossfade geometry stays causal at short **Time** settings: below 100%
+the tap spacing shrinks with the base delay (down to ~15 ms at 50%), which slightly quickens
+the splice cadence. Previously a tap could sit against the delay line's lower bound for
+stretches of a second or more and leak an unshifted copy of the input into the return.
 
 ### ④ SLAP — single-repeat dark delay
 
@@ -173,13 +205,93 @@ It affects only the SLAP return, never the direct path. At 0 nothing is generate
 - **Parallel** is a macro trim (−24…+6 dB) that offsets all four return faders together — the
   "VCA ride back" gesture for quickly backing off the whole parallel layer.
 
+## External sidechain (v0.7.0)
+
+Miserere exposes an optional **Sidechain** input bus, **disabled by default** — enable it in
+your host's plugin routing, then switch individual detectors over to it with the **Ext Key**
+lamp in the Direct Path, Crush and Sandwich panels. There is no master switch: each detector
+decides for itself, so you can key CRUSH from a snare while SANDWICH keeps listening to the
+vocal. If the bus is absent or disabled, or the host sends no key, every switch falls back to
+internal detection silently. A mono key feeding a stereo instance keys both channels.
+
+**What keying actually does to CRUSH and SANDWICH — read this before assuming it is "the same
+sound, different detector source".** Both of those busses are *feedback* designs, and that is
+not an implementation detail, it is where their character comes from:
+
+- **CRUSH** drives its rectifier from its own output, one sample back. The soft knee, the
+  ratio creeping up as a note is held, the program-dependent release — all of it emerges
+  from that loop.
+- **SANDWICH**'s opto leveler drives its EL panel from its own compressed output, for the
+  same reason: there is no static-curve lookup in the code at all, the curve *is* the loop.
+
+An external key does not add a detector input to those loops. It **replaces the loop drive**,
+which converts both modules into **feed-forward keyed compressors** for as long as Ext Key is
+engaged. The photocell physics, the ballistics and the colour stages are unchanged, but the
+static curve is not: a feedback detector sees the already-reduced signal and backs itself off,
+while a feed-forward detector sees the full-scale key and does not. Measured on the same
+signal at the same settings (a −22 dBFS tone, 0 dB Input), CRUSH produces about **3 dB** of
+gain reduction with internal detection and about **21 dB** when keyed with a copy of its own
+input. That is a legitimate and useful mode — it is simply a different compressor, and expecting
+your internal-detection settings to carry over unchanged will surprise you.
+
+**The Direct FET is the exception**: it has always been feed-forward (its envelope comes from
+the pre-gain input), so keying it really is a pure detector-source swap — same topology, same
+curve, different source.
+
+The key is read only. It never reaches the audio path, it is not part of the sum, and it does
+not affect the zero-latency guarantee.
+
+## Output limiter (v0.7.0)
+
+The last stage in the plugin, after Out Trim, with its own needle meter on the Global panel.
+**Off by default**, and while it is off it is a bit-exact bypass — the default wire stays a
+wire.
+
+- **Limiter** engages it. **Ceiling** (−12…0 dB, default −0.3 dB) is the level no output
+  sample may exceed. **Release** (5…500 ms, default 60 ms) is how quickly the gain recovers
+  once the peak has passed.
+- It is a **safety stage, not a colour device**. Attack is instantaneous (there is no
+  lookahead anywhere in this plugin), so deep, sustained reduction on bass-heavy material
+  will be audible as distortion before it is audible as level control. Use it to catch peaks,
+  not to squash a mix.
+- Detection is **always L/R-linked**, regardless of the global **Link** switch. Link chooses
+  dual-mono vs. linked detection for CRUSH and SANDWICH, where dual mono is part of the
+  sound; limiting each channel with its own gain would move the stereo image on every peak,
+  so the limiter does not offer that.
+- Once the signal is clear of the ceiling's soft knee (3 dB wide, centred on the ceiling) the
+  gain returns to exactly unity and the stage is bit-transparent again.
+
+**This is a sample-peak ceiling, not a true-peak ceiling — and it deliberately cannot be
+one.** True-peak limiting means detecting the reconstructed waveform *between* the samples,
+which requires oversampled detection, whose filters are delays; honouring their verdict means
+holding the audio back by that delay, i.e. lookahead. The zero-latency guarantee (see below)
+rules that out. What the limiter guarantees is that no output *sample* exceeds the Ceiling;
+the analogue waveform your converter reconstructs between those samples still can.
+
+Measured with an 8× windowed-sinc reconstruction (`tests/OutputLimiterTests.cpp`, where these
+figures are regression-frozen), at a −0.3 dB ceiling:
+
+| Programme | Inter-sample overshoot above the ceiling |
+|---|---|
+| 11.025 kHz tone at 44.1 kHz, phased so every sample straddles a crest (the analytic worst case for a sine) | **3.01 dB** |
+| 11 kHz tone, arbitrary phase | **0.71 dB** |
+| 1 kHz tone, 5 ms release | **0.06 dB** |
+
+Practically: on real programme material the overshoot is a fraction of a dB, and the 3 dB
+figure is the mathematical ceiling of what a sine can hide between samples, not a typical
+result. If you are delivering to a specification that mandates a true-peak limit (−1 dBTP for
+lossy encoding, for instance), set Ceiling with that headroom — or use a true-peak limiter at
+the end of your master chain, where its latency costs nothing.
+
 ## Presets
 
 A preset bar sits at the top of the editor: `[<] [PresetName*] [>] [Save] [Save As...]
 [Delete] [Import...] [Export...]`. Clicking the preset name opens a Factory/User menu; a
-trailing `*` means the current preset has unsaved changes. Twelve factory presets ship in the
+trailing `*` means the current preset has unsaved changes. Thirteen factory presets ship in the
 box (see `presets.md` for what each one is for) — including **Tape Slap 7.5** and **Worn
-Slap**, added in v0.5.0 to exercise Wobble and Age; user presets save to
+Slap**, added in v0.5.0 to exercise Wobble and Age, and **BV Mode**, a
+background/stacked-vocal starting point with every return pushed harder than the lead
+template; user presets save to
 `~/Library/Audio/Presets/Yves Vogl/Miserere/` on macOS (`%APPDATA%/Yves Vogl/Miserere/Presets/`
 on Windows). The preset menu's "Set current as default" makes any preset — factory or user —
 load automatically on every fresh instance; "Import..." accepts both single preset files and
@@ -221,15 +333,37 @@ oversampling is for, and it costs latency.
 
 ## Known limitations
 
-- SPREAD's pitch shifter crossfades two taps of one delay line held a fixed distance apart, so
-  a sustained pure tone (a synth or a very steady held vowel) meets a mild comb whose depth
-  depends on the note. On real programme material this is inaudible; a smarter splice is on
-  the roadmap.
-- The GUI is a functional slider/knob editor (custom vector GUI with per-bus needle meters is
-  milestone M3); the preset bar is a plain functional strip, not yet restyled.
-- Out of scope for v2, tracked as M2+/M3 issues: a short plate reverb module, a "BV mode"
-  preset, swappable compressor colours beyond the two CRUSH styles, external sidechain, an
-  output limiter.
+- SPREAD's pitch shifter crossfades two taps of one delay line. Since v0.6.0 the tap spacing
+  listens to the input: on confidently pitched material (a held vowel, a synth) it snaps to a
+  multiple of the note's period so the taps reinforce instead of drawing comb luck — sustained
+  tones that previously met a note-dependent comb of up to ~18 dB envelope ripple now stay
+  within ~2 dB at any pitch. On unpitched material (consonants, breath, noise) the detector
+  stands down and the bus behaves exactly as before. Residual limits: the tracker follows the
+  lowest fundamental down to 80 Hz; re-alignment takes roughly a second after a note lands
+  (longer for very low notes, so very short notes ride mostly on the standard path), and fast
+  vibrato can outrun it — a brief return of the old mild shimmer, which reads as natural
+  doubling. Below Time 100% the causal cap on the tap spacing progressively overrides the
+  period-aligned spacing (the up voice first), so the sustained-tone protection fades back
+  toward the v0.5.0 behaviour as Time shrinks — by ~60% Time it is effectively off. What can
+  no longer happen at any Time setting is the pre-v0.6.0 dry leak from a tap parked at the
+  delay line's lower bound.
+- The GUI is the M3 custom vector editor: one faceplate panel per bus with pointer knobs,
+  engraved scale rings and per-bus gain-reduction needle meters (Direct FET, CRUSH,
+  SANDWICH), fully keyboard-operable (Arrow/Shift+Arrow/PageUp/PageDown/Home/End,
+  Shift-drag for fine mouse adjustment) and screen-reader accessible (per-bus grouping,
+  unit-suffixed values). Final manual VoiceOver verification is tracked on the a11y issue.
+- The output limiter (v0.7.0) enforces a **sample-peak** ceiling, not a true-peak one, and
+  cannot enforce a true-peak one without breaking the zero-latency guarantee — see the
+  measured inter-sample overshoot table in the Output limiter section above.
+- Keying CRUSH or SANDWICH from the external sidechain converts them from feedback to
+  feed-forward compressors, with a measurably different static curve — see the External
+  sidechain section above. This is inherent to keying a feedback topology, not a limitation
+  that can be tuned away.
+- Out of scope for v2, tracked as an M2+/M3 issue: a short plate reverb module. (Swappable
+  compressor colours per dynamics slot shipped in
+  v0.6.0 — the Direct FET's Character, CRUSH's third Style and SANDWICH's Colour switches
+  above; the output limiter, the BV Mode preset and the external sidechain shipped in
+  v0.7.0.)
 - Dynamics detection is unlinked (independent L/R) by default on Crush and Sandwich; Link
   makes both channels track a shared detector.
 - The voicing throughout this plugin is **research-derived, not measured against hardware
