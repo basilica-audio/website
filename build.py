@@ -116,19 +116,6 @@ STRINGS = {
         "download_heading": "Download",
         "download_fallback": "The latest builds are published on {link}.",
         "download_fallback_link": "GitHub&nbsp;Releases",
-        "unsigned_title": "A note on unsigned binaries.",
-        "unsigned_body": ("These builds are not yet code-signed — the signing and "
-                           "notarisation pipeline is still in progress. Your operating "
-                           "system will warn you on first launch:"),
-        "unsigned_macos": ("<strong>macOS</strong> — Gatekeeper will block the first open. "
-                            "Right-click the plugin or app and choose <em>Open</em>, or "
-                            "remove the quarantine flag in Terminal: "
-                            "<code>xattr&nbsp;-dr&nbsp;com.apple.quarantine&nbsp;&lt;file&gt;</code>."),
-        "unsigned_windows": ("<strong>Windows</strong> — SmartScreen may show “Windows "
-                              "protected your PC”. Choose <em>More info</em> → "
-                              "<em>Run anyway</em>."),
-        "unsigned_footer": ("Only ever do this for builds downloaded directly from this "
-                             "project’s GitHub releases."),
         "screenshots_heading": "Screenshots",
         "screenshots_empty": "Coming with the next release.",
         "screenshots_empty_sub": ("The custom interface is currently in design — "
@@ -199,21 +186,6 @@ STRINGS = {
         "download_heading": "Download",
         "download_fallback": "Die aktuellen Builds werden auf {link} veröffentlicht.",
         "download_fallback_link": "GitHub&nbsp;Releases",
-        "unsigned_title": "Hinweis zu unsignierten Binaries.",
-        "unsigned_body": ("Diese Builds sind noch nicht code-signiert — die Signierungs- "
-                           "und Notarisierungs-Pipeline ist noch in Arbeit. Dein "
-                           "Betriebssystem warnt dich beim ersten Start:"),
-        "unsigned_macos": ("<strong>macOS</strong> — Gatekeeper blockiert das erste "
-                            "Öffnen. Rechtsklick auf das Plugin bzw. die App und "
-                            "<em>Öffnen</em> wählen, oder das Quarantäne-Flag im "
-                            "Terminal entfernen: "
-                            "<code>xattr&nbsp;-dr&nbsp;com.apple.quarantine&nbsp;&lt;Datei&gt;</code>."),
-        "unsigned_windows": ("<strong>Windows</strong> — SmartScreen zeigt eventuell "
-                              "„Der Computer wurde durch Windows geschützt“. "
-                              "<em>Weitere Informationen</em> → "
-                              "<em>Trotzdem ausführen</em> wählen."),
-        "unsigned_footer": ("Mach das ausschließlich bei Builds, die direkt aus den "
-                             "GitHub-Releases dieses Projekts stammen."),
         "screenshots_heading": "Screenshots",
         "screenshots_empty": "Kommt mit dem nächsten Release.",
         "screenshots_empty_sub": ("Die individuelle Oberfläche befindet sich aktuell in "
