@@ -20,7 +20,7 @@ Triptych ist ein **Mastering-/Mixbus-Dynamik-Tool**, kein Effekt für einzelne I
 Full mix (guitars + orchestra + choir + drums/bass) -> Triptych (multiband glue/control) -> brickwall limiter -> master out
 ```
 
-Greife danach, wenn ein Single-Band-Kompressor entweder die Tiefen übermäßig zusammendrückt, um Hochfrequenz-Peaks zu kontrollieren, oder die Tiefen locker lässt, während die Höhen schon gut im Griff sind — das klassische Symphony-Metal-Problem einer dichten Wand aus verzerrten Gitarren, Orchester-Hits und Chor, die alle um denselben Headroom konkurrieren. Es funktioniert auch gut als „Glue"-Stufe auf einem Drum-Bus oder einem kompletten Gitarren-Stack, unabhängig vom Gesamtmix.
+Greife danach, wenn ein Single-Band-Kompressor entweder die Tiefen übermäßig zusammendrückt, um Hochfrequenz-Peaks zu kontrollieren, oder die Tiefen locker lässt, während die Höhen schon gut im Griff sind — das klassische Heavy-Music-Problem einer dichten Wand aus verzerrten Gitarren, Orchester-Hits und Chor, die alle um denselben Headroom konkurrieren. Es funktioniert auch gut als „Glue"-Stufe auf einem Drum-Bus oder einem kompletten Gitarren-Stack, unabhängig vom Gesamtmix.
 
 ## Signalfluss
 
@@ -140,9 +140,9 @@ Diese vier Regler formen nur den Detektor des **Kompressors**. Das Gate des Band
 
 Beide stehen per Default auf 0, was exakt dem Gate aus v0.4.0 entspricht. Beide sind zudem so implementiert, dass keines klicken kann: Hold arbeitet auf der Hüllkurve des Gates, statt seinen Ausgangs-Gain festzunageln, und der Threshold bewegt sich durch denselben 50-ms-Glätter, den jede andere Threshold-Änderung nutzt.
 
-### Gain-Reduktions-Meter *(neu in v0.5.0)*
+### Gain-Reduktions-Meter *(neu in v0.5.0; Nadelmeter seit dem M3-Editor)*
 
-Jede Bandspalte trägt einen schmalen vertikalen Balken, der zeigt, wie stark dieses Band das Signal gerade herunterzieht (Kompressor und Gate zusammen), mit einer langsam abfallenden Peak-Hold-Linie. Vollausschlag sind 24 dB. Sie sind schreibgeschützt — es gibt sie, damit du auf einen Blick siehst, welches Band die Arbeit macht.
+Jede Bandspalte trägt ein vektorgezeichnetes Nadelmeter, das zeigt, wie stark dieses Band das Signal gerade herunterzieht (Kompressor und Gate zusammen), auf einer eingravierten 0/3/6/10/20-dB-Skala mit sanfter Meter-Ballistik — die Nadel ruht bei 0 dB und schwenkt beim Vertiefen der Reduktion nach links. Sie sind schreibgeschützt — es gibt sie, damit du auf einen Blick siehst, welches Band die Arbeit macht. Für Screenreader-Nutzer legt jedes Meter seinen geglätteten Messwert zusätzlich als abrufbaren Accessible-Wert offen.
 
 ### Mute/Solo je Band (Low, Mid, High)
 
@@ -245,7 +245,7 @@ Die Beschriftungen, Menüs und Dialoge der Preset-Leiste folgen automatisch dein
 
 ## Bekannte Einschränkungen
 
-- **Der Spectrum-on-Curve-Analyzer ist nicht Teil dieses Releases.** v0.5.0 liefert nur die drei Gain-Reduktions-Balken pro Band (siehe „Gain-Reduktions-Meter" oben); ein Frequenzbereich-Analyzer-Overlay ist für den M3-Custom-GUI-Meilenstein vorgesehen, nicht spät gestrichen.
+- **Der Spectrum-on-Curve-Analyzer ist nicht Teil dieses Releases.** Der Editor liefert nur die drei Gain-Reduktions-Nadelmeter pro Band (siehe „Gain-Reduktions-Meter" oben); ein Frequenzbereich-Analyzer-Overlay bleibt zukünftiger Scope.
 - **Verschoben auf v0.6.0+**: ein linearphasiger FIR-Crossover-Modus (gepaart mit Allpass-Kompensation für das Phasenverhalten darunter), Sidechain-EQ pro Band, Dry/Wet-Mix pro Band, sample-genaue Parameter-Interpolation (das heutige Smoothing löst über einen 50-ms-Timer auf statt pro Sample), sowie ein Gate-Range-Boden.
 - **Der Drei-Band-Crossover-Baum ist magnitudenflach, aber nicht phasenflach** bei keinem Slope-Setting — siehe „Crossover-Flanken und Phase" oben. Das spielt nur eine Rolle, wenn Triptychs Output gegen eine trockene Kopie desselben Signals gemischt wird (auch über **Mix**) oder bei Messung mit einem phasenbewussten Analyzer; für normalen seriellen Einsatz spielt es keine Rolle.
 - **Die Ziel-Breite des VCA-Knees wird innerhalb von etwa 3 dB eines 0-dB-Thresholds unerreichbar** — siehe den Hinweis unter „Detektor je Band" oben. Die erreichte Breite verengt sich gleichmäßig Richtung Hard Knee, je näher der Threshold an 0 dB kommt; nichts verhält sich dabei numerisch daneben, aber die volle VCA-Rundung braucht einen Threshold bei -3 dB oder darunter.
