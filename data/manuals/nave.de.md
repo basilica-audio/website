@@ -44,6 +44,45 @@ Nave hat **zwei unabhängige IR-Slots**, A und B:
 - **IR A** — der primäre/ursprüngliche Slot. Nutze den Button **Load IR...**, um eine `.wav`/`.aiff`-Cabinet-IR-Datei auszuwählen; **Default** setzt ihn zurück auf die eingebaute transparente Delta-IR.
 - **IR B** — ein sekundärer Slot, geladen und geleert auf die gleiche Weise über **Load IR B...** / **Default**. Für sich allein bewirkt er nichts (siehe [IR Blend](#ir-blend) unten) — er spielt erst eine Rolle, sobald du etwas Blend einstellst.
 
+### Die mitgelieferte Bibliothek
+
+Nave bringt **neun Impulsantworten** direkt im Plugin mit. Öffne den IR-Browser in einem der beiden Slots — sind sie noch nicht auf der Festplatte, zeigt er dort einen **Install Library**-Button: ein Klick schreibt sie nach `Music/Nave/Impulse Responses` unter deinem Benutzerordner (`~/Music/Nave/Impulse Responses` auf macOS, `%USERPROFILE%\Music\Nave\Impulse Responses` unter Windows) und listet sie sofort auf. Es wird nichts geschrieben, bevor du klickst, und ein erneuter Klick auf eine bereits vorhandene Bibliothek bewirkt nichts — außer dass er im Stillen jede Datei ersetzt, die verschwunden oder beschädigt ist.
+
+Dieselben neun Dateien liegen auch im Release-Archiv, in einem Ordner namens `Impulse Responses`, falls du sie lieber von Hand woanders hin kopieren möchtest.
+
+**Es sind Modelle, keine Aufnahmen.** Jede einzelne wird aus einem analytischen Cabinet-Modell berechnet — Treiber- und Gehäuseabstimmung, Cone-Breakup-Moden, Voice-Coil-Rolloff, Schallwand- und Bodenreflexionen, Mikrofonabstand und -richtcharakteristik — durch einen Generator, der in diesem Repository eingecheckt ist. Keine davon ist die Aufnahme eines echten Cabinets, Lautsprechers oder Mikrofons, und keine ist nach einem solchen benannt. Deshalb beginnt jeder Dateiname mit `modelled_`, und das ist auch der Grund, warum das Set überhaupt ausgeliefert werden konnte: Eine generierte IR hat kein Lizenzproblem, während eine Aufnahme Rechte am Cabinet, am Mikrofon und an demjenigen trägt, der aufgenommen hat.
+
+Sie sind unter CC0 1.0 Universal gemeinfrei gestellt. Nutze sie für alles, auch kommerziell, ganz ohne Namensnennung.
+
+| | |
+|---|---|
+| `modelled_4x12_ceramic_cone` | Geschlossenes 4x12, keramische 12"-Voicing, dynamisches Mikrofon auf der Staubkappe. Das Standard-Cabinet für satte Rhythmus-Parts. |
+| `modelled_4x12_ceramic_edge` | Dasselbe Cabinet mit dem Mikrofon am Konusrand — dunkler, weniger Fizz. |
+| `modelled_4x12_ceramic_room` | Dasselbe Cabinet aus einem Meter Abstand, mit frühen Reflexionen und einem kurzen Tail. |
+| `modelled_2x12_alnico_cone` | Offenes 2x12, Alnico-Voicing: früherer Breakup, dünneres Low End. |
+| `modelled_1x12_combo_cone` | Kleiner offener Combo: näselnd, mit der Resonanz eines kleinen Gehäuses. |
+| `modelled_8x10_cone` | Geschlossener 8x10-Bass-Stack, dynamisches Mikrofon auf der Staubkappe. |
+| `modelled_8x10_edge` | Derselbe Stack, Mikrofon am Konusrand. |
+| `modelled_1x15_vintage` | Bassreflex-1x15 durch ein Bändchenmikrofon — die dunkle Variante. |
+| `modelled_4x10_horn` | Bassreflex-4x10 mit HF-Horn — die helle Variante, für Klirren und Grind. |
+
+Die drei Cone/Edge-Paare sind so gebaut, dass sie sich gegeneinander blenden lassen: lade die Cone-Version in IR A, die Edge-Version in IR B, und nutze **IR Blend**, um die Höhen zwischen beiden einzustellen. [IR Align](#ir-align) übernimmt das Timing, damit der Blend nicht kammfiltert.
+
+Vollständige Provenienz, die Modellparameter hinter jeder Datei, Prüfsummen und der gemessene Frequenzgang jeder einzelnen stehen in `resources/irs/LICENSES.md` im Repository. Um sie neu zu generieren oder eigene zu voicen, siehe `tools/ir-synth/cabsynth.py`.
+
+### Der IR-Browser
+
+Jeder Slot hat außerdem einen **Browse...**-Button, der den **IR-Browser** öffnet: ein Overlay, das jede unter deinem IR-Bibliotheksordner (rekursiv) gefundene `.wav`/`.aiff`-Datei auflistet, sodass du eine ganze Bibliothek durchhören kannst, statt für jede IR einzeln den Dateidialog hin- und herzuklicken.
+
+- **Eine Zeile auszuwählen lädt sie sofort in den Slot** — klicke dich durch die Liste, oder fokussiere sie und blättere mit den Pfeiltasten, und du hörst Cabs in Echtzeit durch. Beachte, dass (wie bei jedem IR-Laden außerhalb von Morph) jeder Wechsel ein harter Engine-Reload ist — höre also während der Track leise loopt, nicht mitten im Take.
+- **Return** oder ein Doppelklick lädt die ausgewählte IR und schließt den Browser; **Escape** oder **Close** schließt ihn nur (die zuletzt angehörte IR bleibt geladen).
+- Die **Filterbox** grenzt die Liste nach Namen ein (Groß-/Kleinschreibung wird ignoriert, abgeglichen wird gegen den Pfad relativ zum Bibliotheksordner).
+- **Folder...** richtet den Browser auf dein eigenes IR-Bibliotheksverzeichnis aus. Die Wahl wird mit dem Plugin-State gespeichert. Im Auslieferungszustand schaut er in `Music/Nave/Impulse Responses` unter deinem Benutzerordner nach — genau dorthin legt **Install Library** [die mitgelieferte Bibliothek](#die-mitgelieferte-bibliothek).
+- **Install Library** erscheint nur, solange die mitgelieferte Bibliothek noch nicht vollständig in diesem Standardordner liegt — sobald sie installiert ist, verschwindet der Button und nimmt keinen Platz mehr weg.
+- Der Ordner-Scan läuft im Hintergrund (eine riesige Bibliothek oder ein Netzlaufwerk blockiert die UI nie) und ist auf 2000 Dateien gedeckelt.
+
+Der Browser und der Dateidialog **Load IR...** pro Slot laden über exakt denselben Pfad — nutze, was gerade besser passt.
+
 **Dein IR-Audio wird in der Session gespeichert** (neu in v0.3.0). Bis zu 10 Sekunden pro Slot der geladenen IR liegen im plugin-eigenen State, sodass ein Projekt mit denselben Cabinets wieder öffnet, selbst wenn die Originaldateien verschoben, umbenannt, gelöscht oder auf einem anderen Rechner zurückgelassen wurden. Die Dateipfade werden weiterhin mitgespeichert, damit der Editor dir sagen kann, woher eine IR stammt — der Klang hängt aber nicht mehr von ihnen ab. (Vor v0.3.0 wurde nur der Pfad gespeichert, und eine fehlende Datei setzte den Slot stillschweigend auf den transparenten Default zurück. Hast du ältere Projekte, macht sie erneutes Öffnen und Speichern in v0.3.0 selbsttragend.) Eine IR länger als 10 Sekunden wird weiterhin nur als Pfad gespeichert, da eine Cabinet-IR nie so lang ist und das Einbetten deine Session-Datei aufblähen würde.
 
 ### IR Gain Match
@@ -144,6 +183,27 @@ Jeder in v0.3.0 hinzugekommene Parameter steht per Default auf einem Wert, der n
 
 Am oberen Rand von Naves Editor sitzt eine Preset-Leiste: `[<] [Preset-Name] [>] [Save] [Save As...] [Delete] [Import...] [Export...]`. Klicke auf den Preset-Namen, um die vollständige Liste zu öffnen (zuerst Werkspresets, dann deine eigenen, beide alphabetisch); `<`/`>` blättern durch dieselbe Liste. Nave bringt zehn Werkspresets mit — was jedes einzelne bewirkt, steht in [`docs/presets.md`](presets.md). Deine eigenen Presets speichert Nave unter `~/Library/Audio/Presets/Yves Vogl/Nave/` auf macOS (`%APPDATA%\Yves Vogl\Nave\Presets\` unter Windows); „Set current as default" (im Preset-Menü) bestimmt, was eine frisch eingefügte Instanz von Nave lädt. Import/Export akzeptieren beide einzelne Preset-Dateien; Import akzeptiert zusätzlich eine `.zip`-Preset-Bank, exportiert von `PresetManager::exportBank()`.
 
+### Presets und Cabinets
+
+**Ein Preset kann das Cabinet nennen, mit dem es erstellt wurde — muss es aber nie.** Beim Speichern eines Presets legt Nave einen Fingerabdruck dessen an, was in IR A und IR B geladen ist — eine Prüfsumme des Audios der Datei, plus ihr Name zur Anzeige. Lädst du das Preset erneut, sucht Nave nach genau diesen IRs in deinem Bibliotheksordner und setzt sie wieder ein. Ein Preset, das ohne geladene IR gespeichert wurde, legt nichts fest und lädt genau wie Presets es schon immer getan haben: nur Parameter, Cabinets bleiben unangetastet.
+
+**Ein Preset zu laden und danach das Cabinet zu tauschen ist ausdrücklich vorgesehen.** Die Referenz ist ein Ausgangspunkt, keine Festlegung. Änderst du die IR danach, wehrt sich nichts dagegen; speicherst du über das Preset, merkt es sich stattdessen die neue.
+
+**Drei Werkspresets werden mit Referenz ausgeliefert** — *Even Blend*, *Touch of Room Mic* und *Mic Morph* — weil jedes davon ein Rezept für ein bestimmtes *Paar* von Aufnahmen ist statt eine reine Klangformungs-Einstellung, und die Paare liegen in Naves eigener mitgelieferter Bibliothek. Die übrigen sieben referenzieren bewusst nichts: Es sind LoCut-/HiCut-/Distance-/Mix-Rezepte, gedacht für das Cabinet, das du gerade geladen hast. Hast du die mitgelieferte Bibliothek noch nicht installiert, öffne **Browse...** in einem der beiden IR-Slots und drücke **Install Library** — von da an finden die drei referenzierten Presets ihre Cabinets.
+
+### Wenn das Cabinet eines Presets fehlt
+
+**Eine fehlende IR hindert ein Preset nie am Öffnen.** Findet Nave das referenzierte Audio nicht — du hast die mitgelieferte Bibliothek nicht installiert, das Preset stammt von jemand anderem, du hast die Datei verschoben oder gelöscht —, dann gilt:
+
+- die **Parameter des Presets laden vollständig**, genau so, als hätte es überhaupt keine Referenz getragen;
+- die IR-Slots **bleiben exakt so, wie sie waren**. Welches Cabinet auch immer geladen war, bleibt geladen;
+- **es wird nichts ersetzt.** Nave lädt keine andere IR, nur weil sie zufällig in der Nähe liegt oder einen ähnlichen Namen trägt. Ein Preset, das im Stillen das falsche Cabinet aufruft, würde plausibel klingen und trotzdem falsch sein — das ist schlimmer als eines, das dir sagt, dass etwas fehlt;
+- unterhalb der IR-Slots erscheint ein **Hinweis**, der benennt, was erwartet wurde — zum Beispiel: *„Dieses Preset wurde mit ‚Modelled 4x10 Horn' (IR A) erstellt, die sich nicht in deiner IR-Bibliothek befindet."* Er ist kein Dialog und muss nicht weggeklickt werden; er verschwindet von selbst, sobald du das nächste Mal ein Preset lädst oder selbst eine IR änderst.
+
+Nave gleicht IRs anhand ihres **Audioinhalts** ab, nicht anhand des Dateinamens oder einer Katalog-ID. Deshalb bricht Umbenennen oder Verschieben einer Datei ein Preset nicht — das Audio ist dasselbe, also löst es sich weiterhin auf. Aus demselben Grund passt eine IR, die *bearbeitet* wurde, nicht mehr: Der Klang hat sich geändert, also sagt das Preset das, statt unter dem alten Namen anderes Audio zu laden.
+
+**Auch ältere Versionen von Nave lesen diese Presets.** Ein mit dieser Version gespeichertes Preset öffnet sich auch in einem Build, der die Funktion noch nicht kennt: Es lädt mit intakten Parametern und ignoriert schlicht die Cabinet-Referenz, die es nicht versteht.
+
 ## Unter der Haube
 
 Die Begründung und die vollständigen technischen Details stehen in `docs/architecture.md`; die Zahlen unten sind das, was die automatisierte Testsuite bei jedem Push erzwingt.
@@ -176,8 +236,8 @@ Beide Convolution-Pfade sind latenzfrei, über zwei unterschiedliche Wege. **Cro
 
 - **Ein Bug bei der fraktionalen Delay-Indizierung, gefunden und behoben vor diesem Release.** Früher in der Entwicklung indizierte der Vier-Tap-Lagrange-Interpolator, den Distance Airs Time-of-Flight-Delay und IR B Delay nutzen, sein Fenster ein Sample zu früh, sodass jede solche Delay in der Engine geringfügig zu kurz war. Gefunden wurde es durch Distance Airs eigene Time-of-Flight-Messung (genau auf 0,02 ms zu ihrem Ziel) und vor dem Ausliefern behoben — hier erwähnt, weil es die Art von Sache ist, die es wert ist, offengelegt zu werden, nicht weil es irgendetwas in diesem Release betrifft.
 - **Die GUI ist bewusst schlicht** — ein Regler pro Parameter im bestehenden funktionalen Slider-Stil; ein eigenes Look-and-Feel ist ein späterer, suite-weiter Meilenstein.
-- **Die mitgelieferten IRs sind Modelle, keine Aufnahmen.** Nave bringt neun Cabinet-IRs im Plugin selbst mit, unter CC0 1.0 Universal gemeinfrei gestellt. Jede davon ist aus einem analytischen Cabinet-Modell berechnet, statt von einem echten Cabinet, Lautsprecher oder Mikrofon aufgenommen — genau das hält sie frei von jeder Lizenzfrage. Echte Cabinet-Aufnahmen sind nicht enthalten; für den Klang eines bestimmten Cabinets lässt sich jederzeit eine eigene Aufnahme in einen der beiden Slots laden.
-- **Pre-1.0.** Release-Binaries für macOS und Windows sind derzeit unsigniert. Lizenziert unter AGPLv3. Breaking Changes bleiben bis v1.0.0 möglich.
+- **Die mitgelieferten IRs sind Modelle, keine Aufnahmen.** Nave bringt [neun Cabinet-IRs](#die-mitgelieferte-bibliothek) im Plugin selbst mit, unter CC0 1.0 Universal gemeinfrei gestellt. Jede davon ist aus einem analytischen Cabinet-Modell berechnet, statt von einem echten Cabinet, Lautsprecher oder Mikrofon aufgenommen — genau das hält sie frei von jeder Lizenzfrage. Echte Cabinet-Aufnahmen sind nicht enthalten; für den Klang eines bestimmten Cabinets lässt sich jederzeit eine eigene Aufnahme in einen der beiden Slots laden.
+- **Pre-1.0.** Release-Binaries für macOS sind Developer-ID-signiert, notarisiert und gestapelt; Windows-Binaries sind noch nicht Authenticode-signiert. Lizenziert unter AGPLv3. Breaking Changes bleiben bis v1.0.0 möglich.
 
 Die übrigen ehrlichen Vorbehalte von Nave — was Morph mit den Blend-0-%/100-%-Endpunkten macht und wann es das richtige Werkzeug gegenüber Crossfade ist, warum drei bestimmte Schalter (IR Gain Match, die Min-Phase-Umschalter, IR Align) die Convolution-Engine kurz zurücksetzen, während alles andere klickfrei bleibt, warum Loudness Matching bei flachem Material exakt und bei einem echten Take nur approximativ ist, der 10-Sekunden-Einbettungs-Deckel, und wie eine negative IR B Delay realisiert wird — stehen unter [Blend Mode](#blend-mode-crossfade-oder-morph), [IR Gain Match](#ir-gain-match), [Eine Anmerkung zu den drei „Reset"-Schaltern](#eine-anmerkung-zu-den-drei-reset-schaltern) und [IR B Trim, Polarity und Delay](#ir-b-trim-polarity-und-delay) oben.
 
