@@ -31,7 +31,7 @@ Input Trim → Gate → LR4 Split Low (60–400 Hz, default 120 Hz)
         ┌─────────────┴───────────────────────────────┐
         │                                              │
      Low band                              Remainder → LR4 Split High (300–2000 Hz, default 600 Hz)
-  Parallel Comp → Level                                  │
+  Parallel Comp → Graaawl → Level                        │
         │                          ┌───────────────────┴───────────────────┐
         │                       Mid band                              High band
         │                    Drive → Level          Tight → Voicing → Drive → Tone → Blend → Level
@@ -70,6 +70,38 @@ Crypta bringt ein Preset-System mit: Eine horizontale Leiste am oberen Rand des 
 
 Eine frische Instanz lädt ein eigenes „Default"-Preset, falls du eines gespeichert hast („Set current as default" im Preset-Menü), sonst das Werks-„Default"-Preset (das den unten dokumentierten reinen Parameter-Defaults entspricht).
 
+## Die Bedienoberfläche
+
+Das Plugin-Fenster ist **in Signalreihenfolge** angeordnet, von links nach rechts und von oben nach unten, in zehn Abschnitten: Input, Noise Gate, Crossover, Low Band, Drive Engine, Mid Band, High Band, Cabinet, EQ, Output. Was weiter rechts oder weiter unten zu sehen ist, passiert später in der Kette. Jeder der 54 Parameter des Plugins liegt auf der Frontplatte — nichts versteckt sich hinter einem Menü.
+
+**Regler.** Ziehe nach oben/unten oder links/rechts, um zu drehen; halte **Shift** beim Ziehen für die Feineinstellung. Regler mit einer festen Auswahl an Positionen (Gate Mode, Low Comp Detector, Drive Engine, High Voicing) rasten in ihre Stellungen ein und zeigen den Namen der Option an. Doppelklicke auf ein Wertefeld, um eine exakte Zahl einzutippen.
+
+**Tastatur.** Jedes Bedienelement ist mit **Tab** erreichbar, in Signalreihenfolge — und Tab bleibt nie in einem Abschnitt hängen. Bei fokussiertem Regler:
+
+| Taste | Schritt |
+|---|---|
+| ← / → / ↑ / ↓ | 1 % des Regler-Bereichs (Auswahl-Regler: eine Position) |
+| Shift + Pfeil | fein — 0,1 % des Bereichs |
+| Page Up / Page Down | 10 % des Bereichs |
+| Home / End | Minimum / Maximum |
+
+Toggles (die Lampenschalter) reagieren auf **Space** und **Return**. Ctrl/Cmd-modifizierte Pfeiltasten werden nicht angetastet, sodass die eigenen Shortcuts deines Hosts weiter funktionieren. Das fokussierte Bedienelement ist immer mit einem goldenen Ring markiert.
+
+**Screenreader.** Jedes Bedienelement kündigt seinen Namen, seine Rolle und seinen aktuellen Wert *mit Einheit* an („Gate Threshold, slider, −60.00 dB"), und jeder Abschnitt wird als benannte Gruppe angesagt. Die vier Meter lassen sich auf Abruf abfragen und lesen ihren aktuellen Wert vor („Input peak level meter, −8.2 dBFS"); sie unterbrechen dich bewusst nicht bei jedem Update.
+
+**Meter.** Vier Nadel-Meter lesen das in v0.3.0 hinzugefügte Metering aus:
+
+| Meter | Skala | Zeigt |
+|---|---|---|
+| IN | −60…+6 dBFS | Peak des Input-Blocks, vor allem anderen |
+| GATE | 0…20 dB | Wie stark das Noise Gate gerade herunterzieht |
+| COMP | 0…20 dB | Wie stark der Parallel-Kompressor des Low-Bands gerade herunterzieht |
+| OUT | −60…+6 dBFS | Peak des Output-Blocks, nach allem |
+
+Die Peak-Meter steigen schnell und fallen langsam, sodass ein Transient tatsächlich sichtbar wird, und die Skala ab 0 dBFS ist rot eingraviert — die Nadel wird dort ebenfalls rot, aber schon die Position allein sagt es dir. Gain-Reduction-Nadeln ruhen rechts und schwingen nach links aus, je tiefer die Reduktion wird. Das gesamte Metering läuft auf dem Interface-Thread; es kostet die Audio-Engine nichts.
+
+**Größe ändern.** Zieh den Griff in der unteren rechten Ecke. Das Fenster behält sein Seitenverhältnis und skaliert zwischen 60 % und 180 % — es ist ein reiner Zoom, sodass bei keiner Größe irgendetwas neu umbricht oder abgeschnitten wird. **Die gewählte Größe wird mit der Session** und mit der Plugin-Instanz gespeichert, sodass ein wieder geöffnetes Projekt so zurückkommt, wie du es verlassen hast. Ein vor dieser Version gespeichertes Projekt öffnet bei 100 %.
+
 ## Engines (NEU in v0.3.0)
 
 Drei Parameter wählen zwischen dem DSP aus v0.2.0 und seinem Ersatz aus v0.3.0. Eine **neue** Instanz startet in den neuen Engines; **jede Session und jedes Preset, das du vor v0.3.0 gespeichert hast, behält die alten**, sodass sich an nichts, was du bereits gemacht hast, der Klang ändert. Wechsle frei — die Änderung ist überblendet, nicht gestuft.
@@ -91,7 +123,7 @@ Sofern nicht anders angegeben, sind alle kontinuierlichen Parameter geglättet (
 | Parameter | Range | Default | Unit | Was es bewirkt |
 |---|---|---|---|---|
 | Input Gain | −24 … +24 | 0 | dB | Trimmt das Signal, bevor irgendetwas anderes in der Kette passiert. Nutze das, um ein hohes, aber nicht clippendes Signal in die Gate-/Kompressor-/Drive-/Voicing-Stufen zu bekommen — all ihre Thresholds sind unter der Annahme eines einigermaßen „Line-Level"-Eingangs kalibriert. |
-| Output Gain | −24 … +24 | 0 | dB | Finaler Output-Trim, angewendet nach allem anderen (einschließlich des Safety Clip). |
+| Output Gain | −24 … +24 | 0 | dB | Finaler Output-Trim, angewendet nach allem anderen (einschließlich des Safety Clip). Der Regler selbst hat als Default 0 dB, aber eine frische Instanz startet auf dem Werks-*Default*-Preset, das −2,8 dB setzt — der abgeleitete Trim, der eine −12-dBFS-Bass-DI unter Vollaussteuerung hält (jedes Werkspreset trägt einen solchen Trim, wo er gebraucht wird). |
 | Bypass | off/on | off | — | Erzwingt einen bitgenauen Durchlauf des Eingangssignals. Auch als hostseitiger Bypass-Parameter des Plugins verfügbar, sodass auch der eigene Bypass-Button/die Automationsspur deiner DAW funktioniert. |
 | Safety Clip | off/on | off | — | Ein weicher Ceiling-Clip auf der allerletzten Stufe vor dem Output-Trim. Standardmäßig aus; schalte ihn als Sicherheitsnetz gegen versehentliches hartes Clipping ein, nicht als Tone-Shaping-Werkzeug. Seit v0.3.0 ist er antialiased und unterhalb des Ceilings wirklich transparent — ihn scharf zu stellen färbt nichts mehr, bis tatsächlich etwas das Ceiling erreicht. |
 | Clip Ceiling | −12 … 0 | 0 | dBFS | Wo der Safety Clip zu arbeiten beginnt. Wird nur gelesen, solange Safety Clip an ist. 0 dBFS reproduziert das Verhalten aus v0.2.0. |
@@ -139,6 +171,24 @@ Das Low-Band wird **parallel** komprimiert: Das komprimierte Signal wird über M
 | Low Comp Knee | 0 … 18 | 6 | dB | *Nur Smooth RMS.* Breite des Soft Knee um den Threshold. 0 dB ist ein Hard Knee; breitere Einstellungen beginnen allmählich zu komprimieren, während sich das Signal dem Threshold nähert, was bei getragenem Bass deutlich unauffälliger ist. |
 | Low Comp Auto Release | off/on | on | — | *Nur Smooth RMS.* Dehnt das Release bei getragenem Material und lässt es bei Transienten auf dem eingestellten Wert, sodass eine gehaltene tiefe Note nicht gepumpt wird. |
 | Low Comp Auto Makeup | off/on | off | — | Wird von **beiden** Detektoren gelesen. Fügt einen festen Boost hinzu, der etwa die Hälfte des am Threshold weggenommenen Gains kompensiert, sodass eine Threshold-Änderung nicht auch deinen Pegel ändert. Wird mit dem manuellen Makeup-Regler summiert. |
+
+Die Gain Reduction, die beide Detektoren anwenden, wird an die Meter (und an jede UI, die danach fragt) in positiven dB gemeldet. Bei **Smooth RMS** ist das der Gain des Detektors selbst; bei **Classic Peak** wird sie aus dem Blockpeak vor und nach dem Kompressor geschätzt, weil `juce::dsp::Compressor` seinen internen Gain nicht offenlegt — akkurat für das gleichmäßige Material, gegen das ein Meter typischerweise abgelesen wird, Worst-Case-pro-Block bei schnellen Transienten.
+
+### Low-Band: Graaawl (NEU in v0.4.0)
+
+**Graaawl** legt den hölzernen, vokalischen, aggressiven Grind eines Warwick Thumb auf deine Tiefen, ohne sie schwammig zu machen. Standardmäßig aus.
+
+Das ist keine tieffrequente Distortion, und genau diese Unterscheidung ist der ganze Sinn des Designs. Das Growling des Thumb ist ein **asymmetrischer Obere-Mitten-Charakter um 700 Hz – 2,2 kHz**, mit einer formantartigen Resonanz nahe 1 kHz, der auf einem tight bleibenden Low-End sitzt. Also erzeugt Crypta diesen harmonischen Inhalt in einem **parallelen Zweig** — einem asymmetrischen Sättiger, gefolgt von einem Bandpass auf das Formant-Fenster — und mischt ihn oben auf das unangetastete Low-Band. Dein Grundton läuft nie durch einen Shaper. Gemessen an einer 50-Hz-Probe mit Amount bei 100 %: Die Energie im 20–150-Hz-Sub-Bereich ändert sich um **weniger als 0,01 dB**, während im Fenster von 700 Hz – 2,2 kHz echtes Signal hinzukommt.
+
+Er sitzt **nach** dem Low-Band-Kompressor und vor Low Level, sodass der Kompressor den Eingangspegel bereits vorhersehbar gemacht hat und der Amount-Regler von Note zu Note dasselbe bedeutet.
+
+| Parameter | Range | Default | Unit | Was es bewirkt |
+|---|---|---|---|---|
+| Graaawl | off/on | off | — | Aktiviert den Growl-Zweig. Ausgeschaltet ist er ein bit-exakter Bypass — nicht „fast transparent", sondern buchstäblich dieselben Samples. |
+| Graaawl Amount | 0 … 100 | 0 | % | Wie viel Growl oben auf das Low-Band gemischt wird. Ein linearer Gain auf dem harmonischen Zweig, Halbieren ist also −6 dB. Bewusst pegelabhängig: Der Growl kommt durch, wenn du reinlangst. |
+| Graaawl Tone | 0 … 100 | 50 | % | Bewegt das Formant-Fenster: 800 Hz bei 0 %, ~1130 Hz bei 50 %, 1600 Hz bei 100 %. Niedriger ist hölzerner und lauter (tiefe Harmonische tragen mehr Energie), höher ist nasaler und zurückhaltender. |
+
+Der Zweig ist arithmetisch antialiased (ADAA-1) statt per Oversampling, weshalb **Graaawl überhaupt keine Latenz hinzufügt** — ihn mitten in der Session einzuschalten kann deine Spur nie verschieben. Gemessenes Alias-zu-Signal-Verhältnis an einer heißen 50-Hz-Probe bei 100 % Amount: **−86 dB bei Tone 0, −105 dB bei Tone 100**.
 
 ### Mid-Band: Drive + Level (NEU in v0.2.0)
 
@@ -202,7 +252,9 @@ Eine faltungsbasierte (Convolution) Cab-Sim-Stufe, die jetzt **nur das Mid+High-
 | IR Enable | off/on | off | — | Aktiviert die IR-Loader-Stufe. |
 | IR Mix | 0 … 100 | 100 | % | Blend zwischen dem trockenen (Pre-Convolution-) und dem vollständig gefalteten Mid+High-Signal. |
 
-*Impulsantworten laden:* v0.2.0 liefert weiterhin keinen In-Plugin-Dateibrowser und keine Factory-Cabinet-IRs (beides steht für einen späteren Milestone zusammen mit dem Custom-GUI auf der Roadmap). Die IR-Loading-DSP-Engine selbst ist vollständig implementiert und echtzeitsicher.
+*Impulsantworten laden:* Die IR-Loading-Engine und ihre **Factory-IR-Slot-Mechanik** sind fertig — das Dekodieren einer eingebetteten WAV-Datei, ihr Installieren und das Zurücksetzen auf die Passthrough-Identitäts-IR sind alle implementiert und getestet (`getNumFactoryImpulseResponses()` / `loadFactoryImpulseResponse()` / `clearImpulseResponse()`). Der Cabinet-Abschnitt des Editors zeigt derzeit nur die beiden obigen Parameter und sonst nichts: Es gibt **noch keinen In-Plugin-Dateibrowser**, und ein Host oder Wrapper, der den IR-Loading-Einstiegspunkt des Plugins aufruft, funktioniert schon heute.
+
+Was **nicht** ausgeliefert wird, ist Inhalt: **Crypta bündelt keine Cabinet-IRs**, und das ist eine bewusste Lizenzentscheidung, kein unfertiges Feature. Eine Cab-IR zu bündeln bedeutet, die Aufnahme einer anderen Person in jeder Kopie des Plugins weiterzuverbreiten, also liegt die Messlatte bei einer Lizenz, die über jeden Zweifel erhaben ist — CC0, eine ausdrückliche Public-Domain-Freigabe, oder eine eigene Aufnahme. „Kostenloser Download" und „gebührenfrei" sind keine Lizenzen. Bislang hat noch nichts diese Messlatte erreicht; die Messlatte selbst ist im Code (`src/dsp/FactoryIRs.h`) verankert und wird von der Testsuite geprüft, sodass keine unverifizierte IR in einen Release-Build durchrutschen kann. Bis dahin lade deine eigenen IRs — die Stufe ist ohne geladene IR bei jeder Session-Samplerate ein garantiert bitgenauer Durchlauf.
 
 ## State-Migration
 
@@ -266,7 +318,9 @@ Keine Heap-Allokationen auf dem Audio-Thread, bei **beiden** Engines, mit jedem 
 - **Eine bewusste Abweichung vom Output von v0.2.0: der scharfgeschaltete Safety Clip.** War er bei dir aktiv, ist v0.3.0 nicht bit-identisch — es aliast weit weniger und ist unterhalb der Ceiling transparent. Der Unterschied beschränkt sich auf Material, das tatsächlich geclippt wurde, und ist begrenzt (gemessen −26,5 dB relativ bei einem Fixture, das 12 dB über die Ceiling getrieben wurde). Alles andere an einer Session oder einem Preset von vor v0.3.0 ist sample-exakt.
 - **Bit-Exaktheit über Toolchains hinweg ist unerreichbar und wird nicht behauptet.** macOS ist die Golden-Plattform; auf Windows liegt die Grenze bei −60 dB relativ, mit dem schlechtesten von drei Fixtures gemessen bei −73 dB. Der Drift ist kein reines Letzte-Stelle-Rauschen — sowohl das Gate als auch der Low-Band-Kompressor treffen Entscheidungen anhand eines Detektor-Pegels, ein 1-Stelle-Unterschied nahe einem Threshold kann also einen Übergang um ein Sample verschieben.
 - **Die GUI ist ein funktionaler generischer Editor** plus eine schlichte beschriftete Meter-Anzeigenzeile. Die photoreale M3-GUI ist ein späterer Meilenstein und wird dieselbe `MeterTaps`-Struktur konsumieren; die Preset-Leiste ist ein rein funktionaler Streifen.
-- **Weiterhin kein In-Plugin-IR-Browser und keine gebündelten Werks-Cabinet-IRs.** Die Convolution-Engine ist vollständig implementiert und echtzeitsicher, und ist ohne geladene IR ein garantiert bit-exakter Passthrough, bei jeder Session-Samplerate.
+- **Keine gebündelten Werks-Cabinet-IRs, aus Entscheidung.** Die Slot-Mechanik, der Decoder und der Lizenz-Guard sind alle ausgeliefert und getestet; die Asset-Tabelle ist leer, weil noch keine IR mit einer Lizenz beschafft wurde, die es wert ist, dafür eine weiterverbreitete Binärdatei zu riskieren. Der In-Plugin-Dateibrowser ist die Arbeit des GUI-Meilensteins. Die Convolution-Engine ist ohne geladene IR ein garantiert bit-exakter Passthrough, bei jeder Session-Samplerate.
+- **Graaawls Voicing-Konstanten sind engineering-abgeleitete Ausgangspunkte.** Drive und Asymmetrie des Shapers, das Formant-Fenster und seine Resonanz sind aus dem abgeleitet, was der Growl nachweislich ist, und jede Aussage darüber in diesem Handbuch ist eine Messung — aber das endgültige Voicing ist eine Gehör-Entscheidung gegen eine echte Thumb 5 DI, und dieses Gate (Issue #36) ist noch offen.
+- **Graaawls Sub-Schutz ist Bandbegrenzung, keine Magie.** Die eigenen Harmonischen des Zweigs sickern durch das Stopband des Formant-Hochpasses: Bei einem reinen 50-Hz-Sinus liegt die dritte Harmonische bei 149 Hz rund 51 dB unter dem Grundton. In der Summe bewegt sich der 20–150-Hz-Bereich um unter 0,01 dB, und echtes Bassmaterial trägt seine eigene dritte Harmonische rund 30 dB lauter als das, sodass das unhörbar ist — aber es ist nicht null, und das wird auch nicht behauptet.
 - **Bewusst außerhalb des Umfangs von v0.3.0, offen vorgemerkt:** Werks-IRs / IR-Browser / IR-Trim-Align; die Stereo-Strategie (Low-Mono-Sum-Toggle, Mid/High-Width); vollständige Per-Sample-Newton-DK-Schaltungssimulation (v0.3.0 liefert die kalibrierten faktorisierten Modelle; eine vollständige Simulation ist ein möglicher späterer „HQ Circuit"-Modus); ein Lookahead-Gate und zeitvariantes Auto-Release; Linear-Phase-/HQ-Offline-Oversampling-Modi und ein geteiltes suite-weites Oversampler-Modul.
 - **Das Voicing ist recherchebasiert, nie gegen Hardware oder gegen Audio, DSP-Quelle oder Einheit eines Referenzprodukts gemessen.** Wo ein Modell eine bewusste Vereinfachung ist, sagen die Docs das.
 - **Pre-1.0 und AGPLv3** — Breaking Changes bis v1.0.0 möglich. Die Umbenennung in v0.1.1 (Plugin-Code `Cryp`, Bundle-ID `com.yvesvogl.crypta`) bedeutet, dass DAWs dies im Vergleich zu Sessions aus der v0.1.0-Ära als neues Plugin behandeln.
@@ -277,4 +331,5 @@ Keine Heap-Allokationen auf dem Audio-Thread, bei **beiden** Engines, mit jedem 
 - **Split Low und Split High sind Klangentscheidungen, nicht nur technische.** Split Low nach oben zu schieben, verschiebt mehr Notenkörper aus dem (nur komprimierten) Low-Band heraus; Split High nach oben zu schieben, verbreitert den eigenen Durchlassbereich des Mid-Bands und gibt dem „kehligeren" Charakter mehr Raum, bevor der eigene Fuzz-/Presence-Charakter des High-Bands übernimmt.
 - **High Tight ist dein wichtigster „Fuzz vs. Tightness"-Regler**, unabhängig davon, welches Voicing du gewählt hast — zieh ihn Richtung seiner Untergrenze von 20 Hz für maximalen Fuzz, drehe ihn Richtung 500 Hz für straffere, kontrolliertere Höhen. Er zähmt außerdem Härte bei heißen Drive-Einstellungen.
 - **High Blend ist dein „Wie viel"-Regler, High Drive dein „Wie hart"-Regler.** Wirkt ein Voicing zu extrem, versuche zuerst, Blend zu senken statt Drive — so behältst du oft mehr vom Charakter, nur bei insgesamt geringerer Intensität, statt die Nichtlinearität selbst zu glätten.
+- **Graaawl ist eine Charakter-Schicht, kein Distortion-Maß.** Starte bei 30–40 % mit Tone nahe der Mitte und lausche nach dem Vokal statt nach Grit; klingt es am unteren Ende wie Fuzz, bist du über das hinausgegangen, was der Thumb tatsächlich macht. Weil er nach dem Kompressor sitzt, ändert eine Änderung von Low Comp Threshold, wie hart der Growl angetrieben wird — stell zuerst den Kompressor ein.
 - **Lass den Safety Clip beim Tracking/Mixing aus**, und greife nur dann dazu, als Absicherung gegen unerwartete Automation oder einen zu heißen Eingang bei einem bestimmten Take — er ist ein Sicherheitsnetz, kein Teil des beabsichtigten Tone-Shaping-Signalpfads.
