@@ -138,7 +138,7 @@ Alle zehn neuen v0.3.0-Parameter stehen standardmäßig auf neutral, und der Cod
 - **Das Gate steht weiterhin standardmäßig auf an**, eine aus v0.2.0 übernommene Änderung, nicht neu in v0.3.0: Das Laden einer Session von vor v0.2.0 aktiviert es mit seinen Default-Settings obendrauf auf das Gespeicherte. Jede v0.3.0-Ergänzung dagegen ist standardmäßig neutral.
 - **Keine Cabinet-Simulation, mit Absicht und dauerhaft.** Tenebrae ist die Wall of Gain, nicht der Lautsprecher — kombiniere es mit einer Cab-Sim / einem IR-Loader.
 - **Die GUI ist weiterhin das schlichte Pre-M3-Layout**, jetzt für die neuen Regler auf eine zweite Zeile umgebrochen. Das eigens vektorgezeichnete Look-and-Feel und der Accessibility-Pass sind Milestone M3.
-- **Pre-1.0, AGPLv3, unsignierte/teilweise blockierte Binaries.** Breaking Changes sind bis v1.0.0 möglich. macOS-Release-Assets sind derzeit durch ein Sichtbarkeitsproblem eines Signing-Secrets auf Org-Ebene blockiert; Windows-Release-Assets sind davon nicht betroffen.
+- **Pre-1.0, AGPLv3.** Breaking Changes sind bis v1.0.0 möglich. Release-Binaries für macOS sind Developer-ID-signiert, notarisiert und gestapelt; Windows-Binaries sind noch nicht Authenticode-signiert.
 
 ## Tipps
 

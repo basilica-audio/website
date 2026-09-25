@@ -136,9 +136,23 @@ Ein paar Mechanismen, die es wert sind zu kennen, wenn du verstehen willst, waru
 - **Kombiniere Air Freq auf 15 kHz mit stärkerem De-Essing.** So fügst du Offenheit oberhalb des Zischlautbereichs hinzu statt obendrauf.
 - **Seraph ist weiterhin sicher in Parallelketten.** In seiner Default-Konfiguration meldet es überhaupt keine Latenz; sind Shift-Modus oder Lookahead aktiv, übernimmt die Delay-Kompensation deiner DAW die Ausrichtung, und die Dry-Seite von Mix wird intern passend verzögert.
 
+## Der Editor
+
+Seraph bringt den M3-Vektor-Editor der Suite mit: eine vollständig zur Laufzeit gezeichnete Schwarz-Gold-Oberfläche (keine Bitmap-Assets) mit Zeiger-Reglern auf gravierten Skalenringen, Lampen-Schaltern und fünf Stufen-Panels in der Reihenfolge des Signalflusses — **De-Ess**, **Air**, **Compressor**, **Doubler** und **Output**. Auswahlparameter (Doubler Mode, die Air-Shelf-Eckfrequenz) sind gerasterte Regler, die einrasten und ihre Modusnamen ansagen.
+
+Zwei Nadelmeter zeigen die Gain-Reduction live an: **ESS** auf dem De-Ess-Panel und **COMP** auf dem Compressor-Panel, beide in dB Reduction mit sanfter Meter-Ballistik (die Nadel ruht exakt bei 0 dB und schwenkt mit zunehmender Reduction nach links).
+
+### Barrierefreiheit
+
+Der Editor ist nach WCAG 2.1 AA gebaut:
+
+- **Tastatur**: Jeder Regler und jeder Schalter ist per Tab erreichbar. Pfeiltasten bewegen Regler in 1-%-Schritten ihres Bereichs, Umschalt+Pfeil in feinen 0,1-%-Schritten, Bild-auf/Bild-ab in 10-%-Schritten, Pos1/Ende springen an die Extremwerte; Auswahl-Regler springen pro Tastendruck genau einen Modus weiter. Schalter kippen mit Leertaste/Eingabe. Umschalt+Ziehen ist das Maus-Äquivalent zu Umschalt+Pfeil (Feinjustierung).
+- **Sichtbarer Fokus**: Ein goldener Fokusring (mit dunklem Halo) markiert jederzeit das fokussierte Element.
+- **Screenreader**: Jedes Bedienelement gibt seine aufgedruckte Beschriftung als zugänglichen Namen aus, seinen Wert mit Einheit („40,0 %", „7000 Hz"), und seine korrekte Rolle; die fünf Panels werden als benannte Gruppen angesagt; die Meter geben ihren geglätteten Messwert auf Abfrage als reinen Lesewert aus.
+- **Kontrast**: Alle dargestellten Text-/Markierungspaare halten mindestens 4,5:1 (WCAG AA) ein, abgesichert durch Unit-Tests gegen die exakt gezeichneten Farben.
+
 ## Bekannte Einschränkungen (v0.3.0)
 
-- Die GUI ist ein funktionaler Slider-/Knob-Editor plus eine einfache Preset-Leiste (eine eigene, vektorgezeichnete GUI ist ein späterer Meilenstein — siehe die Projekt-Roadmap).
 - Detune ist in jedem Modus auf +/-50 Cent begrenzt. Die Engine des Shift-Modus kann weit mehr, aber größere Intervalle brauchen Kontrolle pro Stimme und die Oberfläche eines Harmonizers, und das ist ein eigenes Feature statt einer größeren Zahl an diesem Regler.
 - Formant-Erhaltung ist nur im Shift-Modus sinnvoll; Classic und Micro resampeln das Spektrum nicht, es gibt dort also nichts zu korrigieren.
 - Der Erkennungs-Threshold von De-Ess ist weiterhin ein fixer, absoluter Pegel (nicht pegel-relativ/adaptiv) — bei einem sehr leisen Take muss dessen Gain eventuell erst hochgezogen werden, bevor De-Ess spürbar reagiert. Die Begründung findest du in `docs/design-brief.md` ss2.1.

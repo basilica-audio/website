@@ -69,7 +69,7 @@ Ein recherchebasiertes Deep-Dive-Rework (siehe `docs/design-brief.md`/`docs/rese
 - **Gain/Q-Kopplung** (`bN_gainQ`, neuer Toggle pro Band, standardmäßig aus): Ist sie aktiviert, wird das eigene Filter-Q eines Bands proportional dazu weicher (breiter), wie stark sich sein dynamisches Gain gerade bewegt — für einen sanfteren, analogeren Charakter bei tieferen dynamischen Bewegungen. Das *statische* Gain des Bands beeinflusst Q nie, nur seine dynamische Komponente tut das. Gleicher Automations-/Preset-only-Status wie Auto Release in v0.2.0.
 - **Attack-/Release-Bereiche erweitert**: Attack jetzt 0.1 bis 500 ms (vorher 0.5 bis 100 ms), Release jetzt 5 bis 1500 ms (vorher 10 bis 1000 ms) — an beiden Enden, für sowohl schnelleres Transienten-Einfangen als auch langsamere, musikalische Tonalausgleichs-Anwendungsfälle.
 - **Die Knee-Breite wird jetzt von Range abgeleitet**, statt einer festen 6-dB-Konstante — flachere Range-Einstellungen wirken jetzt sanfter/weicher, Range-Einstellungen mit voller Tiefe (±12 dB) klingen identisch zum festen 6-dB-Knee von v0.1.0.
-- **Neun Werkspresets** (`docs/presets.md`) für gängige Anwendungsfälle (Glue, De-Essing, Transientenverstärkung, Mix-Bus-Beruhigung, langsamer Tonalausgleich, Resonanz-Zähmung und eine diagnostische Auto-Release-Demo), plus eine Preset-Leiste (Save/Save As/Delete/Import/Export, Werks- + Nutzer-Bibliothek) am oberen Rand des Editors.
+- **Elf Werkspresets** (`docs/presets.md`) für gängige Anwendungsfälle (Glue, De-Essing, Transientenverstärkung, Mix-Bus-Beruhigung, langsamer Tonalausgleich, Resonanz-Zähmung und eine diagnostische Auto-Release-Demo), plus eine Preset-Leiste (Save/Save As/Delete/Import/Export, Werks- + Nutzer-Bibliothek) am oberen Rand des Editors.
 - Eine v0.1.0-Session lädt sauber in v0.2.0 (toleranter Import): Jeder bestehende Parameterwert bleibt exakt erhalten, und die beiden neuen Toggles pro Band werden mit ihrem Aus-Standardwert befüllt.
 
 ## Was es ist
@@ -218,7 +218,7 @@ schneidendes oder untätiges Band bleibt damit eingeschaltet bit-identisch.
 | **Q** | 0.3 - 12 | 0.9 / 1.1 / 1.0 / 1.2 / 1.4 / 1.0 (v0.3.0, pro Band — siehe Tabelle unten) | | Wie schmal (hohes Q) oder breit (niedriges Q) das Band ist. **Wird im Shelf-Modus ignoriert**, der unabhängig von dieser Einstellung immer eine feste, standardmäßige Shelf-Flanke nutzt (Q = 0.707). |
 | **Gain** | -12 - +12 | 0 | dB | Das *statische* Gain des Bands — immer angewendet, dynamisch oder nicht. Setze das auf deine „Ruhe"-EQ-Bewegung; Range addiert oder subtrahiert dann obendrauf, wenn der Detector auslöst. |
 | **Range** | -12 - +12 | 0 | dB | Wie weit sich das Gain des Bands dynamisch bewegen kann, zusätzlich zu Gain. **0 = ein rein statisches EQ-Band** (kein Detector-Einfluss). Negatives Range schneidet, wenn das Signal lauter als Threshold wird (die klassische Resonanz-Zähmung/De-Essing-Bewegung); positives Range boostet, wenn es lauter wird (eine aufwärtsgerichtete „Duck-in"-Expansions-Bewegung, nützlich z. B. um Anschlag nur bei hart gespielten Noten hervorzuheben). |
-| **Thresh** | -60 - 0 | -26 / -28 / -26 / -24 / -22 / -20 (v0.3.0, pro Band — siehe Tabelle unten) | dB | Der Detector-Pegel, ab dem die dynamische Bewegung einsetzt. Ein Soft-Knee, zentriert auf diesen Wert, macht den Übergang graduell statt zu einem harten Schalter — die Breite des Knees selbst skaliert mit Range (v0.2.0): `clamp(\|Range\| * 0.5, 2, 10)` dB, sodass flachere Range-Einstellungen sanfter wirken und Range-Einstellungen mit voller Tiefe (±12 dB) identisch zum festen 6-dB-Knee von v0.1.0 klingen. |
+| **Thresh** | -60 - 0 | -24 / -25 / -24 / -24 / -24 / -24 (kalibriert, pro Band — siehe Tabelle unten) | dB | Der Detector-Pegel, ab dem die dynamische Bewegung einsetzt. Ein Soft-Knee, zentriert auf diesen Wert, macht den Übergang graduell statt zu einem harten Schalter — die Breite des Knees selbst skaliert mit Range (v0.2.0): `clamp(\|Range\| * 0.5, 2, 10)` dB, sodass flachere Range-Einstellungen sanfter wirken und Range-Einstellungen mit voller Tiefe (±12 dB) identisch zum festen 6-dB-Knee von v0.1.0 klingen. |
 | **Attack** | 0.1 - 500 | 25 / 15 / 8 / 4 / 2 / 3 (v0.3.0, pro Band — siehe Tabelle unten) | ms | Wie schnell sich das dynamische Gain bewegt, sobald der Detector den Threshold überschreitet. Schneller Attack erwischt Transienten hart; langsamerer Attack lässt einen kurzen Peak durch, bevor reagiert wird, was bei perkussivem Material natürlicher klingen kann. Die 500-ms-Obergrenze ist für langsame, musikalische Tonalausgleichs-Bewegungen gedacht, nicht für das Einfangen von Transienten. **Seit v0.4.0 ist dieser Regler über seinen gesamten Bereich echt** — siehe „Was ist neu in v0.4.0" oben; davor verhielt sich alles unterhalb von ~50 ms identisch. |
 | **Release** | 5 - 1500 | 280 / 180 / 130 / 100 / 70 / 90 (v0.3.0, pro Band — siehe Tabelle unten) | ms | Wie schnell das dynamische Gain zurück Richtung Gain kehrt, sobald der Detector wieder unter den Threshold fällt. Schneller Release kann bei anhaltendem Material hörbar pumpen; langsamer Release glättet die Rückkehr, kann aber einen Cut/Boost in Inhalt hineinhalten, der ihn nicht mehr braucht. |
 | **Listen** | Off / On | Off | | Solot das eigene Detector-Signal dieses Bands — das bandpassgefilterte Audio vor dem EQ, das tatsächlich seine dynamische Bewegung antreibt — anstelle des normalen Programm-Outputs, um genau zu hören, was es auslöst. Exklusiv: Aktivierst du Listen bei einem Band, deaktiviert das automatisch Listen bei jedem anderen Band. Die vollständige Signalkette (inklusive der Verarbeitung jedes einzelnen Bands) läuft darunter weiter, sodass das Deaktivieren von Listen nie knackt. |
@@ -228,18 +228,30 @@ schneidendes oder untätiges Band bleibt damit eingeschaltet bit-identisch.
 | **SC Mode** (v0.4.0) | Split / Wide | Split | | Wie viel von der Quelle des Detektors dieses Band hört. **Split** (Default) filtert den Detektor-Input auf den eigenen Frequenzbereich dieses Bands herunter, sodass nur Inhalt nahe Freq es triggern kann — das chirurgische Verhalten. **Wide** überspringt diesen Filter, sodass das Band auf den Gesamtpegel über das ganze Spektrum reagiert und dabei weiterhin nur sein eigenes Band bewegt. Wide willst du, wenn ein Band mit dem Mix atmen soll, statt eine Resonanz zu überwachen. Listen folgt dieser Einstellung, sodass du immer das echte Trigger-Signal abhörst. |
 | **Saturation** (v0.3.0) | Off / On | Off | | Sanftes Waveshaping: Ist es aktiviert, wird ein sanfter Drive auf den eigenen Output des Bands angewendet, aber nur, während es aktiv boostet (Gain + der dynamische Beitrag netto positiv) — ein schneidendes oder ruhendes Band bleibt unberührt, auch damit aktiviert. Der Drive skaliert damit, wie stark das Band gerade boostet (kaum wahrnehmbar nahe 0 dB, deutlich hörbar, aber weiterhin soft-knee-geformt nahe +12 dB). Seit v0.4.0 ist der Waveshaper antialiast und fügt damit weit weniger vom harschen Fold-back-Grit hinzu, den ein einfacher Waveshaper bei hochfrequentem Material erzeugt, ohne Latenzkosten. Nur per Automation/Preset — noch kein dedizierter Editor-Regler (Roadmap M3). |
 
-Per-Band-Voicing-Defaults (v0.3.0, `docs/voicing-notes.md`) — abgestimmt auf die
-typische Rolle jedes Bands entlang der bestehenden Frequenzleiter, kein flacher
-Wert, der über jedes Band hinweg wiederholt wird:
+Per-Band-Voicing-Defaults (`docs/voicing-notes.md`) — Q/Attack/Release abgestimmt
+auf die typische Rolle jedes Bands entlang der bestehenden Frequenzleiter
+(v0.3.0), Threshold nach Messung kalibriert, sodass jedes Band bei derselben
+Programmlautheit einzusetzen beginnt (Issue-#4-Kalibrierungs-Pass — siehe
+unten):
 
 | Band | Freq | Rolle | Q | Threshold | Attack | Release |
 |---|---|---|---|---|---|---|
-| 1 | 100 Hz (Low Shelf) | Boom-/Sub-Kontrolle | 0.9 | -26 dB | 25 ms | 280 ms |
-| 2 | 250 Hz | Mulm-/Boxiness-Resonanz (Vocal & Gitarrenkörper) | 1.1 | -28 dB | 15 ms | 180 ms |
-| 3 | 630 Hz | Allgemeine Mitten-Präsenz (standardmäßig aktives Demo-Band) | 1.0 | -26 dB | 8 ms | 130 ms |
+| 1 | 100 Hz (Low Shelf) | Boom-/Sub-Kontrolle | 0.9 | -24 dB | 25 ms | 280 ms |
+| 2 | 250 Hz | Mulm-/Boxiness-Resonanz (Vocal & Gitarrenkörper) | 1.1 | -25 dB | 15 ms | 180 ms |
+| 3 | 630 Hz | Allgemeine Mitten-Präsenz (standardmäßig aktives Demo-Band) | 1.0 | -24 dB | 8 ms | 130 ms |
 | 4 | 1600 Hz | Vocal-Präsenz / Gitarren-Schärfe | 1.2 | -24 dB | 4 ms | 100 ms |
-| 5 | 4000 Hz | Zischlaute / Anschlag / Härte | 1.4 | -22 dB | 2 ms | 70 ms |
-| 6 | 10000 Hz (High Shelf) | Luft / Fizz-Erholung | 1.0 | -20 dB | 3 ms | 90 ms |
+| 5 | 4000 Hz | Zischlaute / Anschlag / Härte | 1.4 | -24 dB | 2 ms | 70 ms |
+| 6 | 10000 Hz (High Shelf) | Luft / Fizz-Erholung | 1.0 | -24 dB | 3 ms | 90 ms |
+
+Der Default-Threshold jedes Bands entspricht dessen eigenem gemessenen
+Detector-Pegel unter einem −18-dBFS-RMS-Rosa-Rauschen als Programmanker (der
+gängigen digitalen Alignment-Pegel-Konvention), sodass bei typischem
+Mix-Pegel jedes Band genau an der Schwelle zum Einsetzen sitzt: Stellst du
+eine Range ein, beginnt das Band sofort, auf alles bei oder über normaler
+Programmlautheit zu wirken — bei jedem Band gleichermaßen. Läuft das
+Material heißer oder kälter als diese Konvention (oder über eine
+Input-Trim-Anpassung), verschiebt sich der Einsatzpunkt mit — Threshold
+bleibt ein gewöhnlicher Regler pro Band; nur sein *Default* ist kalibriert.
 
 ### Global
 
@@ -251,7 +263,7 @@ Wert, der über jedes Band hinweg wiederholt wird:
 
 ## Presets
 
-Am oberen Rand des Editors sitzt eine Preset-Leiste: `[<] [Preset Name] [>]`, um alphabetisch durch die Werks- und Nutzer-Bibliothek zu blättern, `Save`/`Save As...`, um eigene Presets zu schreiben, `Delete` für Nutzer-Presets, `Import.../Export...` für einzelne `.basilicapreset`-Dateien oder `.zip`-Bänke, sowie ein Menü (Klick auf den Preset-Namen) mit einem Eintrag „Set current as default" für deinen eigenen Out-of-the-Box-Startpunkt. Elf Werkspresets werden mit v0.4.0 ausgeliefert — was jedes davon bewirkt und warum, steht in `docs/presets.md`. Nutzer-Presets werden pro Nutzer unter `~/Library/Audio/Presets/Yves Vogl/Lancet/` auf macOS gespeichert (`%APPDATA%/Yves Vogl/Lancet/Presets/` unter Windows).
+Am oberen Rand des Editors sitzt eine Preset-Leiste: `[<] [Preset Name] [>]`, um alphabetisch durch die Werks- und Nutzer-Bibliothek zu blättern, `Save`/`Save As...`, um eigene Presets zu schreiben, `Delete` für Nutzer-Presets, `Import.../Export...` für einzelne `.basilicapreset`-Dateien oder `.zip`-Bänke, sowie ein Menü (Klick auf den Preset-Namen) mit einem Eintrag „Set current as default" für deinen eigenen Out-of-the-Box-Startpunkt. Elf Werkspresets werden ausgeliefert — was jedes davon bewirkt und warum, steht in `docs/presets.md`. Nutzer-Presets werden pro Nutzer unter `~/Library/Audio/Presets/Yves Vogl/Lancet/` auf macOS gespeichert (`%APPDATA%/Yves Vogl/Lancet/Presets/` unter Windows).
 
 Die Interface-Texte des Editors (Preset-Leisten-Beschriftungen, Menüs, Dialoge) werden automatisch auf Deutsch lokalisiert, wenn die Systemsprache Deutsch ist; Parameternamen, Einheiten und Fachbegriffe (Attack, Release, Hz, dB, ms, …) bleiben immer auf Englisch — genau wie bei jedem anderen Basilica-Audio-Plugin.
 
@@ -384,6 +396,7 @@ Klar benannt, weil sie zu kennen nützlicher ist, als sie zu übersehen:
   Automations-Kurven-Mapping des Hosts verändert), Lookahead, Per-Band-Ratio,
   Linear Phase, mehr als sechs Bänder, und eine Spektrum-Analyzer-/EQ-Kurven-
   Anzeige.
-- **Lancet ist Pre-1.0, und seine Binaries sind derzeit unsigniert.**
-  Breaking Changes sind bis v1.0.0 möglich; Signierung, Notarisierung und
-  Installer sind ein späterer Milestone. Siehe `README.md`.
+- **Lancet ist Pre-1.0.** Release-Binaries für macOS sind
+  Developer-ID-signiert, notarisiert und gestapelt; Windows-Binaries sind
+  noch nicht Authenticode-signiert. Breaking Changes sind bis v1.0.0
+  möglich; Installer sind ein späterer Milestone. Siehe `README.md`.

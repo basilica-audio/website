@@ -214,7 +214,7 @@ konfigurieren.
 Am oberen Rand des Plugin-Fensters sitzt eine Preset-Leiste: `[<] [Name] [>]
 [Save] [Save As...] [Delete] [Import...] [Export...]`, dazu ein Menü (Klick
 auf den Preset-Namen), das Factory- und User-Presets auflistet, sowie eine
-Aktion „Set current as default". Mit v0.2.0 werden neun Werkspresets
+Aktion „Set current as default". Es werden zehn Werkspresets
 ausgeliefert — wofür jedes einzelne gedacht ist, steht in
 [`docs/presets.md`](presets.md). User-Presets werden pro Benutzer gespeichert
 (`~/Library/Audio/Presets/Yves Vogl/Silentium/` auf macOS,
@@ -268,7 +268,14 @@ werden.
 - **Keine veröffentlichte CPU-Zahl.** Es gibt in diesem Projekt keinen CPU-Benchmark und kein CI-Performance-Gate — behandle jede CPU-Auslastungszahl, die du woanders siehst, als unverifiziert; dieses Handbuch behauptet keine. Mehrere Erkennungspfade (beide Detektoren, beide Sidechain-Flankensteilheiten, der Smooth-Open-Smoother) laufen bei jedem Block bedingungslos, ob ausgewählt oder nicht, gezielt damit ein Wechsel zwischen ihnen immer eine klickfreie Überblendung ist statt ein Sprung zu einem kalten Filter; das ist eine bewusste feste Kostenstelle, kein Versehen.
 - **RMS ist nicht universell „ruhiger" als Peak.** Bei einem gehaltenen tiefen Ton (um 70 Hz) glättet das 5-ms-RMS-Fenster das Mean-Square-Ripple nicht so gut wie das eigene Release von Peak, Peak ist dort also tatsächlich der ruhigere Detektor. Der echte Vorteil von RMS liegt bei Material mit hohem Crest-Faktor — isolierte Spitzen (Bundgeräusche, ein knisterndes DI-Signal), die kaum Energie tragen und das Gate nicht öffnen sollten.
 - **Smooth Open formt auch die schließende Flanke**, nicht nur die öffnende: Es hält das Öffnungsziel für bis zu die Hälfte der Lookahead-Zeit, nachdem das Signal abgefallen ist, bevor die Schließ-Rampe beginnt. Meist unhörbar, gelegentlich nützlich, aber deshalb lassen die straffsten, chirurgischsten Presets es aus.
-- **Die sechs neuen v0.4.0-Parameter haben noch keine dedizierten Bildschirm-Regler.** Sie sind vollständig host-automatisierbar und erscheinen in der generischen Parameteransicht deines Hosts, aber der eigens gestaltete, photoreale Editor (eingeführt in v0.3.0) wurde von diesem Release nicht angefasst — ein Screenshot der aktuellen GUI zeigt den Regler-Satz von v0.3.0.
+- **Die sechs v0.4.0-Parameter sitzen in einer Erweiterungs-Bucht unterhalb der Frontplatte**
+  (hinzugekommen nach v0.4.2 — frühere v0.4.x-Builds boten sie nur über Host-Automation und
+  die generische Parameteransicht an). Ratio und Hysteresis sind Messing-Regler; Detector,
+  SC Slope, Smooth Open und Release Shape sind Zweistellungs-Schalter, deren aktive Option
+  neben dem Hebel golden aufleuchtet. Alle sechs sind wie jedes andere Bedienelement
+  tastaturbedienbar (Tab zum Fokussieren, Pfeiltasten/Page/Home/End bei Reglern,
+  Leertaste/Eingabe bei Schaltern). Die Hauptfrontplatte selbst ist unverändert — ihre neun
+  Regler und zwei Kippschalter sind Teil des freigegebenen v0.3.x-Artworks.
 - **Die Erkennung ist konstruktionsbedingt stereo-gelinkt**, ohne nutzerseitige Kontrolle darüber: Alle Kanäle werden vor der Erkennung über `max(|Kanal|)` kombiniert, und eine Gain wird identisch auf jeden Kanal angewendet. Es gibt keinen Stereo-Link-Prozentsatz, keinen Dual-Mono-Modus und keine M/S-Erkennungsoption.
 - **Kein Oversampling.** Die einzige Nichtlinearität in Silentiums Signalpfad ist eine multiplikative Gain, deren Bandbreite durch die Ballistik begrenzt ist, Antiderivative Anti-Aliasing greift hier also nicht — eine bewusste Design-Entscheidung, nichts von der Roadmap Ausgelassenes.
 - **Pre-1.0, AGPLv3.** Breaking Changes bleiben bis v1.0.0 möglich.
